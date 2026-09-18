@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Registro - Intranet</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f4f6f9; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .box { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); width: 300px; text-align: center; }
+        input { width: 90%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; }
+        label { display: block; text-align: left; font-size: 13px; color: #555; margin-left: 15px; margin-top: 5px; }
+        button { width: 96%; padding: 10px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; margin-top: 10px; }
+        a { display: block; margin-top: 15px; color: #0056b3; text-decoration: none; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <h2>📝 Registrar Nuevo Empleado</h2>
+        <form method="POST">
+            <input type="text" name="usuario" placeholder="Nombre de Usuario" required><br>
+            <input type="password" name="clave" placeholder="Contraseña" required><br>
+            <input type="text" name="puesto" placeholder="Puesto (ej. Ventas, Logística)" required><br>
+            
+            <!-- NUEVO: Selector de fecha de cumpleaños -->
+            <label>Fecha de Nacimiento:</label>
+            <input type="date" name="cumpleanos" required><br>
+            
+            <button type="submit">Crear Cuenta</button>
+        </form>
+        <a href="/login">Volver al Inicio de Sesión</a>
+    </div>
+</body>
+</html>
+

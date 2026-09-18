@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Intranet Corporativa Pro</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; background: #f4f6f9; color: #333; }
+        header { background: #0056b3; color: white; padding: 15px; display: flex; justify-content: space-between; align-items: center; }
+        header a { color: white; text-decoration: none; font-weight: bold; }
+        .container { max-width: 1200px; margin: 20px auto; padding: 0 20px; display: grid; grid-template-columns: 2fr 1fr; gap: 20px; }
+        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        h2 { color: #0056b3; margin-top: 0; }
+        textarea, select, input[type="text"] { width: 95%; padding: 10px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; }
+        textarea { height: 60px; resize: none; }
+        button { background: #0056b3; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; }
+        button:hover { background: #004085; }
+        .search-box { width: 95%; padding: 10px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; }
+        .sidebar-search { width: 90%; padding: 8px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 4px; font-size: 13px; }
+        ul { list-style: none; padding: 0; }
+        li { padding: 12px 0; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+        .btn-green { background: #28a745; color: white; text-decoration: none; padding: 4px 8px; border-radius: 4px; font-size: 13px; text-align: center; }
+        .btn-red { background: #dc3545; color: white; text-decoration: none; padding: 4px 8px; border-radius: 4px; font-size: 13px; text-align: center; }
+        .msg { background: #eef2f7; padding: 12px; border-radius: 5px; margin-bottom: 10px; position: relative; }
+        .author { font-weight: bold; color: #0056b3; display: inline; }
+        .role-tag { background: #6c757d; color: white; font-size: 11px; padding: 2px 6px; border-radius: 10px; margin-left: 5px; font-weight: normal; }
+        .time-tag { font-size: 11px; color: #888; display: block; margin-top: 2px; }
+        .uploader-tag { font-size: 11px; color: #666; display: block; margin-top: 3px; }
+        .msg-img { max-width: 100%; max-height: 300px; border-radius: 5px; margin-top: 8px; display: block; }
+        .delete-msg { position: absolute; top: 10px; right: 10px; color: #dc3545; text-decoration: none; font-weight: bold; font-size: 14px; }
+        .like-container { margin-top: 10px; display: flex; align-items: center; }
+        .like-btn { text-decoration: none; font-size: 13px; padding: 4px 10px; border-radius: 12px; background: white; border: 1px solid #ccc; display: inline-block; font-weight: bold; color: #333; }
+        .like-btn.liked { background: #e2f0fe; color: #0056b3; border-color: #0056b3; }
+        .like-count { font-size: 13px; color: #555; margin-left: 8px; }
+        .folder-header { background: #e2eafc; padding: 8px 12px; border-radius: 4px; font-weight: bold; color: #0056b3; margin-top: 10px; font-size: 14px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none; }
+        .folder-header:hover { background: #d0dfff; }
+        .folder-content { display: none; padding-left: 10px; border-left: 2px solid #e2eafc; margin-bottom: 10px; list-style: none; }
+        .folder-content.active { display: block; }
+        .delete-folder { 
+            color: #dc3545 !important; 
+            text-decoration: none !important; 
+            font-weight: bold !important; 
+            font-size: 14px !important; 
+            margin-left: 10px !important; 
+            display: inline-block !important;
+            cursor: pointer;}
+
+        .cake-item { display: flex; align-items: center; margin-bottom: 10px; font-size: 14px; padding: 5px 0; border-bottom: 1px dashed #ddd; }
+        .cake-icon { font-size: 20px; margin-right: 10px; }
+    </style>
+    <link rel="stylesheet" href="https://cloudflare.com">
+
+</head>
+<body>
+	<header style="background: #0056b3; color: white; padding: 15px; display: flex; justify-content: space-between; align-items: center;">
+             <h1>🏢 I Austral</h1>
+        
+             <div style="display: flex; align-items: center; gap: 20px;">
+            		<!-- TABLERO DEL DÓLAR CONFIGURABLE POR ROL -->
+            	            <!-- TABLERO DEL DÓLAR CON BITÁCORA DE AUDITORÍA -->
+            <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 4px;">
+                <div style="background: rgba(255, 255, 255, 0.15); padding: 6px 12px; border-radius: 6px; font-size: 13px; font-weight: bold; border: 1px solid rgba(255,255,255,0.25); 			display: flex; align-items: center; gap: 8px;">
+                    <span>💵 Tipo de Cambio (Austral):</span>
+                    
+                    {% if 'administrador' in puesto|lower or 'administración' in puesto|lower or 'administracion' in puesto|lower %}
+                    <form action="/actualizar_dolar" method="POST" style="display: flex; align-items: center; gap: 5px; margin: 0;">
+                        <span style="font-size: 14px;">1 USD = $</span>
+                        <input type="text" name="nuevo_dolar" value="{{ tipo_cambio }}" style="width: 55px; padding: 2px 5px; border-radius: 4px; border: none; font-weight: bold; text-align: 				center; color: #333; margin: 0; font-size: 14px;">
+                        <span style="font-size: 14px;">MXN</span>
+                        <button type="submit" style="background: #28a745; border: none; padding: 2px 8px; border-radius: 4px; color: white; font-size: 12px; cursor: pointer; height: auto;">				Actualizar</button>
+                    </form>
+                    {% else %}
+                    <span style="color: #28a745; background: white; padding: 2px 6px; border-radius: 4px; font-size: 14px;">1 USD = ${{ tipo_cambio }} MXN</span>
+                    {% endif %}
+                </div>
+                                <!-- ETIQUETA INFERIOR CON HISTORIAL DE VALOR ANTERIOR -->
+                <span style="font-size: 11px; color: rgba(255,255,255,0.8); font-weight: normal; margin-right: 5px;">
+                    ⏪ Valor anterior: <b style="color: #ffc107;">${{ d_anterior }} MXN</b> | 📝 Último cambio: <b>{{ d_usuario }}</b> el {{ d_fecha }} a las {{ d_hora }} hs.
+                </span>
+
+            </div>
+
+            
+                 <div style="font-size: 14px;">Bienvenido, <b>{{ usuario }}</b> (<span>{{ puesto }}</span>) | <a href="/logout" style="color: white; text-decoration: none; font-weight: 			bold;">Cerrar Sesión</a>
+		 </div>
+              </div>
+	</header>
+
+    <div class="container">
+        <main>
+            <div class="card">
+                <h2>✍️ Publicar en el Muro</h2>
+        <form action="/publicar" method="POST" enctype="multipart/form-data">
+            <textarea name="contenido" placeholder="Escribe un anuncio para el equipo..."></textarea>
+            <p style="margin: 5px 0; font-size: 14px; color: #666;">O sube una foto desde tu PC:</p>
+            <input type="file" name="foto" accept="image/*"><br><br>
+            <button type="submit">Publicar</button>
+        </form>
+            </div>
+
+            <div class="card">
+                <h2>📢 Muro de Anuncios</h2>
+                <input type="text" id="buscarAnuncio" class="search-box" placeholder="🔍 Buscar anuncios...">
+                <div id="listaMensajes">
+                    {% for id, autor, contenido, es_foto, puesto_autor, fecha, total_likes in mensajes %}
+                    <div class="msg">
+                        <span class="author">{{ autor }}</span>
+                        <span class="role-tag">{{ puesto_autor }}</span>
+                        <span class="time-tag">🕒 {{ fecha }}</span>
+                        {% if autor == usuario %}
+                        <a class="delete-msg" href="/borrar_mensaje/{{ id }}" onclick="return confirm('¿Borrar mensaje?')">❌</a>
+                        {% endif %}
+                        <div style="margin-top: 8px;">
+                            {% if es_foto == 1 %}
+                                <img class="msg-img" src="/descargar/{{ contenido }}" alt="Foto">
+                            {% else %}
+                                {% if contenido.startswith('http') and (contenido.endswith('.jpg') or contenido.endswith('.png') or contenido.endswith('.gif')) %}
+                                    <img class="msg-img" src="{{ contenido }}" alt="Imagen web">
+                                {% else %}
+                                    <p style="margin: 0;">{{ contenido }}</p>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                        <div class="like-container">
+                            <a href="/like/{{ id }}" class="like-btn {% if id in mis_likes %}liked{% endif %}">
+                                👍 {% if id in mis_likes %}Te gusta{% else %}Me gusta{% endif %}
+                            </a>
+                            <span class="like-count">{{ total_likes }} me gusta</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- DIRECTORIO TELEFÓNICO DESPLEGABLE INTERACTIVO -->
+            <div class="card">
+                <!-- Encabezado cliqueable para abrir/cerrar -->
+                <div class="folder-header" onclick="toggleFolder('directorio-telefonico')" style="background:#e2eafc; 				padding:12px; border-radius:6px; font-weight:bold; color:#0056b3; font-size:16px; display:flex; 			justify-content:space-between; align-items:center; cursor:pointer; user-select:none; margin-				bottom: 0;">
+                    <span>📞 Directorio Telefónico Interno</span>
+                    <span style="font-size:12px; color:#888; font-weight:normal;">(Hacer clic para Ver / Ocultar)</span>
+                </div>
+                
+                <!-- Contenido del directorio que nace oculto -->
+                <div id="directorio-telefonico" style="display: none; margin-top: 15px; border-top: 1px solid #e2eafc; 				padding-top: 15px;">
+                    <!-- Cuadro de Búsqueda Dinámica -->
+                    <div style="margin-bottom: 15px;">
+                        <input type="text" id="buscarContacto" placeholder="🔍 Buscar contacto por nombre, área o 					correo..." style="width: 95%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; 				font-size: 14px;">
+                    </div>
+
+                    <!-- Formulario para agregar contactos (Ahora con campo correo) -->
+                    <form action="/crear_contacto" method="POST" style="display: grid; grid-template-columns: 1fr 1fr 1fr 				1fr auto; gap: 10px; margin-bottom: 20px;">
+                        <input type="text" name="nom_contacto" placeholder="Nombre (ej: Martín)..." required 						style="width:90%;">
+                        <input type="text" name="tel_contacto" placeholder="Teléfono..." required style="width:90%;">
+                        <input type="text" name="area_contacto" placeholder="Área/Puesto..." style="width:90%;">
+                        <input type="email" name="correo_contacto" placeholder="Correo electrónico..." style="width:90%;">
+                        <button type="submit" style="height: 38px;">Añadir</button>
+                    </form>
+
+                    <!-- Lista de contactos registrados -->
+                    <div style="max-height: 300px; overflow-y: auto;">
+                        <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 14px;">
+                            <thead>
+                                <tr style="border-bottom: 2px solid #ccc; color: #0056b3;">
+                                    <th style="padding: 8px;">Contacto</th>
+                                    <th style="padding: 8px;">Área</th>
+                                    <th style="padding: 8px;">Teléfono</th>
+                                    <th style="padding: 8px;">Correo</th>
+                                    <th style="padding: 8px; text-align: right;">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- ACTUALIZACIÓN: Desempaquetamos los 6 campos en orden -->
+                                {% for id_c, nom_c, tel_c, area_c, creador_c, corr_c in contactos %}
+                                <tr style="border-bottom: 1px solid #eee;">
+                                    <td style="padding: 8px;"><b>{{ nom_c }}</b></td>
+                                    <td style="padding: 8px;"><span class="role-tag" style="margin:0;">{{ area_c }}</span></td>
+                                    <td style="padding: 8px;">
+                                        <input type="text" name="nuevo_telefono" value="{{ tel_c }}" id="input-tel-{{ id_c }}" readonly style="border: none; background: transparent; font-weight: bold; width: 110px; padding: 2px; margin: 0; color: #333;">
+                                    </td>
+                                    <td style="padding: 8px;">
+                                        <!-- Formulario inline para guardar las ediciones del teléfono o correo -->
+                                        <form action="/editar_contacto/{{ id_c }}" method="POST" id="form-edit-{{ id_c }}" style="display: inline; margin: 0; padding: 0;">
+                                            <input type="text" name="nuevo_correo" value="{{ corr_c }}" id="input-corr-{{ id_c }}" readonly style="border: none; background: transparent; width: 150px; padding: 2px; margin: 0; color: #555;">
+                                            <button type="submit" id="btn-save-{{ id_c }}" style="display: none; background: #28a745; padding: 2px 6px; font-size: 11px;">💾 Guardar</button>
+                                        </form>
+                                    </td>
+                                    <td style="padding: 8px; text-align: right; display: flex; justify-content: flex-end; gap: 6px; align-items: center;">
+                                        <!-- BOTÓN COPIAR COMPLETO: Guarda Nombre, Área, Teléfono y Correo -->
+                                        <button onclick="copiarContacto('{{ nom_c }}', '{{ area_c }}', '{{ tel_c }}', '{{ corr_c }}')" title="Copiar contacto completo" style="background: #6c757d; padding: 4px 8px; font-size: 12px;">📋 Copiar</button>
+                                        
+                                        {% if creador_c == usuario or puesto == 'Administrador' %}
+                                        <button onclick="habilitarEdicion('{{ id_c }}')" title="Editar datos" style="background: #ffc107; color: black; padding: 4px 8px; font-size: 12px;">✏️</button>
+                                        <a href="/borrar_contacto/{{ id_c }}" onclick="return confirm('¿Borrar este contacto?')" style="background: #dc3545; color: white; text-decoration: none; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold;">❌</a>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="5" style="text-align: center; color: #888; padding: 15px;">No hay contactos registrados en el directorio.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+
+        </main>
+
+        <aside>
+            
+            <!-- CALENDARIO DE CUMPLEAÑOS DESPLEGABLE INTERACTIVO -->
+            <div class="card">
+                <!-- Encabezado cliqueable para abrir/cerrar -->
+                <div class="folder-header" onclick="toggleFolder('calendario-cumple')" style="background:#e2eafc; padding:10px 12px; border-radius:4px; font-weight:bold; color:#0056b3; font-size:14px; display:flex; justify-content:space-between; align-items:center; cursor:pointer; user-select:none;">
+                    <span>🎂 Calendario de Cumpleaños</span>
+                    <span style="font-size:11px; color:#888; font-weight:normal;">(Ver / Ocultar)</span>
+                </div>
+                
+                <!-- Contenido del calendario que nace oculto -->
+                <div id="calendario-cumple" style="display: none; margin-top: 10px; padding-top: 5px;">
+                    <div style="max-height: 180px; overflow-y: auto; padding-right: 5px;">
+                        {% for nombre, puesto_emp, fecha_b, es_hoy in cumpleanos %}
+                        
+                        <!-- REGLA CUMPLE HOY: Si cumple años hoy, se pinta de color rosa/dorado festivo -->
+                        {% if es_hoy == 1 %}
+                        <div class="cake-item" style="display: flex; align-items: center; margin-bottom: 10px; font-size: 14px; padding: 10px; border-radius: 6px; background: #fff3cd; border: 1px solid #ffeeba; animation: pulse 2s infinite;">
+                            <span class="cake-icon" style="font-size: 24px; margin-right: 10px; animation: spin 1.5s linear infinite;">🎈</span>
+                            <div>
+                                <b style="color: #856404;">🎉 ¡HOY CUMPLE AÑOS! 🎉</b><br>
+                                <b>{{ nombre }}</b> ({{ puesto_emp }})<br>
+                                <span style="color: #dc3545; font-size: 12px; font-weight: bold;">🥳 {{ fecha_b }}</span>
+                            </div>
+                        </div>
+                        {% else %}
+                        <!-- Si es un día normal, se muestra con el diseño estándar limpio de la oficina -->
+                        <div class="cake-item" style="display: flex; align-items: center; margin-bottom: 10px; font-size: 14px; padding: 6px 0; border-bottom: 1px dashed #ddd;">
+                            <span class="cake-icon" style="font-size: 20px; margin-right: 10px;">🎉</span>
+                            <div>
+                                <b>{{ nombre }}</b> ({{ puesto_emp }})<br>
+                                <span style="color: #28a745; font-size: 12px; font-weight: bold;">📅 {{ fecha_b }}</span>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        {% else %}
+                        <div style="text-align: center; color: #888; padding: 10px; font-size: 13px;">No hay cumpleaños registrados.</div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <!-- LINKS DE INTERÉS DESPLEGABLE INTERACTIVO -->
+            <div class="card" style="padding: 10px; margin-bottom: 15px;">
+                <!-- Cabecera cliqueable para abrir/cerrar -->
+                <div class="folder-header" onclick="toggleFolder('links-interes-panel')" style="background:#e2eafc; padding:10px 12px; border-radius:4px; font-weight:bold; color:#0056b3; font-size:14px; display:flex; justify-content:space-between; align-items:center; cursor:pointer; user-select:none;">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span style="font-size: 16px;">🔗</span>
+                        <span>Links de Interés</span>
+                    </div>
+                    <span style="font-size:11px; color:#888; font-weight:normal;">(Abrir)</span>
+                </div>
+                
+                <!-- Contenido del módulo que nace oculto -->
+                <div id="links-interes-panel" style="display: none; margin-top: 10px; padding: 5px;">
+                    <!-- Formulario rápido para añadir enlaces -->
+                    <form action="/crear_link" method="POST" style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 15px;">
+                        <input type="text" name="tit_link" placeholder="Título (ej: Portal SAT)..." required style="width:92%; padding:6px;">
+                        <input type="text" name="url_link" placeholder="Dirección (ej: sat.gob.mx)..." required style="width:92%; padding:6px;">
+                        <button type="submit" style="background:#0056b3; color:white; border:none; padding:6px; border-radius:4px; cursor:pointer; font-weight:bold;">				Añadir Link</button>
+                    </form>
+
+                    <!-- Lista de links guardados en la oficina -->
+                    <ul style="list-style: none; padding: 0; margin: 0; max-height: 150px; overflow-y: auto;">
+                        {% for id_l, tit_l, url_l, creador_l in links %}
+                        <li style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px dashed #eee; font-size: 				13px;">
+                            <a href="{{ url_l }}" target="_blank" style="color: #0056b3; text-decoration: none; font-weight: bold; overflow: hidden; text-overflow: 				ellipsis; max-width: 180px;" title="Subido por: {{ creador_l }}">🔗 {{ tit_l }}</a>
+                            
+                            <!-- CANDADO DE SEGURIDAD: Muestra la X de borrado solo al dueño o al Administrador -->
+                            {% if creador_l == usuario or puesto == 'Administrador' %}
+                            <a href="/borrar_link/{{ id_l }}" onclick="return confirm('¿Borrar este enlace del tablero?')" style="color: #dc3545; text-decoration: 				none; font-weight: bold; font-size: 11px; padding: 2px 5px; cursor: pointer;">❌</a>
+                            {% endif %}
+                        </li>
+                        {% else %}
+                        <li style="color: #888; font-size: 12px; text-align: center; padding: 10px 0;">No hay enlaces compartidos.</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+
+
+            <!-- CREAR CARPETAS DESPLEGABLE INTERACTIVO -->
+            <div class="card" style="padding: 10px; margin-bottom: 15px;">
+                <div class="folder-header" onclick="toggleFolder('crear-carpeta-panel')" style="background:#e2eafc; padding:10px 12px; border-radius:4px; font-weight:bold; color:#0056b3; font-size:14px; display:flex; justify-content:space-between; align-items:center; cursor:pointer; user-select:none;">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span style="font-size: 16px;">📂</span>
+                        <span>Crear Nueva Carpeta</span>
+                    </div>
+                    <span style="font-size:11px; color:#888; font-weight:normal;">(Abrir)</span>
+                </div>
+                <div id="crear-carpeta-panel" style="display: none; margin-top: 10px; padding: 5px;">
+                    <form action="/crear_carpeta" method="POST">
+                        <input type="text" name="nombre_carpeta" placeholder="Nombre de la carpeta..." required style="width:90%;">
+                        <button type="submit">Crear Carpeta</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- SUBIR DOCUMENTO DESPLEGABLE INTERACTIVO -->
+            <div class="card" style="padding: 10px; margin-bottom: 15px;">
+                <div class="folder-header" onclick="toggleFolder('subir-documento-panel')" style="background:#e2eafc; padding:10px 12px; border-radius:4px; font-weight:bold; color:#0056b3; font-size:14px; display:flex; justify-content:space-between; align-items:center; cursor:pointer; user-select:none;">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span style="font-size: 16px;">⬆️</span>
+                        <span style="font-size: 16px;">📄</span>
+                        <span>Subir Documento</span>
+                    </div>
+                    <span style="font-size:11px; color:#888; font-weight:normal;">(Abrir)</span>
+                </div>
+                <div id="subir-documento-panel" style="display: none; margin-top: 10px; padding: 5px;">
+                    <form action="/subir" method="POST" enctype="multipart/form-data">
+                        <input type="file" name="archivo" required><br><br>
+                        <label style="font-size:13px; color:#555;">Selecciona Carpeta Destino:</label>
+                        <select name="carpeta_destino" style="width:96%; margin-top:5px;">
+                            {% for carpeta, creador_c in carpetas %}
+                            <option value="{{ carpeta }}">{{ carpeta }}</option>
+                            {% endfor %}
+                        </select><br><br>
+                        <button type="submit">Subir Archivo</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- ARCHIVOS POR CARPETAS DESPLEGABLE INTERACTIVO -->
+            <div class="card" style="padding: 10px; margin-bottom: 15px;">
+                <div class="folder-header" onclick="toggleFolder('archivos-carpetas-panel')" style="background:#e2eafc; padding:10px 12px; border-radius:4px; font-weight:bold; color:#0056b3; font-size:14px; display:flex; justify-content:space-between; align-items:center; cursor:pointer; user-select:none;">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span style="font-size: 16px;">🔍</span>
+                        <span style="font-size: 16px;">📄</span>
+                        <span>Archivos por Carpetas</span>
+                    </div>
+                    <span style="font-size:11px; color:#888; font-weight:normal;">(Ver)</span>
+                </div>
+                
+                <div id="archivos-carpetas-panel" style="display: none; margin-top: 10px; padding: 5px;">
+                    <input type="text" id="buscarArchivo" class="sidebar-search" placeholder="🔍 Buscar archivos..." style="width: 90%; padding: 8px; margin-bottom: 15px;">
+                    <div id="contenedorCarpetas">
+                        {% for nom_carp, creador_carp in carpetas %}
+                        <div class="bloque-carpeta" style="margin-bottom: 10px;">
+                            <div class="folder-header" onclick="toggleFolder('folder-{{ loop.index }}')" style="background:#f4f6f9; padding:8px 12px; border-radius:4px; font-weight:bold; color:#333; font-size:13px; display:flex; justify-content:space-between; align-items:center; cursor:pointer; user-select:none;">
+                                <span>📁 {{ nom_carp }} <small style="color:#888; font-weight:normal;">(Creador: {{ creador_carp }})</small></span>
+                                <div>
+                                    <span style="font-size:11px; color:#888; font-weight:normal; margin-right:5px;">(Ver)</span>
+                                    {% if (creador_carp|lower == usuario|lower or puesto|lower == 'administrador') and nom_carp != 'General' %}
+                                    <a class="delete-folder" href="/borrar_carpeta/{{ nom_carp }}" onclick="event.stopPropagation(); return confirm('¿Borrar carpeta?')" style="color:#dc3545; text-decoration:none; font-weight:bold; font-size:12px; margin-left:10px;">❌</a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <ul id="folder-{{ loop.index }}" class="folder-content" style="display:none; padding-left:10px; border-left:2px solid #e2eafc; margin-bottom:10px; list-style:none;">
+                                <li class="aviso-vacio" style="color:#888; font-size:12px; text-align:center; padding:10px 0; display:block;">Carpeta vacía</li>
+                                {% for nombre_archivo, subido_por, fecha, carpeta_archivo in archivos %}
+                                    {% if carpeta_archivo == nom_carp %}
+                                    <li class="archivo-item" style="display: flex; justify-content: space-between; align-items: center; padding:12px 0; border-bottom:1px solid #eee;">
+                                        <div>
+                                            <span style="font-size:13px; display:block; max-width:130px; overflow:hidden; text-overflow:ellipsis; font-weight:bold;">📄 {{ nombre_archivo }}</span>
+                                            <span class="uploader-tag" style="font-size:11px; color:#666; display:block; margin-top:3px;">Por: {{ subido_por }}</span>
+                                            <span style="font-size:11px; color:#999; display:block;">📅 {{ fecha }}</span>
+                                        </div>
+                                        <div style="margin-top:5px; display:flex; flex-direction:column; gap:3px;">
+                                            <a class="btn-green" href="/descargar/{{ nombre_archivo }}" style="background:#28a745; color:white; text-decoration:none; padding:4px 8px; border-radius:4px; font-size:13px; text-align:center;">Bajar</a>
+                                            {% if subido_por == usuario %}
+                                            <a class="btn-red" href="/borrar_archivo/{{ nombre_archivo }}" style="background:#dc3545; color:white; text-decoration:none; padding:4px 8px; border-radius:4px; font-size:13px; text-align:center;">Borrar</a>
+                                            {% endif %}
+                                        </div>
+                                    </li>
+                                    <span style="display:none;">
+                                        <script>
+                                            document.currentScript.parentElement.parentElement.querySelector('.aviso-vacio').style.display = 'none';
+                                        </script>
+                                    </span>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <!-- CÓDIGO INTERACTIVO JAVASCRIPT -->
+    <script>
+                function toggleFolder(id) {
+            let el = document.getElementById(id);
+            if (el.style.display === "none" || el.style.display === "") {
+                el.style.display = "block";
+            } else {
+                el.style.display = "none";
+            }
+        }
+
+        
+        document.getElementById('buscarAnuncio').addEventListener('keyup', function() {
+            let filtro = this.value.toLowerCase();
+            document.querySelectorAll('#listaMensajes .msg').forEach(function(msg) {
+                msg.style.display = msg.innerText.toLowerCase().includes(filtro) ? "block" : "none";
+            });
+        });
+        
+        document.getElementById('buscarArchivo').addEventListener('keyup', function() {
+            let filtro = this.value.toLowerCase();
+            document.querySelectorAll('.archivo-item').forEach(function(item) {
+                let coincide = item.innerText.toLowerCase().includes(filtro);
+                item.style.display = coincide ? "flex" : "none";
+                if (filtro !== "" && coincide) {
+                    item.parentElement.classList.add('active');
+                }
+            });
+        });
+                // Función interactiva para abrir los cuadros de texto del teléfono y del correo
+        function habilitarEdicion(id) {
+            let inputTel = document.getElementById('input-tel-' + id);
+            let inputCorr = document.getElementById('input-corr-' + id);
+            let btnGuardar = document.getElementById('btn-save-' + id);
+            
+            inputTel.readOnly = false;
+            inputTel.style.border = "1px solid #0056b3";
+            inputTel.style.background = "white";
+            
+            inputCorr.readOnly = false;
+            inputCorr.style.border = "1px solid #0056b3";
+            inputCorr.style.background = "white";
+            
+            inputTel.focus();
+            btnGuardar.style.display = "inline-block";
+        }
+
+        // Función que copia los 4 campos ordenados en un solo texto limpio para enviar por chat
+        function copiarContacto(nombre, area, telefono, correo) {
+            let textoCompleto = nombre + " (" + area + ") - Tel: " + telefono + " | Correo: " + correo;
+            
+            navigator.clipboard.writeText(textoCompleto).then(function() {
+                alert("¡Contacto copiado al portapapeles!\n" + textoCompleto);
+            }).catch(function(err) {
+                alert("No se pudo copiar el contacto: ", err);
+            });
+        }
+
+        // Buscador Dinámico para el Directorio Telefónico
+        document.getElementById('buscarContacto').addEventListener('keyup', function() {
+            let filtro = this.value.toLowerCase();
+            // Buscamos todas las filas de datos de la tabla del directorio
+            document.querySelectorAll('#directorio-telefonico tbody tr').forEach(function(fila) {
+                // Si la fila tiene celdas de texto, revisamos si coincide con la búsqueda
+                if (fila.cells.length > 1) {
+                    let textoFila = fila.innerText.toLowerCase();
+                    // Si coincide se muestra (table-row), si no, se oculta por completo
+                    fila.style.display = textoFila.includes(filtro) ? "table-row" : "none";
+                }
+            });
+        });
+
+    </script>
+    <!-- FOOTER CORPORATIVO CON LOGOTIPOS SVG NATIVOS BLINDADOS -->
+    <footer style="background: #242526; color: rgba(255,255,255,0.7); text-align: center; padding: 20px 0; margin-top: 40px; font-size: 13px; border-top: 3px solid #0056b3; width: 100%;">
+        <div style="max-width: 1200px; margin: 0 auto; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+            <div>
+                © 2026 <b>Austral</b>. Todos los derechos reservados. | Portal Intranet Interno
+            </div>
+            
+            <!-- BOTONERA CON LOGOS EN ALTA DEFINICIÓN SIN INTERNET -->
+            <div style="display: flex; gap: 18px; align-items: center;">
+                <span style="font-weight: bold; font-size: 12px; color: #fff; letter-spacing: 0.5px;">SÍGUENOS:</span>
+                
+                <!-- 1. Pagina Web (Mundo) -->
+                <a href="https://www.nuestronorteeselsur.com" target="_blank" style="color: #e2eafc; text-decoration: none; display: flex; align-items: center; gap: 6px; font-weight: bold; font-size: 14px;" title="Web Oficial Austral">
+                    <svg style="width:16px; height:16px; fill:currentColor;" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.53c-.26-.81-1-1.4-1.9-1.4h-1v-3c0-.55-.45-1-1-1h-6v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+                    Web Oficial
+                </a>
+                
+                <!-- 2. LinkedIn -->
+                <a href="https://mx.linkedin.com/in/martin-montemurro-bb8712b4" target="_blank" style="color: #0077b5; text-decoration: none; display: flex; align-items: center; gap: 6px; font-weight: bold; font-size: 14px;" title="LinkedIn Austral">
+                    <svg style="width:16px; height:16px; fill:currentColor;" viewBox="0 0 24 24"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.32 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.79M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/></svg>
+                    LinkedIn
+                </a>
+                
+                <!-- 3. Instagram -->
+                <a href="https://www.instagram.com/austral.mx/" target="_blank" style="color: #e1306c; text-decoration: none; display: flex; align-items: center; gap: 6px; font-weight: bold; font-size: 14px;" title="Instagram Austral">
+                    <svg style="width:16px; height:16px; fill:currentColor;" viewBox="0 0 24 24"><path d="M7.8 2h8.4C19.4 2 22 4.6 22 7.8v8.4a5.8 5.8 0 0 1-5.8 5.8H7.8C4.6 22 2 19.4 2 16.2V7.8A5.8 5.8 0 0 1 7.8 2m-.2 2A3.6 3.6 0 0 0 4 7.6v8.8A3.6 3.6 0 0 0 7.6 20h8.8a3.6 3.6 0 0 0 3.6-3.6V7.6A3.6 3.6 0 0 0 16.4 4H7.6m11.4 2a1.2 1.2 0 1 1-1.2 1.2A1.2 1.2 0 0 1 19 6m-7 2a4 4 0 1 1-4 4 4 4 0 0 1 4-4m0 2a2 2 0 1 0 2 2 2 2 0 0 1-2-2z"/></svg>
+                    Instagram
+                </a>
+                
+                <!-- 4. YouTube -->
+                <a href="https://www.youtube.com/@australmx4858" target="_blank" style="color: #ff0000; text-decoration: none; display: flex; align-items: center; gap: 6px; font-weight: bold; font-size: 14px;" title="YouTube Austral">
+                    <svg style="width:16px; height:16px; fill:currentColor;" viewBox="0 0 24 24"><path d="M23.498 6.163a3.003 3.003 0 0 0-2.11-2.11C19.517 3.545 12 3.545 12 3.545s-7.516 0-9.387.508a3.003 3.003 0 0 0-2.11 2.11C0 8.033 0 12 0 12s0 3.967.503 5.837a3.003 3.003 0 0 0 2.11 2.11c1.871.508 9.387.508 9.387.508s7.517 0 9.387-.508a3.003 3.003 0 0 0 2.11-2.11c.503-1.87 	.503-5.837.503-5.837s0-3.967-.503-5.837zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                    YouTube
+                </a>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>
+
+        

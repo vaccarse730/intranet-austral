@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="es">
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Austral - Portal Intranet</title>
+    <!-- Fuente Tipográfica Moderna alineada a la web principal -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary: #0b1f3a;       /* Azul Marino Profundo Austral */
+            --primary-hover: #15325b;
+            --accent: #c5a059;        /* Dorado sutil / Lujo */
+            --bg-body: #f4f6f8;
+            --card-bg: #ffffff;
+            --text-main: #2b2b2b;
+            --text-muted: #6c757d;
+            --border-color: #e2e8f0;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Montserrat', 'Segoe UI', sans-serif; }
+        body { background: var(--bg-body); color: var(--text-main); padding-bottom: 260px; transition: background 0.3s; }
+
+        /* HEADER PRINCIPAL */
+        header { 
+            background: var(--primary); 
+            color: white; 
+            padding: 18px 35px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15); 
+            border-bottom: 3px solid var(--accent);
+            position: relative; 
+            z-index: 10; 
+        }
+        header h1 { font-size: 24px; display: flex; align-items: center; gap: 10px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; }
+        header h1 span { color: var(--accent); }
+
+        /* CONTENEDOR PRINCIPAL */
+        .container { max-width: 1050px; margin: 30px auto; padding: 0 20px; }
+
+        /* TARJETAS */
+        .card { 
+            background: var(--card-bg); 
+            padding: 24px; 
+            border-radius: 6px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03); 
+            margin-bottom: 25px; 
+            border: 1px solid var(--border-color);
+        }
+        .card h2 { 
+            color: var(--primary); 
+            font-size: 16px; 
+            font-weight: 700;
+            margin-bottom: 18px; 
+            border-bottom: 2px solid var(--border-color); 
+            padding-bottom: 10px; 
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* FORMULARIOS Y ELEMENTOS */
+        textarea { 
+            width: 100%; 
+            height: 90px; 
+            padding: 12px; 
+            border: 1px solid var(--border-color); 
+            border-radius: 4px; 
+            resize: none; 
+            font-size: 13px; 
+            margin-bottom: 12px; 
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        textarea:focus { border-color: var(--primary); }
+        
+        button, .btn-submit { 
+            background: var(--primary); 
+            color: white; 
+            border: none; 
+            padding: 10px 22px; 
+            border-radius: 4px; 
+            font-weight: 600; 
+            cursor: pointer; 
+            font-size: 13px; 
+            letter-spacing: 0.5px;
+            transition: background 0.2s;
+        }
+        button:hover { background: var(--primary-hover); }
+
+        /* MURO DE ANUNCIOS */
+        .msg-item { 
+            border-left: 4px solid var(--accent); 
+            padding: 16px; 
+            margin-bottom: 18px; 
+            background: #fafbfc; 
+            border-radius: 0 6px 6px 0; 
+            border-top: 1px solid var(--border-color);
+            border-right: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+        }
+        .msg-meta { font-size: 12px; color: var(--text-muted); margin-bottom: 8px; }
+        .role-tag { 
+            background: #e9ecef; 
+            color: var(--primary); 
+            padding: 3px 8px; 
+            border-radius: 3px; 
+            font-weight: 700; 
+            font-size: 10px; 
+            margin-left: 5px; 
+            text-transform: uppercase;
+        }
+
+        /* BOTÓN HERRAMIENTAS FLOTANTE Y CUADRADO */
+        .btn-menu-flotante { 
+            position: fixed; 
+            bottom: 90px; 
+            right: 1px; 
+            background: var(--primary); 
+            color: white; 
+            border: 1px solid var(--accent); 
+            padding: 12px; 
+            border-radius: 0; 
+            font-weight: 700; 
+            cursor: pointer; 
+            box-shadow: 0 6px 16px rgba(0,0,0,0.2); 
+            z-index: 1500; 
+            font-size: 12px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            gap: 8px; 
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .btn-menu-flotante:hover { background: var(--primary-hover); }
+
+        /* PANEL LATERAL DE HERRAMIENTAS */
+        .sidebar-panel { 
+            position: fixed; 
+            top: 0; 
+            right: -360px; 
+            width: 350px; 
+            height: 100%; 
+            background: #ffffff; 
+            box-shadow: -6px 0 20px rgba(0,0,0,0.15); 
+            padding: 25px; 
+            overflow-y: auto; 
+            transition: right 0.3s ease; 
+            z-index: 2000; 
+            padding-bottom: 260px; 
+            border-left: 3px solid var(--accent);
+        }
+        .sidebar-panel.active { right: 0; }
+        .sidebar-close { font-size: 22px; color: #dc3545; cursor: pointer; float: right; font-weight: bold; }
+        .folder-header { 
+            background: #f1f5f9; 
+            padding: 10px 14px; 
+            border-radius: 4px; 
+            font-weight: 700; 
+            color: var(--primary); 
+            cursor: pointer; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            user-select: none; 
+            margin-bottom: 5px; 
+            font-size: 13px;
+        }
+
+        /* FOOTER FIX DE DIRECTORIO */
+        .fixed-footer { 
+            position: fixed; 
+            bottom: 0; 
+            left: 0; 
+            width: 100%; 
+            background: #111827; 
+            color: white; 
+            z-index: 3000; 
+            box-shadow: 0 -4px 15px rgba(0,0,0,0.2); 
+            border-top: 3px solid var(--accent); 
+            padding: 10px 25px 6px 25px; 
+        }
+        .footer-top-layout { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            background: #1f2937; 
+            padding: 8px 16px; 
+            border-radius: 4px; 
+            margin-bottom: 8px; 
+            cursor: pointer; 
+            user-select: none; 
+        }
+        .footer-dir-content { display: none; max-height: 150px; overflow-y: auto; margin-bottom: 10px; padding: 5px 0; }
+        
+        .table-dir { width: 100%; border-collapse: collapse; text-align: left; font-size: 12px; }
+        .table-dir th { color: var(--accent); padding: 6px 8px; border-bottom: 1px solid #374151; font-size: 11px; text-transform: uppercase; font-weight: 700; }
+        .table-dir td { padding: 6px 8px; border-bottom: 1px solid #1f2937; vertical-align: middle; }
+        .table-dir input { background: transparent; border: none; color: #fff; font-weight: 600; width: 100%; font-size: 12px; padding: 2px; }
+        
+        .footer-bottom-bar { display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: #9ca3af; border-top: 1px solid #1f2937; padding-top: 6px; }
+        .footer-redes { display: flex; gap: 15px; }
+        .footer-redes a { color: #d1d5db; text-decoration: none; font-weight: 600; display: flex; align-items: center; gap: 5px; font-size: 11px; }
+        .footer-redes a:hover { color: var(--accent); }
+    </style>
+</head>
+<body>
+
+    <!-- BOTÓN FLOTANTE PARA PANEL DE HERRAMIENTAS -->
+    <button class="btn-menu-flotante" onclick="toggleSidebar()">
+        <i class="fa-solid fa-folder-open"></i> Herramientas de Oficina
+    </button>
+
+    <!-- HEADER PRINCIPAL MEJORADO -->
+    <header>
+        <h1>🏢 Austral</h1>
+        
+        <!-- Tablero del Dólar e Info de Usuario -->
+        <div style="display: flex; align-items: center; gap: 20px;">
+            <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 3px;">
+                <div style="background: rgba(255, 255, 255, 0.12); padding: 5px 12px; border-radius: 4px; font-size: 13px; font-weight: bold; border: 1px solid rgba(255,255,255,0.2); display: flex; align-items: center; gap: 6px;">
+                    <span>💵 Dólar (Austral):</span>
+                    {% if 'administrador' in puesto|lower or 'administración' in puesto|lower or 'administracion' in puesto|lower %}
+                    <form action="/actualizar_dolar" method="POST" style="display: flex; align-items: center; gap: 3px; margin: 0;">
+                        <span>$</span>
+                        <input type="text" name="nuevo_dolar" value="{{ tipo_cambio }}" style="width: 50px; padding: 2px; border-radius: 3px; border: none; font-weight: bold; text-align: center; color: #333; font-size: 13px;">
+                        <button type="submit" style="background: #28a745; border: none; padding: 2px 6px; border-radius: 3px; color: white; font-size: 11px; cursor: pointer; height: auto;">💾</button>
+                    </form>
+                    {% else %}
+                    <span style="color: #28a745; background: white; padding: 2px 6px; border-radius: 3px; font-size: 13px;">${{ tipo_cambio }}</span>
+                    {% endif %}
+                </div>
+                <span style="font-size: 10px; color: rgba(255,255,255,0.75); font-weight: normal;">
+                    ⏪ Antes: <b style="color:#ffc107;">${{ d_anterior }}</b> | Modificó: <b>{{ d_usuario }}</b> ({{ d_fecha }} - {{ d_hora }})
+                </span>
+            </div>
+            
+            <div style="font-size: 14px;">Bienvenido, <b>{{ usuario }}</b> <span class="role-tag" style="color:#333; background:white; font-size: 12px; padding: 3px 8px;">{{ puesto }}</span> | <a href="/logout" style="color: #ffc107; text-decoration: none; font-weight: bold; margin-left: 5px;">Salir</a></div>
+        </div>
+    </header>
+
+    <!-- COLUMNA CENTRAL ÚNICA -->
+    <div class="container">
+        <!-- Publicar en el Muro (Desplegable) -->
+<div class="card">
+    <h2 onclick="toggleFolder('form-publicar')" style="cursor: pointer; display: flex; justify-content: space-between; align-items: center; user-select: none;">
+        <span>📢 Publicar en el Muro</span>
+        <span style="font-size: 12px; color: var(--text-muted); font-weight: normal;">(Clic para desplegar)</span>
+    </h2>
+    <div id="form-publicar" style="display: none; margin-top: 15px;">
+        <form action="/publicar" method="POST" enctype="multipart/form-data">
+            <textarea name="contenido" placeholder="Escribe un anuncio para el equipo..."></textarea>
+            <p style="margin: 5px 0 10px 0; font-size: 13px; color: var(--text-muted);">O sube una foto desde tu PC:</p>
+            <input type="file" name="foto" accept="image/*" style="font-size: 12px; margin-bottom: 15px;"><br>
+            <button type="submit">Publicar</button>
+        </form>        
+    </div>
+</div>
+
+        <!-- Historial del Muro -->
+        <div class="card">
+            <h2>📋 Muro de Anuncios General</h2>
+            <input type="text" id="buscarAnuncio" placeholder="🔍 Buscar anuncios..." style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; margin-bottom: 20px;">
+            
+            <div id="contenedorAnuncios">
+                {% for id_m, autor, contenido, es_foto, puesto_a, fecha, likes_count in mensajes %}
+                <div class="msg-item">
+                    <div class="msg-meta">
+                        👤 Por: <b>{{ autor }}</b> <span class="role-tag">{{ puesto_a }}</span> | 📅 {{ fecha }}
+                        {% if autor == usuario or puesto == 'Administrador' %}
+                        <a href="/borrar_mensaje/{{ id_m }}" onclick="return confirm('¿Borrar anuncio?')" style="color: #dc3545; text-decoration: none; font-weight: bold; float: right;">❌</a>
+                        {% endif %}
+                    </div>
+                   
+		<!-- CÓDIGO CORREGIDO -->
+	{% if '|' in contenido %}
+    		<!-- 1. Muestra el texto limpio -->
+    		<p style="font-size: 14px; line-height: 1.5; margin: 8px 0; white-space: pre-wrap;">				  {{ contenido.split('|')[0] }}</p>
+    	  {% if es_foto == 1 %}
+        	<!-- 2. Muestra solo el nombre de la imagen -->
+        	<img src="/static/uploads/{{ contenido.split('|')[1] }}" style="max-width: 100%; max-height: 350px; 				border-radius: 6px; margin-top: 5px; display: block; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+    	  {% endif %}
+	  {% else %}
+    	  {% if es_foto == 1 %}
+        	<!-- Si solo subieron foto sin texto -->
+        	<img src="/static/uploads/{{ contenido }}" style="max-width: 100%; max-height: 350px; border-radius: 6px; 			margin-top: 5px; display: block; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+    	  {% else %}
+        	<!-- Si solo subieron texto sin foto -->
+        	<p style="font-size: 14px; line-height: 1.5; margin: 8px 0; white-space: pre-wrap;">{{ contenido }}</p>
+    	  {% endif %}
+        {% endif %}                    
+                   
+	 <div style="margin-top: 10px;">
+                        <a href="/like/{{ id_m }}" style="background: #ffc107; color: black; text-decoration: none; padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: bold; display: inline-block;">👍 Me gusta ({{ likes_count }})</a>
+                    </div>
+                </div>
+                {% else %}
+                <p style="text-align: center; color: #888; font-size: 14px; padding: 20px;">No hay anuncios publicados en el muro.</p>
+                {% endfor %}
+
+    <!-- PIEZA 2: PANEL LATERAL DE HERRAMIENTAS RETRÁCTIL -->
+    <div id="sidebarHerramientas" class="sidebar-panel">
+        <span class="sidebar-close" onclick="toggleSidebar()">×</span>
+        <h3 style="color: #0056b3; margin-bottom: 20px; font-size: 18px; border-bottom: 2px solid #ccc; padding-bottom: 5px;">🛠️ Herramientas</h3>
+        
+        <!-- 1. CUMPLEANOS DESPLEGABLE -->
+        <div class="card" style="padding: 10px; margin-bottom: 15px; box-shadow: none; border: 1px solid #ddd;">
+            <div class="folder-header" onclick="toggleFolder('cal-cumple')">
+                <span>🎂 Cumpleaños de Hoy</span>
+            </div>
+            <div id="cal-cumple" style="display: none; margin-top: 10px;">
+                {% for nombre, puesto_emp, fecha_b, es_hoy in cumpleanos %}
+                    {% if es_hoy == 1 %}
+                    <div style="background: #fff3cd; border: 1px solid #ffeeba; padding: 8px; border-radius: 4px; font-size: 13px; margin-bottom: 5px;">
+                        🎈 <b>¡HOY! {{ nombre }}</b> ({{ puesto_emp }})
+                    </div>
+                    {% else %}
+                    <div style="font-size: 12px; padding: 4px 0; border-bottom: 1px dashed #eee;">
+                        🎉 {{ nombre }} - <span style="color:#28a745; font-weight:bold;">{{ fecha_b }}</span>
+                    </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+
+<!-- 2. LINKS DE INTERÉS DESPLEGABLE -->
+<div class="card" style="padding: 10px; margin-bottom: 15px; box-shadow: none; border: 1px solid #ddd;">
+    <div class="folder-header" onclick="toggleFolder('links-side')">
+        <span>🔗 Links de Interés</span>
+    </div>
+    <div id="links-side" style="display: none; margin-top: 10px;">
+        <!-- 1. LISTA DE LINKS (ARRIBA) -->
+        <ul style="list-style: none; padding: 0; font-size: 13px; margin-top: 0; margin-bottom: 10px;">
+            {% for id_l, tit_l, url_l, creador_l in links %}
+            <li style="display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid #eee;">
+                <a href="{{ url_l }}" target="_blank" style="color:#0056b3; text-decoration:none;">🔗 {{ tit_l }}</a>
+                {% if creador_l == usuario or puesto == 'Administrador' %}
+                <a href="/borrar_link/{{ id_l }}" style="color:red; text-decoration:none;">❌</a>
+                {% endif %}
+            </li>
+            {% endfor %}
+        </ul>
+
+        <!-- 2. FORMULARIO PARA AÑADIR (ABAJO) -->
+        <form action="/crear_link" method="POST" style="display: flex; flex-direction: column; gap: 5px; border-top: 1px solid #eee; padding-top: 8px;">
+            <input type="text" name="tit_link" placeholder="Título..." required style="padding:4px; font-size:12px;">
+            <input type="text" name="url_link" placeholder="Dirección..." required style="padding:4px; font-size:12px;">
+            <button type="submit" style="padding:4px; font-size:12px;">+ Añadir</button>
+        </form>
+    </div>
+</div>
+
+        <!-- 3. CREAR CARPETA DESPLEGABLE -->
+        <div class="card" style="padding: 10px; margin-bottom: 15px; box-shadow: none; border: 1px solid #ddd;">
+            <div class="folder-header" onclick="toggleFolder('carp-side')">
+                <span>📂 Crear Nueva Carpeta</span>
+            </div>
+            <div id="carp-side" style="display: none; margin-top: 10px;">
+                <form action="/crear_carpeta" method="POST">
+                    <input type="text" name="nombre_carpeta" placeholder="Nombre..." required style="width:100%; padding:5px; font-size:12px; margin-bottom:5px;">
+                    <button type="submit" style="padding:4px 10px; font-size:12px;">Crear</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- 4. SUBIR DOCUMENTO DESPLEGABLE -->
+        <div class="card" style="padding: 10px; margin-bottom: 15px; box-shadow: none; border: 1px solid #ddd;">
+            <div class="folder-header" onclick="toggleFolder('subir-side')">
+                <span>📄 Subir Documento</span>
+            </div>
+            <div id="subir-side" style="display: none; margin-top: 10px;">
+                <form action="/subir" method="POST" enctype="multipart/form-data">
+                    <input type="file" name="archivo" required style="font-size:11px; margin-bottom:5px;"><br>
+                    <select name="carpeta_destino" style="width:100%; padding:3px; font-size:12px; margin-bottom:8px;">
+                        {% for carpeta, creador_c in carpetas %}
+                        <option value="{{ carpeta }}">{{ carpeta }}</option>
+                        {% endfor %}
+                    </select>
+                    <button type="submit" style="padding:4px 10px; font-size:12px;">Subir</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- 5. ARCHIVOS GUARDADOS POR CARPETA -->
+        <div class="card" style="padding: 10px; margin-bottom: 15px; box-shadow: none; border: 1px solid #ddd;">
+            <div class="folder-header" onclick="toggleFolder('arch-carp-side')">
+                <span>🔍📄 Archivos Guardados</span>
+            </div>
+            <div id="arch-carp-side" style="display: none; margin-top: 10px;">
+                <input type="text" id="buscarArchivo" placeholder="🔍 Buscar archivos..." style="width:100%; padding:4px; font-size:12px; margin-bottom:10px;">
+                {% for nom_carp, creador_carp in carpetas %}
+                <div style="margin-bottom: 5px; border-bottom: 1px solid #eee; padding-bottom: 5px;">
+                    <span style="font-size:12px; font-weight:bold; color:#0056b3; cursor:pointer;" onclick="toggleFolder('subfolder-{{ loop.index }}')">📁 {{ nom_carp }}</span>
+                    {% if (creador_carp|lower == usuario|lower or puesto|lower == 'administrador') and nom_carp != 'General' %}
+                    <a href="/borrar_carpeta/{{ nom_carp }}" style="color:red; font-size:10px; text-decoration:none; margin-left:5px;">❌</a>
+                    {% endif %}
+                    
+                    <ul id="subfolder-{{ loop.index }}" style="display:none; padding-left:10px; list-style:none; font-size:11px; color:#555; margin-top:3px;">
+                        {% for nombre_archivo, subido_por, fecha, carpeta_archivo in archivos %}
+                            {% if carpeta_archivo == nom_carp %}
+                            <li style="margin-bottom:4px; display:flex; justify-content:space-between; align-items:center;">
+                                <span title="{{ nombre_archivo }}">📄 {{ nombre_archivo[:12] }}...</span>
+                                <div>
+                                    <a href="/descargar/{{ nombre_archivo }}" style="color:green; text-decoration:none; font-weight:bold; margin-right:4px;">⬇️</a>
+                                    {% if subido_por == usuario %}
+                                    <a href="/borrar_archivo/{{ nombre_archivo }}" style="color:red; text-decoration:none;">❌</a>
+                                    {% endif %}
+                                </div>
+                            </li>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER STICKY FIJO CON EL DIRECTORIO HORIZONTAL -->
+    <footer class="fixed-footer">
+        <div class="footer-top-layout" onclick="toggleFooterDir()">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <span style="font-size:16px;">📞</span>
+                <b style="font-size: 13px;">Directorio Telefónico Corporativo Austral</b>
+            </div>
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <input type="text" id="buscarContacto" placeholder="🔍 Buscar número o correo..." onclick="event.stopPropagation();" style="background:#fff; border:none; padding:4px 10px; border-radius:4px; font-size:12px; width:220px; color:#333; font-weight:normal;">
+                <span id="txt-indicador-foot" style="font-size: 11px; color: rgba(255,255,255,0.6);">(Hacer clic para Desplegar)</span>
+            </div>
+        </div>
+        
+        <div id="footerDirectorioContent" class="footer-dir-content">
+            <form action="/crear_contacto" method="POST" style="display: flex; gap: 8px; margin-bottom: 8px; background: rgba(255,255,255,0.05); padding: 5px; border-radius: 4px;">
+                <input type="text" name="nom_contacto" placeholder="Nombre..." required style="background:#fff; color:#333; padding:4px; border-radius:3px; font-size:12px;">
+                <input type="text" name="tel_contacto" placeholder="Teléfono..." required style="background:#fff; color:#333; padding:4px; border-radius:3px; font-size:12px;">
+                <input type="text" name="area_contacto" placeholder="Área..." style="background:#fff; color:#333; padding:4px; border-radius:3px; font-size:12px;">
+                <input type="email" name="correo_contacto" placeholder="Correo..." style="background:#fff; color:#333; padding:4px; border-radius:3px; font-size:12px;">
+                <button type="submit" style="padding: 2px 10px; font-size: 12px; background:#28a745; color:white; border:none; border-radius:3px; font-weight:bold; cursor:pointer;">+ Añadir</button>
+            </form>
+
+            <table class="table-dir">
+                <thead>
+                    <tr>
+                        <th>Contacto</th>
+                        <th>Área / Puesto</th>
+                        <th>Teléfono Guardado</th>
+                        <th>Correo Corporativo</th>
+                        <th style="text-align: right;">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for id_c, nom_c, tel_c, area_c, creador_c, corr_c in contactos %}
+                    <tr class="contacto-row">
+                        <td><b>{{ nom_c }}</b></td>
+                        <td><span style="background:rgba(255,255,255,0.1); padding:2px 5px; border-radius:3px;">{{ area_c }}</span></td>
+                        <td>
+                            <input type="text" name="nuevo_telefono" value="{{ tel_c }}" id="input-tel-{{ id_c }}" readonly>
+                        </td>
+                        <td>
+                            <form action="/editar_contacto/{{ id_c }}" method="POST" id="form-edit-{{ id_c }}" style="display: inline; margin:0;">
+                                <input type="text" name="nuevo_correo" value="{{ corr_c }}" id="input-corr-{{ id_c }}" readonly style="color:rgba(255,255,255,0.75);">
+                                <button type="submit" id="btn-save-{{ id_c }}" style="display: none; background: #28a745; padding: 1px 4px; font-size: 10px; color:white; border:none; border-radius:2px;">💾</button>
+                            </form>
+                        </td>
+                        <td style="text-align: right; display: flex; justify-content: flex-end; gap: 5px; align-items: center;">
+                            <button onclick="copiarContacto('{{ nom_c }}', '{{ area_c }}', '{{ tel_c }}', '{{ corr_c }}')" style="background: #6c757d; padding: 2px 6px; font-size: 11px; color:white; border:none; border-radius:3px; cursor:pointer;">📋 Copiar</button>
+                            {% if creador_c == usuario or puesto == 'Administrador' %}
+                            <button onclick="habilitarEdicion('{{ id_c }}')" style="background: #ffc107; color: black; padding: 2px 6px; font-size: 11px; border:none; border-radius:3px; cursor:pointer;">✏️</button>
+                            <a href="/borrar_contacto/{{ id_c }}" onclick="return confirm('¿Borrar contacto?')" style="background: #dc3545; color: white; padding: 2px 5px; border-radius: 3px; font-size: 11px; text-decoration:none; font-weight:bold;">❌</a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Barra de créditos y redes sociales vectoriales nativas SVG -->
+        <div class="footer-bottom-bar">
+            <div>© 2026 <b>Austral</b>. Portal Interno.</div>
+            <div class="footer-redes">
+                <a href="https://www.nuestronorteeselsur.com" target="_blank" style="color: #e2eafc;">
+                    <svg style="width:12px; height:12px; fill:currentColor;" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.53c-.26-.81-1-1.4-1.9-1.4h-1v-3c0-.55-.45-1-1-1h-6v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg> Web
+                </a>
+                <a href="https://mx.linkedin.com/in/martin-montemurro-bb8712b4" target="_blank" style="color: #0077b5;">
+                    <svg style="width:12px; height:12px; fill:currentColor;" viewBox="0 0 24 24"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1-2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.32 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.79M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/></svg> LinkedIn
+                </a>
+                <a href="https://www.instagram.com/austral.mx/" target="_blank" style="color: #e1306c;">
+                    <svg style="width:12px; height:12px; fill:currentColor;" viewBox="0 0 24 24"><path d="M7.8 2h8.4C19.4 2 22 4.6 22 7.8v8.4a5.8 5.8 0 0 1-5.8 5.8H7.8C4.6 22 2 19.4 2 16.2V7.8A5.8 5.8 0 0 1 7.8 2m-.2 2A3.6 3.6 0 0 0 4 7.6v8.8A3.6 3.6 0 0 0 7.6 20h8.8a3.6 3.6 0 0 0 3.6-3.6V7.6A3.6 3.6 0 0 0 16.4 4H7.6m11.4 2a1.2 1.2 0 1 1-1.2 1.2A1.2 1.2 0 0 1 19 6m-7 2a4 4 0 1 1-4 4 4 4 0 0 1 4-4m0 2a2 2 0 1 0 2 2 2 2 0 0 1-2-2z"/></svg> Instagram
+                </a>
+                <a href="https://www.youtube.com/@australmx4858" target="_blank" style="color: #ff0000;">
+                    <svg style="width:12px; height:12px; fill:currentColor;" viewBox="0 0 24 24"><path d="M23.498 6.163a3.003 3.003 0 0 0-2.11-2.11C19.517 3.545 12 3.545 12 3.545s-7.516 0-9.387.508a3.003 3.003 0 0 0-2.11 2.11C0 8.033 0 12 0 12s0 3.967.503 5.837a3.003 3.003 0 0 0 2.11 2.11c1.871.508 9.387.508 9.387.508s7.517 0 9.387-.508a3.003 3.003 0 0 0 2.11-2.11c.503-1.87 	.503-5.837.503-5.837s0-3.967-.503-5.837zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg> YouTube
+                </a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- SCRIPTS DE CONTROL DE COMPORTAMIENTO INTERACTIVO -->
+    <script>
+        function toggleSidebar() {
+            let panel = document.getElementById('sidebarHerramientas');
+            panel.classList.toggle('active');
+        }
+
+        function toggleFooterDir() {
+            let content = document.getElementById('footerDirectorioContent');
+            let ind = document.getElementById('txt-indicador-foot');
+            if (content.style.display === "none" || content.style.display === "") {
+                content.style.display = "block";
+                ind.innerText = "(Hacer clic para Ocultar)";
+            } else {
+                content.style.display = "none";
+                ind.innerText = "(Hacer clic para Desplegar)";
+            }
+        }
+
+        function toggleFolder(id) {
+            let el = document.getElementById(id);
+            if (el.style.display === "none" || el.style.display === "") {
+                el.style.display = "block";
+            } else {
+                el.style.display = "none";
+            }
+        }
+
+        document.getElementById('buscarContacto').addEventListener('keyup', function() {
+            let filter = this.value.toLowerCase();
+            document.querySelectorAll('.contacto-row').forEach(function(fila) {
+                let textoFila = fila.innerText.toLowerCase();
+                fila.style.display = textoFila.includes(filter) ? "table-row" : "none";
+            });
+        });
+
+// CÓDIGO CORREGIDO
+document.getElementById('buscarContacto').addEventListener('keyup', function() {
+    let filter = this.value.toLowerCase();
+    document.querySelectorAll('.contacto-row').forEach(function(fila) {
+        // 1. Obtener texto visible de la fila (Nombre y Área)
+        let textoFila = fila.innerText.toLowerCase();
+        
+        // 2. Obtener el valor de los inputs (Teléfono y Correo)
+        let inputs = fila.querySelectorAll('input');
+        inputs.forEach(function(input) {
+            textoFila += ' ' + input.value.toLowerCase();
+        });
+
+        // 3. Evaluar coincidencia
+        fila.style.display = textoFila.includes(filter) ? "table-row" : "none";
+    });
+});
+        function habilitarEdicion(id) {
+            let inputTel = document.getElementById('input-tel-' + id);
+            let inputCorr = document.getElementById('input-corr-' + id);
+            let btnGuardar = document.getElementById('btn-save-' + id);
+            
+            inputTel.readOnly = false;
+            inputTel.style.border = "1px solid #0056b3";
+            inputTel.style.background = "#fff";
+            inputTel.style.color = "#333";
+            
+            inputCorr.readOnly = false;
+            inputCorr.style.border = "1px solid #0056b3";
+            inputCorr.style.background = "#fff";
+            inputCorr.style.color = "#333";
+            
+            inputTel.focus();
+            btnGuardar.style.display = "inline-block";
+        }
+
+        function copiarContacto(nombre, area, telefono, correo) {
+            let textoCompleto = nombre + " (" + area + ") - Tel: " + telefono + " | Correo: " + correo;
+            navigator.clipboard.writeText(textoCompleto).then(function() {
+                alert("¡Contacto copiado de Austral!\n" + textoCompleto);
+            });
+        }
+
+	document.getElementById('buscarAnuncio').addEventListener('keyup', function() {
+    let filter = this.value.toLowerCase().trim();
+    
+    document.querySelectorAll('.msg-item').forEach(function(card) {
+        // Obtiene todo el texto visible e interno de la tarjeta del anuncio
+        let textoCard = card.textContent || card.innerText;
+        textoCard = textoCard.toLowerCase();
+        
+        // Si hay coincidencia con la búsqueda, se muestra; de lo contrario se oculta
+        if (filter === '' || textoCard.includes(filter)) {
+            card.style.display = "block";
+        } else {
+            card.style.display = "none";
+        }
+    });
+});
+    </script>
+</body>
+</html>
+
+
