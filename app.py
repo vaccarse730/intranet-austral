@@ -31,7 +31,6 @@ def init_db():
     conn = get_db_connection()
     cursor = conn.cursor()
     
-    # 1. Usuarios
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS usuarios (
             id SERIAL PRIMARY KEY,
@@ -42,7 +41,6 @@ def init_db():
         )
     ''')
     
-    # 2. Mensajes
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS mensajes (
             id SERIAL PRIMARY KEY,
@@ -54,7 +52,6 @@ def init_db():
         )
     ''')
     
-    # 3. Likes
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS likes (
             id SERIAL PRIMARY KEY,
@@ -64,7 +61,6 @@ def init_db():
         )
     ''')
     
-    # 4. Carpetas con Soporte de Subcarpetas (padre_id)
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS carpetas (
             id SERIAL PRIMARY KEY,
@@ -74,14 +70,12 @@ def init_db():
         )
     ''')
     
-    # Migración de seguridad por si la columna padre_id no existe aún en Supabase
     try:
         cursor.execute("ALTER TABLE carpetas ADD COLUMN IF NOT EXISTS padre_id INTEGER REFERENCES carpetas(id) ON DELETE CASCADE NULL;")
         conn.commit()
-    except Exception as e:
+    except Exception:
         conn.rollback()
 
-    # 5. Archivos asociados a carpeta_id
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS archivos (
             id SERIAL PRIMARY KEY,
@@ -93,14 +87,12 @@ def init_db():
         )
     ''')
 
-    # Migración de seguridad para asociar archivos directamente por ID de carpeta
     try:
         cursor.execute("ALTER TABLE archivos ADD COLUMN IF NOT EXISTS carpeta_id INTEGER REFERENCES carpetas(id) ON DELETE CASCADE NULL;")
         conn.commit()
-    except Exception as e:
+    except Exception:
         conn.rollback()
 
-    # 6. Directorio Telefónico
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS directorio (
             id SERIAL PRIMARY KEY,
@@ -112,7 +104,6 @@ def init_db():
         )
     ''')
     
-    # 7. Configuración
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS configuracion (
             clave TEXT PRIMARY KEY,
@@ -120,7 +111,6 @@ def init_db():
         )
     ''')
 
-    # 8. Links de Interés
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS links_interes (
             id SERIAL PRIMARY KEY,
@@ -130,7 +120,6 @@ def init_db():
         )
     ''')
     
-    # Insertar valores por defecto
     try:
         cursor.execute("INSERT INTO configuracion (clave, valor) VALUES ('dolar', '17.35') ON CONFLICT (clave) DO NOTHING")
         cursor.execute("INSERT INTO configuracion (clave, valor) VALUES ('dolar_fecha', '16/09/2026') ON CONFLICT (clave) DO NOTHING")
@@ -138,7 +127,7 @@ def init_db():
         cursor.execute("INSERT INTO configuracion (clave, valor) VALUES ('dolar_usuario', 'Sistema') ON CONFLICT (clave) DO NOTHING")
         cursor.execute("INSERT INTO configuracion (clave, valor) VALUES ('dolar_anterior', '17.35') ON CONFLICT (clave) DO NOTHING")
         conn.commit()
-    except Exception as e:
+    except Exception:
         conn.rollback()
         
     cursor.close()
@@ -147,7 +136,6 @@ def init_db():
 init_db()
 
 def obtener_ruta_carpetas(carpeta_actual_id):
-    """Devuelve la miga de pan (breadcrumbs) hasta la carpeta actual"""
     ruta = []
     curr_id = carpeta_actual_id
     conn = get_db_connection()
@@ -194,9 +182,9 @@ def inicio():
     
     # 3. Archivos de la carpeta actual
     if carpeta_actual_id is None:
-        cursor.execute("SELECT id, nombre_archivo, subido_por, fecha FROM archivos WHERE carpeta_id IS NULL ORDER BY id DESC")
+        cursor.execute("SELECT id, nombre_archivo, subido_por, fecha, carpeta_id FROM archivos WHERE carpeta_id IS NULL ORDER BY id DESC")
     else:
-        cursor.execute("SELECT id, nombre_archivo, subido_por, fecha FROM archivos WHERE carpeta_id = %s ORDER BY id DESC", (carpeta_actual_id,))
+        cursor.execute("SELECT id, nombre_archivo, subido_por, fecha, carpeta_id FROM archivos WHERE carpeta_id = %s ORDER BY id DESC", (carpeta_actual_id,))
     archivos = cursor.fetchall()
 
     # 4. Cumpleaños
@@ -215,7 +203,7 @@ def inicio():
             fecha_bonita = f"{fecha_obj.day} de {meses[fecha_obj.month - 1]}"
             if fecha_obj.day == dia_hoy and fecha_obj.month == mes_hoy:
                 es_hoy = 1
-        except:
+        except Exception:
             fecha_bonita = fecha_str
         cumpleanos_limpios.append((usuario_c, puesto_c, fecha_bonita, es_hoy))
 
@@ -249,7 +237,6 @@ def inicio():
     cursor.close()
     conn.close()
 
-# Miga de pan / Breadcrumbs
     breadcrumbs = obtener_ruta_carpetas(carpeta_actual_id)
 
     return render_template(
@@ -358,7 +345,6 @@ def borrar_archivo(id):
             return redirect(url_for('inicio', folder_id=carpeta_id))
     return redirect(url_for('inicio'))
 
-# Resto de rutas (login, registro, logout, mensajes, likes, etc.)
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
