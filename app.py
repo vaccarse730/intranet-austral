@@ -252,12 +252,25 @@ def inicio():
     # Miga de pan / Breadcrumbs
     breadcrumbs = obtener_ruta_carpetas(carpeta_actual_id)
 
-    return render_template('intranet.html', mensajes=mensajes, mis_likes=mis_likes, archivos=archivos, 
-                           carpetas=carpetas, carpeta_actual_id=carpeta_actual_id, breadcrumbs=breadcrumbs,
-                           cumpleanos=cumpleanos_limpios, usuario=session['usuario'], puesto=session['puesto'], 
-                           contactos=contactos, tipo_cambio=tipo_cambio, d_fecha=d_fecha, d_hora=d_hora, 
-                           d_usuario=d_usuario, d_anterior=d_anterior, links=links)
-
+return render_template(
+    'intranet.html',
+    mensajes=mensajes,
+    mis_likes=mis_likes,
+    archivos=archivos,
+    carpetas=carpetas,
+    carpeta_actual_id=carpeta_actual_id,
+    breadcrumbs=breadcrumbs,
+    cumpleanos=cumpleanos_limpios,
+    usuario=session.get('usuario'),
+    puesto=session.get('puesto'),
+    contactos=contactos,
+    tipo_cambio=tipo_cambio,
+    d_fecha=d_fecha,
+    d_hora=d_hora,
+    d_usuario=d_usuario,
+    d_anterior=d_anterior,
+    links=links
+)    
 @app.route('/crear_carpeta', methods=['POST'])
 def crear_carpeta():
     if 'usuario' in session:
