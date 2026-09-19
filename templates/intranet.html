@@ -375,7 +375,7 @@
                 <form action="/subir" method="POST" enctype="multipart/form-data">
                     <input type="file" name="archivo" required style="font-size:11px; margin-bottom:5px;"><br>
                     <select name="carpeta_destino" style="width:100%; padding:3px; font-size:12px; margin-bottom:8px;">
-                        {% for carpeta, creador_c in carpetas %}
+                        {% for id_c, carpeta, creador_c in carpetas %}
                         <option value="{{ carpeta }}">{{ carpeta }}</option>
                         {% endfor %}
                     </select>
