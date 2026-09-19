@@ -1,20 +1,18 @@
 <!DOCTYPE html>
 <html lang="es">
-<!DOCTYPE html>
-<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Austral - Portal Intranet</title>
-    <!-- Fuente Tipográfica Moderna alineada a la web principal -->
+    <!-- Fuentes e Íconos -->
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
         :root {
-            --primary: #0b1f3a;       /* Azul Marino Profundo Austral */
+            --primary: #0b1f3a;        /* Azul Marino Profundo Austral */
             --primary-hover: #15325b;
-            --accent: #c5a059;        /* Dorado sutil / Lujo */
+            --accent: #c5a059;         /* Dorado sutil */
             --bg-body: #f4f6f8;
             --card-bg: #ffffff;
             --text-main: #2b2b2b;
@@ -119,7 +117,7 @@
             text-transform: uppercase;
         }
 
-        /* BOTÓN HERRAMIENTAS FLOTANTE Y CUADRADO */
+        /* BOTÓN HERRAMIENTAS FLOTANTE */
         .btn-menu-flotante { 
             position: fixed; 
             bottom: 90px; 
@@ -176,7 +174,7 @@
             font-size: 13px;
         }
 
-        /* FOOTER FIX DE DIRECTORIO */
+        /* FOOTER DIRECTORIO */
         .fixed-footer { 
             position: fixed; 
             bottom: 0; 
@@ -220,7 +218,7 @@
         <i class="fa-solid fa-folder-open"></i> Herramientas de Oficina
     </button>
 
-    <!-- HEADER PRINCIPAL MEJORADO -->
+    <!-- HEADER PRINCIPAL -->
     <header>
         <h1>🏢 Austral</h1>
         
@@ -251,20 +249,20 @@
     <!-- COLUMNA CENTRAL ÚNICA -->
     <div class="container">
         <!-- Publicar en el Muro (Desplegable) -->
-<div class="card">
-    <h2 onclick="toggleFolder('form-publicar')" style="cursor: pointer; display: flex; justify-content: space-between; align-items: center; user-select: none;">
-        <span>📢 Publicar en el Muro</span>
-        <span style="font-size: 12px; color: var(--text-muted); font-weight: normal;">(Clic para desplegar)</span>
-    </h2>
-    <div id="form-publicar" style="display: none; margin-top: 15px;">
-        <form action="/publicar" method="POST" enctype="multipart/form-data">
-            <textarea name="contenido" placeholder="Escribe un anuncio para el equipo..."></textarea>
-            <p style="margin: 5px 0 10px 0; font-size: 13px; color: var(--text-muted);">O sube una foto desde tu PC:</p>
-            <input type="file" name="foto" accept="image/*" style="font-size: 12px; margin-bottom: 15px;"><br>
-            <button type="submit">Publicar</button>
-        </form>        
-    </div>
-</div>
+        <div class="card">
+            <h2 onclick="toggleFolder('form-publicar')" style="cursor: pointer; display: flex; justify-content: space-between; align-items: center; user-select: none;">
+                <span>📢 Publicar en el Muro</span>
+                <span style="font-size: 12px; color: var(--text-muted); font-weight: normal;">(Clic para desplegar)</span>
+            </h2>
+            <div id="form-publicar" style="display: none; margin-top: 15px;">
+                <form action="/publicar" method="POST" enctype="multipart/form-data">
+                    <textarea name="contenido" placeholder="Escribe un anuncio para el equipo..."></textarea>
+                    <p style="margin: 5px 0 10px 0; font-size: 13px; color: var(--text-muted);">O sube una foto desde tu PC:</p>
+                    <input type="file" name="foto" accept="image/*" style="font-size: 12px; margin-bottom: 15px;"><br>
+                    <button type="submit">Publicar</button>
+                </form>        
+            </div>
+        </div>
 
         <!-- Historial del Muro -->
         <div class="card">
@@ -281,33 +279,31 @@
                         {% endif %}
                     </div>
                    
-		<!-- CÓDIGO CORREGIDO -->
-	{% if '|' in contenido %}
-    		<!-- 1. Muestra el texto limpio -->
-    		<p style="font-size: 14px; line-height: 1.5; margin: 8px 0; white-space: pre-wrap;">				  {{ contenido.split('|')[0] }}</p>
-    	  {% if es_foto == 1 %}
-        	<!-- 2. Muestra solo el nombre de la imagen -->
-        	<img src="/static/uploads/{{ contenido.split('|')[1] }}" style="max-width: 100%; max-height: 350px; 				border-radius: 6px; margin-top: 5px; display: block; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-    	  {% endif %}
-	  {% else %}
-    	  {% if es_foto == 1 %}
-        	<!-- Si solo subieron foto sin texto -->
-        	<img src="/static/uploads/{{ contenido }}" style="max-width: 100%; max-height: 350px; border-radius: 6px; 			margin-top: 5px; display: block; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-    	  {% else %}
-        	<!-- Si solo subieron texto sin foto -->
-        	<p style="font-size: 14px; line-height: 1.5; margin: 8px 0; white-space: pre-wrap;">{{ contenido }}</p>
-    	  {% endif %}
-        {% endif %}                    
+                    {% if '|' in contenido %}
+                        <p style="font-size: 14px; line-height: 1.5; margin: 8px 0; white-space: pre-wrap;">{{ contenido.split('|')[0] }}</p>
+                        {% if es_foto == 1 %}
+                        <img src="/static/uploads/{{ contenido.split('|')[1] }}" style="max-width: 100%; max-height: 350px; border-radius: 6px; margin-top: 5px; display: block; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                        {% endif %}
+                    {% else %}
+                        {% if es_foto == 1 %}
+                        <img src="/static/uploads/{{ contenido }}" style="max-width: 100%; max-height: 350px; border-radius: 6px; margin-top: 5px; display: block; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                        {% else %}
+                        <p style="font-size: 14px; line-height: 1.5; margin: 8px 0; white-space: pre-wrap;">{{ contenido }}</p>
+                        {% endif %}
+                    {% endif %}                    
                    
-	 <div style="margin-top: 10px;">
+                    <div style="margin-top: 10px;">
                         <a href="/like/{{ id_m }}" style="background: #ffc107; color: black; text-decoration: none; padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: bold; display: inline-block;">👍 Me gusta ({{ likes_count }})</a>
                     </div>
                 </div>
                 {% else %}
                 <p style="text-align: center; color: #888; font-size: 14px; padding: 20px;">No hay anuncios publicados en el muro.</p>
                 {% endfor %}
+            </div>
+        </div>
+    </div>
 
-    <!-- PIEZA 2: PANEL LATERAL DE HERRAMIENTAS RETRÁCTIL -->
+    <!-- PANEL LATERAL DE HERRAMIENTAS RETRÁCTIL -->
     <div id="sidebarHerramientas" class="sidebar-panel">
         <span class="sidebar-close" onclick="toggleSidebar()">×</span>
         <h3 style="color: #0056b3; margin-bottom: 20px; font-size: 18px; border-bottom: 2px solid #ccc; padding-bottom: 5px;">🛠️ Herramientas</h3>
@@ -332,32 +328,30 @@
             </div>
         </div>
 
-<!-- 2. LINKS DE INTERÉS DESPLEGABLE -->
-<div class="card" style="padding: 10px; margin-bottom: 15px; box-shadow: none; border: 1px solid #ddd;">
-    <div class="folder-header" onclick="toggleFolder('links-side')">
-        <span>🔗 Links de Interés</span>
-    </div>
-    <div id="links-side" style="display: none; margin-top: 10px;">
-        <!-- 1. LISTA DE LINKS (ARRIBA) -->
-        <ul style="list-style: none; padding: 0; font-size: 13px; margin-top: 0; margin-bottom: 10px;">
-            {% for id_l, tit_l, url_l, creador_l in links %}
-            <li style="display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid #eee;">
-                <a href="{{ url_l }}" target="_blank" style="color:#0056b3; text-decoration:none;">🔗 {{ tit_l }}</a>
-                {% if creador_l == usuario or puesto == 'Administrador' %}
-                <a href="/borrar_link/{{ id_l }}" style="color:red; text-decoration:none;">❌</a>
-                {% endif %}
-            </li>
-            {% endfor %}
-        </ul>
+        <!-- 2. LINKS DE INTERÉS DESPLEGABLE -->
+        <div class="card" style="padding: 10px; margin-bottom: 15px; box-shadow: none; border: 1px solid #ddd;">
+            <div class="folder-header" onclick="toggleFolder('links-side')">
+                <span>🔗 Links de Interés</span>
+            </div>
+            <div id="links-side" style="display: none; margin-top: 10px;">
+                <ul style="list-style: none; padding: 0; font-size: 13px; margin-top: 0; margin-bottom: 10px;">
+                    {% for id_l, tit_l, url_l, creador_l in links %}
+                    <li style="display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid #eee;">
+                        <a href="{{ url_l }}" target="_blank" style="color:#0056b3; text-decoration:none;">🔗 {{ tit_l }}</a>
+                        {% if creador_l == usuario or puesto == 'Administrador' %}
+                        <a href="/borrar_link/{{ id_l }}" style="color:red; text-decoration:none;">❌</a>
+                        {% endif %}
+                    </li>
+                    {% endfor %}
+                </ul>
 
-        <!-- 2. FORMULARIO PARA AÑADIR (ABAJO) -->
-        <form action="/crear_link" method="POST" style="display: flex; flex-direction: column; gap: 5px; border-top: 1px solid #eee; padding-top: 8px;">
-            <input type="text" name="tit_link" placeholder="Título..." required style="padding:4px; font-size:12px;">
-            <input type="text" name="url_link" placeholder="Dirección..." required style="padding:4px; font-size:12px;">
-            <button type="submit" style="padding:4px; font-size:12px;">+ Añadir</button>
-        </form>
-    </div>
-</div>
+                <form action="/crear_link" method="POST" style="display: flex; flex-direction: column; gap: 5px; border-top: 1px solid #eee; padding-top: 8px;">
+                    <input type="text" name="tit_link" placeholder="Título..." required style="padding:4px; font-size:12px;">
+                    <input type="text" name="url_link" placeholder="Dirección..." required style="padding:4px; font-size:12px;">
+                    <button type="submit" style="padding:4px; font-size:12px;">+ Añadir</button>
+                </form>
+            </div>
+        </div>
 
         <!-- 3. CREAR CARPETA DESPLEGABLE -->
         <div class="card" style="padding: 10px; margin-bottom: 15px; box-shadow: none; border: 1px solid #ddd;">
@@ -425,7 +419,7 @@
         </div>
     </div>
 
-    <!-- FOOTER STICKY FIJO CON EL DIRECTORIO HORIZONTAL -->
+    <!-- FOOTER STICKY FIJO -->
     <footer class="fixed-footer">
         <div class="footer-top-layout" onclick="toggleFooterDir()">
             <div style="display: flex; align-items: center; gap: 10px;">
@@ -484,7 +478,6 @@
             </table>
         </div>
 
-        <!-- Barra de créditos y redes sociales vectoriales nativas SVG -->
         <div class="footer-bottom-bar">
             <div>© 2026 <b>Austral</b>. Portal Interno.</div>
             <div class="footer-redes">
@@ -498,13 +491,13 @@
                     <svg style="width:12px; height:12px; fill:currentColor;" viewBox="0 0 24 24"><path d="M7.8 2h8.4C19.4 2 22 4.6 22 7.8v8.4a5.8 5.8 0 0 1-5.8 5.8H7.8C4.6 22 2 19.4 2 16.2V7.8A5.8 5.8 0 0 1 7.8 2m-.2 2A3.6 3.6 0 0 0 4 7.6v8.8A3.6 3.6 0 0 0 7.6 20h8.8a3.6 3.6 0 0 0 3.6-3.6V7.6A3.6 3.6 0 0 0 16.4 4H7.6m11.4 2a1.2 1.2 0 1 1-1.2 1.2A1.2 1.2 0 0 1 19 6m-7 2a4 4 0 1 1-4 4 4 4 0 0 1 4-4m0 2a2 2 0 1 0 2 2 2 2 0 0 1-2-2z"/></svg> Instagram
                 </a>
                 <a href="https://www.youtube.com/@australmx4858" target="_blank" style="color: #ff0000;">
-                    <svg style="width:12px; height:12px; fill:currentColor;" viewBox="0 0 24 24"><path d="M23.498 6.163a3.003 3.003 0 0 0-2.11-2.11C19.517 3.545 12 3.545 12 3.545s-7.516 0-9.387.508a3.003 3.003 0 0 0-2.11 2.11C0 8.033 0 12 0 12s0 3.967.503 5.837a3.003 3.003 0 0 0 2.11 2.11c1.871.508 9.387.508 9.387.508s7.517 0 9.387-.508a3.003 3.003 0 0 0 2.11-2.11c.503-1.87 	.503-5.837.503-5.837s0-3.967-.503-5.837zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg> YouTube
+                    <svg style="width:12px; height:12px; fill:currentColor;" viewBox="0 0 24 24"><path d="M23.498 6.163a3.003 3.003 0 0 0-2.11-2.11C19.517 3.545 12 3.545 12 3.545s-7.516 0-9.387.508a3.003 3.003 0 0 0-2.11 2.11C0 8.033 0 12 0 12s0 3.967.503 5.837a3.003 3.003 0 0 0 2.11 2.11c1.871.508 9.387.508 9.387.508s7.517 0 9.387-.508a3.003 3.003 0 0 0 2.11-2.11c.503-1.87.503-5.837.503-5.837s0-3.967-.503-5.837zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg> YouTube
                 </a>
             </div>
         </div>
     </footer>
 
-    <!-- SCRIPTS DE CONTROL DE COMPORTAMIENTO INTERACTIVO -->
+    <!-- SCRIPTS -->
     <script>
         function toggleSidebar() {
             let panel = document.getElementById('sidebarHerramientas');
@@ -532,31 +525,21 @@
             }
         }
 
+        // Búsqueda en Directorio de Contactos
         document.getElementById('buscarContacto').addEventListener('keyup', function() {
             let filter = this.value.toLowerCase();
             document.querySelectorAll('.contacto-row').forEach(function(fila) {
                 let textoFila = fila.innerText.toLowerCase();
+                
+                let inputs = fila.querySelectorAll('input');
+                inputs.forEach(function(input) {
+                    textoFila += ' ' + input.value.toLowerCase();
+                });
+
                 fila.style.display = textoFila.includes(filter) ? "table-row" : "none";
             });
         });
 
-// CÓDIGO CORREGIDO
-document.getElementById('buscarContacto').addEventListener('keyup', function() {
-    let filter = this.value.toLowerCase();
-    document.querySelectorAll('.contacto-row').forEach(function(fila) {
-        // 1. Obtener texto visible de la fila (Nombre y Área)
-        let textoFila = fila.innerText.toLowerCase();
-        
-        // 2. Obtener el valor de los inputs (Teléfono y Correo)
-        let inputs = fila.querySelectorAll('input');
-        inputs.forEach(function(input) {
-            textoFila += ' ' + input.value.toLowerCase();
-        });
-
-        // 3. Evaluar coincidencia
-        fila.style.display = textoFila.includes(filter) ? "table-row" : "none";
-    });
-});
         function habilitarEdicion(id) {
             let inputTel = document.getElementById('input-tel-' + id);
             let inputCorr = document.getElementById('input-corr-' + id);
@@ -577,30 +560,31 @@ document.getElementById('buscarContacto').addEventListener('keyup', function() {
         }
 
         function copiarContacto(nombre, area, telefono, correo) {
-            let textoCompleto = nombre + " (" + area + ") - Tel: " + telefono + " | Correo: " + correo;
-            navigator.clipboard.writeText(textoCompleto).then(function() {
-                alert("¡Contacto copiado de Austral!\n" + textoCompleto);
+            let textoCompleto = nombre + " (" + area + ") - Tel: " + telefono + " - Email: " + correo;
+            navigator.clipboard.writeText(textoCompleto).then(() => {
+                alert("Contacto copiado al portapapeles: " + nombre);
+            }).catch(err => {
+                console.error('Error al copiar: ', err);
             });
         }
+   
 
-	document.getElementById('buscarAnuncio').addEventListener('keyup', function() {
-    let filter = this.value.toLowerCase().trim();
-    
-    document.querySelectorAll('.msg-item').forEach(function(card) {
-        // Obtiene todo el texto visible e interno de la tarjeta del anuncio
-        let textoCard = card.textContent || card.innerText;
-        textoCard = textoCard.toLowerCase();
-        
-        // Si hay coincidencia con la búsqueda, se muestra; de lo contrario se oculta
-        if (filter === '' || textoCard.includes(filter)) {
-            card.style.display = "block";
-        } else {
-            card.style.display = "none";
-        }
-    });
-});
+        document.getElementById('buscarAnuncio').addEventListener('keyup', function() {
+            let filter = this.value.toLowerCase().trim();
+
+            document.querySelectorAll('.msg-item').forEach(function(card) {
+                // Obtiene todo el texto visible e interno de la tarjeta del anuncio
+                let textoCard = card.textContent || card.innerText;
+                textoCard = textoCard.toLowerCase();
+
+                // Si hay coincidencia con la búsqueda, se muestra; de lo contrario se oculta
+                if (filter === '' || textoCard.includes(filter)) {
+                    card.style.display = "block";
+                } else {
+                    card.style.display = "none";
+                }
+            });
+        });
     </script>
 </body>
 </html>
-
-
