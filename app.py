@@ -273,6 +273,7 @@ def inicio():
         d_usuario=d_usuario,
         d_anterior=d_anterior,
         links=links)
+    
 @app.route('/crear_carpeta', methods=['POST'])
 def crear_carpeta():
     if 'usuario' in session:
