@@ -360,6 +360,7 @@
             </div>
             <div id="carp-side" style="display: none; margin-top: 10px;">
                 <form action="/crear_carpeta" method="POST">
+                    <input type="hidden" name="padre_id" value="{{ carpeta_actual_id or '' }}">
                     <input type="text" name="nombre_carpeta" placeholder="Nombre..." required style="width:100%; padding:5px; font-size:12px; margin-bottom:5px;">
                     <button type="submit" style="padding:4px 10px; font-size:12px;">Crear</button>
                 </form>
@@ -374,9 +375,10 @@
             <div id="subir-side" style="display: none; margin-top: 10px;">
                 <form action="/subir" method="POST" enctype="multipart/form-data">
                     <input type="file" name="archivo" required style="font-size:11px; margin-bottom:5px;"><br>
-                    <select name="carpeta_destino" style="width:100%; padding:3px; font-size:12px; margin-bottom:8px;">
+                    <select name="carpeta_id" style="width:100%; padding:3px; font-size:12px; margin-bottom:8px;">
+                        <option value="">Raíz (Sin carpeta)</option>
                         {% for id_c, carpeta, creador_c in carpetas %}
-                        <option value="{{ carpeta }}">{{ carpeta }}</option>
+                        <option value="{{ id_c }}" {% if id_c == carpeta_actual_id %}selected{% endif %}>{{ carpeta }}</option>
                         {% endfor %}
                     </select>
                     <button type="submit" style="padding:4px 10px; font-size:12px;">Subir</button>
@@ -384,37 +386,54 @@
             </div>
         </div>
 
-        <!-- 5. ARCHIVOS GUARDADOS POR CARPETA -->
+        <!-- 5. ARCHIVOS GUARDADOS Y CARPETAS -->
         <div class="card" style="padding: 10px; margin-bottom: 15px; box-shadow: none; border: 1px solid #ddd;">
             <div class="folder-header" onclick="toggleFolder('arch-carp-side')">
-                <span>🔍📄 Archivos Guardados</span>
+                <span>🔍📄 Explorador de Archivos</span>
             </div>
             <div id="arch-carp-side" style="display: none; margin-top: 10px;">
-                <input type="text" id="buscarArchivo" placeholder="🔍 Buscar archivos..." style="width:100%; padding:4px; font-size:12px; margin-bottom:10px;">
-                {% for id_a, nom_carp, creador_carp in carpetas %}
-                <div class="folder-item" style="margin-bottom: 5px; border-bottom: 1px solid #eee; padding-bottom: 5px;">
-                    <span style="font-size:12px; font-weight:bold; color:#0056b3; cursor:pointer;" onclick="toggleFolder('subfolder-{{ loop.index }}')">📁 {{ nom_carp }}</span>
-                    {% if (creador_carp|lower == usuario|lower or puesto|lower == 'administrador') and nom_carp != 'General' %}
-                    <a href="/borrar_carpeta/{{ nom_carp }}" style="color:red; font-size:10px; text-decoration:none; margin-left:5px;">❌</a>
-                    {% endif %}
-                    
-                    <ul id="subfolder-{{ loop.index }}" class="subfolder-list" style="display:none; padding-left:10px; list-style:none; font-size:11px; color:#555; margin-top:3px;">
-                        {% for nombre_archivo, subido_por, fecha, carpeta_archivo in archivos %}
-                            {% if carpeta_archivo == nom_carp %}
-                            <li class="file-item" style="margin-bottom:4px; display:flex; justify-content:space-between; align-items:center;">
-                                <span title="{{ nombre_archivo }}">📄 {{ nombre_archivo[:12] }}...</span>
-                                <div>
-                                    <a href="/descargar/{{ nombre_archivo }}" style="color:green; text-decoration:none; font-weight:bold; margin-right:4px;">⬇️</a>
-                                    {% if subido_por == usuario %}
-                                    <a href="/borrar_archivo/{{ nombre_archivo }}" style="color:red; text-decoration:none;">❌</a>
-                                    {% endif %}
-                                </div>
-                            </li>
-                            {% endif %}
-                        {% endfor %}
-                    </ul>
+                
+                <!-- Migas de pan (Navegación) -->
+                <div style="font-size: 11px; margin-bottom: 10px;">
+                    <a href="/" style="text-decoration:none; font-weight:bold; color:#0056b3;">🏠 Raíz</a>
+                    {% for crumb in breadcrumbs %}
+                        / <a href="/?folder_id={{ crumb.id }}" style="text-decoration:none; color:#0056b3;">{{ crumb.nombre }}</a>
+                    {% endfor %}
                 </div>
-                {% endfor %}
+
+                <!-- Lista de Subcarpetas -->
+                <div style="margin-bottom: 10px;">
+                    <b style="font-size:11px; color:#666;">Carpetas:</b>
+                    {% for id_c, nom_carp, creador_carp in carpetas %}
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:3px; font-size:12px;">
+                        <a href="/?folder_id={{ id_c }}" style="text-decoration:none; color:#0056b3; font-weight:bold;">📁 {{ nom_carp }}</a>
+                        {% if creador_carp|lower == usuario|lower or puesto|lower == 'administrador' %}
+                        <a href="/borrar_carpeta/{{ id_c }}" onclick="return confirm('¿Borrar carpeta?')" style="color:red; font-size:10px; text-decoration:none;">❌</a>
+                        {% endif %}
+                    </div>
+                    {% else %}
+                    <p style="font-size:11px; color:#999;">Sin subcarpetas.</p>
+                    {% endfor %}
+                </div>
+
+                <!-- Lista de Archivos -->
+                <div>
+                    <b style="font-size:11px; color:#666;">Archivos:</b>
+                    {% for id_a, nombre_archivo, subido_por, fecha, c_id in archivos %}
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:4px; font-size:11px;">
+                        <span title="{{ nombre_archivo }}">📄 {{ nombre_archivo[:14] }}...</span>
+                        <div>
+                            <a href="/descargar/{{ nombre_archivo }}" style="color:green; text-decoration:none; font-weight:bold; margin-right:4px;">⬇️</a>
+                            {% if subido_por == usuario or puesto == 'Administrador' %}
+                            <a href="/borrar_archivo/{{ id_a }}" onclick="return confirm('¿Borrar archivo?')" style="color:red; text-decoration:none;">❌</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% else %}
+                    <p style="font-size:11px; color:#999;">Sin archivos aquí.</p>
+                    {% endfor %}
+                </div>
+
             </div>
         </div>
     </div>
@@ -530,12 +549,10 @@
             let filter = this.value.toLowerCase();
             document.querySelectorAll('.contacto-row').forEach(function(fila) {
                 let textoFila = fila.innerText.toLowerCase();
-                
                 let inputs = fila.querySelectorAll('input');
                 inputs.forEach(function(input) {
                     textoFila += ' ' + input.value.toLowerCase();
                 });
-
                 fila.style.display = textoFila.includes(filter) ? "table-row" : "none";
             });
         });
@@ -571,46 +588,13 @@
         // Búsqueda en Muro de Anuncios General
         document.getElementById('buscarAnuncio').addEventListener('keyup', function() {
             let filter = this.value.toLowerCase().trim();
-
             document.querySelectorAll('.msg-item').forEach(function(card) {
                 let textoCard = card.textContent || card.innerText;
                 textoCard = textoCard.toLowerCase();
-
                 if (filter === '' || textoCard.includes(filter)) {
                     card.style.display = "block";
                 } else {
                     card.style.display = "none";
-                }
-            });
-        });
-
-        // Búsqueda de Archivos en el Panel Lateral
-        document.getElementById('buscarArchivo').addEventListener('keyup', function() {
-            let filter = this.value.toLowerCase().trim();
-
-            document.querySelectorAll('.folder-item').forEach(function(folder) {
-                let subfolder = folder.querySelector('.subfolder-list');
-                let files = folder.querySelectorAll('.file-item');
-                let coincidenciaEnCarpeta = false;
-
-                files.forEach(function(file) {
-                    let textFile = file.textContent.toLowerCase();
-                    if (filter === '' || textFile.includes(filter)) {
-                        file.style.display = "flex";
-                        coincidenciaEnCarpeta = true;
-                    } else {
-                        file.style.display = "none";
-                    }
-                });
-
-                if (filter !== '' && coincidenciaEnCarpeta) {
-                    subfolder.style.display = "block";
-                    folder.style.display = "block";
-                } else if (filter !== '' && !coincidenciaEnCarpeta) {
-                    folder.style.display = "none";
-                } else {
-                    folder.style.display = "block";
-                    subfolder.style.display = "none";
                 }
             });
         });
