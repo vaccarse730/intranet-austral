@@ -287,6 +287,11 @@
 </footer>
 
 <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        let sb = document.getElementById('sidebarHerramientas');
+        if (sb) sb.classList.remove('active');
+    });
+
     function cargarCarpeta(url, e) {
         if (e) e.preventDefault();
         fetch(url)
