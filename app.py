@@ -3,7 +3,7 @@ import json
 import os
 from flask import Flask, render_template, request, redirect, url_for, session, send_from_directory
 from werkzeug.utils import secure_filename
-import sqlite3
+import psycopg2
 from datetime import datetime
 
 app = Flask(__name__)
@@ -14,6 +14,13 @@ os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
 EXTENSIONES_IMAGEN = {'png', 'jpg', 'jpeg', 'gif'}
 
+def get_db_connection():
+    database_url = os.environ.get('DATABASE_URL')
+    if not database_url:
+        raise ValueError("La variable DATABASE_URL no está configurada.")
+    conn = psycopg2.connect(database_url)
+    return conn
+
 def es_imagen(filename):
     if '.' in filename:
         ext = filename.rsplit('.', 1)[1].lower()
@@ -21,13 +28,13 @@ def es_imagen(filename):
     return False
 
 def init_db():
-    conn = sqlite3.connect('intranet_nueva.db')
+    conn = get_db_connection()
     cursor = conn.cursor()
     
     # 1. Tabla de Usuarios
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS usuarios (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id SERIAL PRIMARY KEY,
             usuario TEXT UNIQUE,
             clave TEXT,
             puesto TEXT,
@@ -38,7 +45,7 @@ def init_db():
     # 2. Tabla de Mensajes del Muro
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS mensajes (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id SERIAL PRIMARY KEY,
             autor TEXT,
             contenido TEXT,
             es_foto INTEGER DEFAULT 0,
@@ -50,7 +57,7 @@ def init_db():
     # 3. Tabla de Likes
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS likes (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id SERIAL PRIMARY KEY,
             mensaje_id INTEGER,
             usuario TEXT,
             UNIQUE(mensaje_id, usuario)
@@ -60,7 +67,7 @@ def init_db():
     # 4. Tabla de Archivos
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS archivos (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id SERIAL PRIMARY KEY,
             nombre_archivo TEXT UNIQUE,
             subido_por TEXT,
             fecha TEXT,
@@ -71,7 +78,7 @@ def init_db():
     # 5. Tabla de Carpetas
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS carpetas (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id SERIAL PRIMARY KEY,
             nombre TEXT UNIQUE,
             creador TEXT DEFAULT 'Sistema'
         )
@@ -80,14 +87,14 @@ def init_db():
     # 6. Tabla del Directorio Telefónico
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS directorio (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id SERIAL PRIMARY KEY,
             nombre TEXT,
             telefono TEXT,
             area TEXT,
-            creador TEXT
+            creador TEXT,
+            correo TEXT DEFAULT 'No registrado'
         )
     ''')
-
     
     # 7. Tabla de Configuración del Dólar
     cursor.execute('''
@@ -96,30 +103,43 @@ def init_db():
             valor TEXT
         )
     ''')
+
+    # 8. Tabla de Links de Interés
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS links_interes (
+            id SERIAL PRIMARY KEY,
+            titulo TEXT,
+            enlace TEXT,
+            creador TEXT
+        )
+    ''')
     
-    # Inyección segura de valores por defecto (Si ya existen, los ignora)
+    # Inyección segura de valores por defecto
     try:
-        cursor.execute("INSERT OR IGNORE INTO carpetas (nombre, creador) VALUES ('General', 'Sistema')")
-        cursor.execute("INSERT OR IGNORE INTO configuracion (clave, valor) VALUES ('dolar', '17.35')")
-        cursor.execute("INSERT OR IGNORE INTO configuracion (clave, valor) VALUES ('dolar_fecha', '16/09/2026')")
-        cursor.execute("INSERT OR IGNORE INTO configuracion (clave, valor) VALUES ('dolar_hora', '12:00')")
-        cursor.execute("INSERT OR IGNORE INTO configuracion (clave, valor) VALUES ('dolar_usuario', 'Sistema')")
-        cursor.execute("INSERT OR IGNORE INTO configuracion (clave, valor) VALUES ('dolar_anterior', '17.35')")
+        cursor.execute("INSERT INTO carpetas (nombre, creador) VALUES ('General', 'Sistema') ON CONFLICT (nombre) DO NOTHING")
+        cursor.execute("INSERT INTO configuracion (clave, valor) VALUES ('dolar', '17.35') ON CONFLICT (clave) DO NOTHING")
+        cursor.execute("INSERT INTO configuracion (clave, valor) VALUES ('dolar_fecha', '16/09/2026') ON CONFLICT (clave) DO NOTHING")
+        cursor.execute("INSERT INTO configuracion (clave, valor) VALUES ('dolar_hora', '12:00') ON CONFLICT (clave) DO NOTHING")
+        cursor.execute("INSERT INTO configuracion (clave, valor) VALUES ('dolar_usuario', 'Sistema') ON CONFLICT (clave) DO NOTHING")
+        cursor.execute("INSERT INTO configuracion (clave, valor) VALUES ('dolar_anterior', '17.35') ON CONFLICT (clave) DO NOTHING")
 
         conn.commit()
     except Exception as e:
         print(f"Aviso en base de datos: {e}")
+        conn.rollback()
         
-    # EL CIERRE AL FINAL: Ahora sí cerramos la base de datos de forma segura
+    cursor.close()
     conn.close()
 
+# Inicializamos las tablas en Supabase
+init_db()
 
 @app.route('/')
 def inicio():
     if 'usuario' not in session or 'puesto' not in session:
         return redirect(url_for('logout'))
     
-    conn = sqlite3.connect('intranet_nueva.db')
+    conn = get_db_connection()
     cursor = conn.cursor()
     
     cursor.execute('''
@@ -129,54 +149,39 @@ def inicio():
     ''')
     mensajes = cursor.fetchall()
     
-    cursor.execute("SELECT mensaje_id FROM likes WHERE usuario = ?", (session['usuario'],))
+    cursor.execute("SELECT mensaje_id FROM likes WHERE usuario = %s", (session['usuario'],))
     mis_likes = [fila[0] for fila in cursor.fetchall()]
     
-    # Aquí corregimos los espacios para que queden alineados con los de arriba:
-    cursor.execute("SELECT nombre, creador FROM carpetas ORDER BY nombre ASC")
-    carpetas = cursor.fetchall()
     cursor.execute("SELECT nombre, creador FROM carpetas ORDER BY nombre ASC")
     carpetas = cursor.fetchall()
     
-    # ¡ESTA ES LA LÍNEA QUE FALTA! Agrégala aquí abajo:
     cursor.execute("SELECT nombre_archivo, subido_por, fecha, carpeta FROM archivos ORDER BY id DESC")
     archivos = cursor.fetchall()
 
-    
-    cursor.execute("SELECT nombre, creador FROM carpetas ORDER BY nombre ASC")
-    carpetas = cursor.fetchall()
-
-    
     cursor.execute("SELECT usuario, puesto, cumpleanos FROM usuarios ORDER BY cumpleanos ASC")
     todos_cumpleanos = cursor.fetchall()
-    # NUEVO: Detector automático de cumpleañeros del día de hoy
+    
     dia_hoy = datetime.now().day
     mes_hoy = datetime.now().month
     
-    # REGRESAMOS LA CONSULTA EXCELENTE DEL DIRECTORIO CON CORREO
     cursor.execute("SELECT id, nombre, telefono, area, creador, correo FROM directorio ORDER BY nombre ASC")
     contactos = cursor.fetchall()
+    
     cumpleanos_limpios = []
     for usuario_c, puesto_c, fecha_str in todos_cumpleanos:
-        es_hoy = 0  # Marcador: 0 = normal, 1 = cumple años hoy
+        es_hoy = 0
         try:
             fecha_obj = datetime.strptime(fecha_str, '%Y-%m-%d')
             meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
             fecha_bonita = f"{fecha_obj.day} de {meses[fecha_obj.month - 1]}"
             
-            # Si el día y el mes coinciden con la fecha actual del servidor, activamos la alerta
             if fecha_obj.day == dia_hoy and fecha_obj.month == mes_hoy:
                 es_hoy = 1
         except:
             fecha_bonita = fecha_str
             
-        # Pasamos el dato extra "es_hoy" a la lista para el HTML
         cumpleanos_limpios.append((usuario_c, puesto_c, fecha_bonita, es_hoy))
-       
-    # LECTURA CORREGIDA Y DESEMPAQUETADA DE CONFIGURACIÓN
-    conn = sqlite3.connect('intranet_nueva.db')
-    cursor = conn.cursor()
-    
+        
     cursor.execute("SELECT valor FROM configuracion WHERE clave = 'dolar'")
     f_dolar = cursor.fetchone()
     tipo_cambio = f_dolar[0] if f_dolar else "17.35"
@@ -193,7 +198,6 @@ def inicio():
     f_user = cursor.fetchone()
     d_usuario = f_user[0] if f_user else "Sistema"
     
-    # ¡AQUÍ ESTÁ LA CORRECCIÓN CLAVE! Le agregamos el [0] para desenvolver el precio viejo:
     cursor.execute("SELECT valor FROM configuracion WHERE clave = 'dolar_anterior'")
     f_ant = cursor.fetchone()
     d_anterior = f_ant[0] if f_ant else "17.35"
@@ -201,10 +205,12 @@ def inicio():
     cursor.execute("SELECT id, titulo, enlace, creador FROM links_interes ORDER BY titulo ASC")
     links = cursor.fetchall()
     
+    cursor.close()
     conn.close()
 
     return render_template('intranet.html', mensajes=mensajes, mis_likes=mis_likes, archivos=archivos, 
-                           carpetas=carpetas, cumpleanos=cumpleanos_limpios, usuario=session['usuario'], puesto=session['puesto'], contactos=contactos, 				   tipo_cambio=tipo_cambio, d_fecha=d_fecha, d_hora=d_hora, d_usuario=d_usuario, d_anterior=d_anterior, links=links)
+                           carpetas=carpetas, cumpleanos=cumpleanos_limpios, usuario=session['usuario'], puesto=session['puesto'], contactos=contactos, 
+                           tipo_cambio=tipo_cambio, d_fecha=d_fecha, d_hora=d_hora, d_usuario=d_usuario, d_anterior=d_anterior, links=links)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -212,10 +218,11 @@ def login():
         usuario = request.form['usuario']
         clave = request.form['clave']
         
-        conn = sqlite3.connect('intranet_nueva.db')
+        conn = get_db_connection()
         cursor = conn.cursor()
-        cursor.execute("SELECT puesto FROM usuarios WHERE usuario=? AND clave=?", (usuario, clave))
+        cursor.execute("SELECT puesto FROM usuarios WHERE usuario=%s AND clave=%s", (usuario, clave))
         user = cursor.fetchone()
+        cursor.close()
         conn.close()
         
         if user:
@@ -234,15 +241,18 @@ def registro():
         puesto = request.form['puesto']
         cumpleanos = request.form['cumpleanos']
         
-        conn = sqlite3.connect('intranet_nueva.db')
+        conn = get_db_connection()
         cursor = conn.cursor()
         try:
-            cursor.execute("INSERT INTO usuarios (usuario, clave, puesto, cumpleanos) VALUES (?, ?, ?, ?)", 
+            cursor.execute("INSERT INTO usuarios (usuario, clave, puesto, cumpleanos) VALUES (%s, %s, %s, %s)", 
                            (usuario, clave, puesto, cumpleanos))
             conn.commit()
+            cursor.close()
             conn.close()
             return "Usuario registrado con éxito. <a href='/login'>Ir al Login</a>"
-        except sqlite3.IntegrityError:
+        except psycopg2.IntegrityError:
+            conn.rollback()
+            cursor.close()
             conn.close()
             return "El nombre de usuario ya existe. <a href='/registro'>Intentar otro</a>"
     return render_template('registro.html')
@@ -270,11 +280,12 @@ def nuevo_mensaje():
         es_foto = 1
 
     if contenido or es_foto:
-        conn = sqlite3.connect('intranet_nueva.db')
+        conn = get_db_connection()
         cursor = conn.cursor()
-        cursor.execute("INSERT INTO mensajes (autor, contenido, es_foto, puesto_autor, fecha) VALUES (?, ?, ?, ?, ?)", 
+        cursor.execute("INSERT INTO mensajes (autor, contenido, es_foto, puesto_autor, fecha) VALUES (%s, %s, %s, %s, %s)", 
                        (session['usuario'], contenido, es_foto, session['puesto'], fecha_actual))
         conn.commit()
+        cursor.close()
         conn.close()
     return redirect(url_for('inicio'))
 
@@ -283,14 +294,15 @@ def crear_carpeta():
     if 'usuario' in session:
         nombre_carpeta = request.form.get('nombre_carpeta', '').strip()
         if nombre_carpeta:
-            conn = sqlite3.connect('intranet_nueva.db')
+            conn = get_db_connection()
             cursor = conn.cursor()
             try:
                 usuario_activo = session['usuario']
-                cursor.execute("INSERT INTO carpetas (nombre, creador) VALUES (?, ?)", (nombre_carpeta, usuario_activo))
+                cursor.execute("INSERT INTO carpetas (nombre, creador) VALUES (%s, %s)", (nombre_carpeta, usuario_activo))
                 conn.commit()
-            except sqlite3.IntegrityError:
-                pass
+            except psycopg2.IntegrityError:
+                conn.rollback()
+            cursor.close()
             conn.close()
     return redirect(url_for('inicio'))
 
@@ -300,15 +312,16 @@ def borrar_carpeta(nombre):
         if nombre == 'General':
             return redirect(url_for('inicio'))
             
-        conn = sqlite3.connect('intranet_nueva.db')
+        conn = get_db_connection()
         cursor = conn.cursor()
-        cursor.execute("SELECT creador FROM carpetas WHERE nombre=?", (nombre,))
+        cursor.execute("SELECT creador FROM carpetas WHERE nombre=%s", (nombre,))
         carpeta_info = cursor.fetchone()
         
         if carpeta_info and (carpeta_info[0] == session['usuario'] or session['puesto'] == 'Administrador'):
-            cursor.execute("UPDATE archivos SET carpeta='General' WHERE carpeta=?", (nombre,))
-            cursor.execute("DELETE FROM carpetas WHERE nombre=?", (nombre,))
+            cursor.execute("UPDATE archivos SET carpeta='General' WHERE carpeta=%s", (nombre,))
+            cursor.execute("DELETE FROM carpetas WHERE nombre=%s", (nombre,))
             conn.commit()
+        cursor.close()
         conn.close()
     return redirect(url_for('inicio'))
 
@@ -321,14 +334,15 @@ def subir_archivo():
             filename = secure_filename(f.filename)
             fecha_actual = datetime.now().strftime('%d/%m/%Y %H:%M')
             f.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            conn = sqlite3.connect('intranet_nueva.db')
+            conn = get_db_connection()
             cursor = conn.cursor()
             try:
-                cursor.execute("INSERT INTO archivos (nombre_archivo, subido_por, fecha, carpeta) VALUES (?, ?, ?, ?)", 
+                cursor.execute("INSERT INTO archivos (nombre_archivo, subido_por, fecha, carpeta) VALUES (%s, %s, %s, %s)", 
                                (filename, session['usuario'], fecha_actual, carpeta_destino))
                 conn.commit()
-            except sqlite3.IntegrityError:
-                pass
+            except psycopg2.IntegrityError:
+                conn.rollback()
+            cursor.close()
             conn.close()
     return redirect(url_for('inicio'))
 
@@ -341,16 +355,17 @@ def descargar_archivo(filename):
 @app.route('/borrar_archivo/<filename>')
 def borrar_archivo(filename):
     if 'usuario' in session:
-        conn = sqlite3.connect('intranet_nueva.db')
+        conn = get_db_connection()
         cursor = conn.cursor()
-        cursor.execute("SELECT subido_por FROM archivos WHERE nombre_archivo=?", (filename,))
+        cursor.execute("SELECT subido_por FROM archivos WHERE nombre_archivo=%s", (filename,))
         archivo_info = cursor.fetchone()
         if archivo_info and archivo_info[0] == session['usuario']:
-            cursor.execute("DELETE FROM archivos WHERE nombre_archivo=?", (filename,))
+            cursor.execute("DELETE FROM archivos WHERE nombre_archivo=%s", (filename,))
             conn.commit()
             ruta_archivo = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             if os.path.exists(ruta_archivo):
                 os.remove(ruta_archivo)
+        cursor.close()
         conn.close()
     return redirect(url_for('inicio'))
 
@@ -362,65 +377,59 @@ def publicar():
         nombre_imagen_bd = None
         es_foto = 0
         
-        # 1. Procesamos la foto si el usuario adjuntó una
         if foto and foto.filename != '' and es_imagen(foto.filename):
             filename = secure_filename(foto.filename)
-            # Creamos la carpeta de uploads automáticamente si no existe en static
             os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-            # Guardamos el archivo físicamente en static/uploads/
             foto.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
             nombre_imagen_bd = filename
             es_foto = 1
 
-        # 2. Si el usuario escribió texto, o subió una foto (o ambas), guardamos el anuncio
         if contenido or es_foto:
             fecha_actual = datetime.now().strftime('%d/%m/%Y %H:%M')
-            conn = sqlite3.connect('intranet_nueva.db')
+            conn = get_db_connection()
             cursor = conn.cursor()
             
-            # Si hay foto, guardamos el nombre de la imagen en 'contenido'. Si no, guardamos el texto normal.
             texto_guardar = nombre_imagen_bd if es_foto else contenido
-            # Guardamos un dato extra: si hay foto y texto juntos, metemos el texto en la BD (opcional)
             if es_foto and contenido:
                 texto_guardar = f"{contenido}|{nombre_imagen_bd}"
                 
-            cursor.execute("INSERT INTO mensajes (autor, contenido, es_foto, puesto_autor, fecha) VALUES (?, ?, ?, ?, ?)",
+            cursor.execute("INSERT INTO mensajes (autor, contenido, es_foto, puesto_autor, fecha) VALUES (%s, %s, %s, %s, %s)",
                            (session['usuario'], texto_guardar, es_foto, session['puesto'], fecha_actual))
             conn.commit()
+            cursor.close()
             conn.close()
             
     return redirect(url_for('inicio'))
 
-
 @app.route('/borrar_mensaje/<int:id>')
 def borrar_mensaje(id):
     if 'usuario' in session:
-        conn = sqlite3.connect('intranet_nueva.db')
+        conn = get_db_connection()
         cursor = conn.cursor()
-        cursor.execute("SELECT autor FROM mensajes WHERE id=?", (id,))
+        cursor.execute("SELECT autor FROM mensajes WHERE id=%s", (id,))
         msg = cursor.fetchone()
         if msg and (msg[0] == session['usuario'] or session['puesto'] == 'Administrador'):
-            cursor.execute("DELETE FROM mensajes WHERE id=?", (id,))
+            cursor.execute("DELETE FROM mensajes WHERE id=%s", (id,))
             conn.commit()
+        cursor.close()
         conn.close()
     return redirect(url_for('inicio'))
 
 @app.route('/like/<int:id>')
 def dar_like(id):
     if 'usuario' in session:
-        conn = sqlite3.connect('intranet_nueva.db')
+        conn = get_db_connection()
         cursor = conn.cursor()
         try:
-            # Registramos el Me Gusta cruzando el ID del mensaje con el usuario activo
-            cursor.execute("INSERT INTO likes (mensaje_id, usuario) VALUES (?, ?)", (id, session['usuario']))
+            cursor.execute("INSERT INTO likes (mensaje_id, usuario) VALUES (%s, %s)", (id, session['usuario']))
             conn.commit()
-        except sqlite3.IntegrityError:
-            # Si el usuario ya le había dado like, lo retira (Toggle de Like)
-            cursor.execute("DELETE FROM likes WHERE mensaje_id=? AND usuario=?", (id, session['usuario']))
+        except psycopg2.IntegrityError:
+            conn.rollback()
+            cursor.execute("DELETE FROM likes WHERE mensaje_id=%s AND usuario=%s", (id, session['usuario']))
             conn.commit()
+        cursor.close()
         conn.close()
     return redirect(url_for('inicio'))
-
 
 @app.route('/crear_contacto', methods=['POST'])
 def crear_contacto():
@@ -430,24 +439,26 @@ def crear_contacto():
         area = request.form.get('area_contacto', '').strip()
         correo = request.form.get('correo_contacto', '').strip() or 'No registrado'
         if nombre and telefono:
-            conn = sqlite3.connect('intranet_nueva.db')
+            conn = get_db_connection()
             cursor = conn.cursor()
-            cursor.execute("INSERT INTO directorio (nombre, telefono, area, creador, correo) VALUES (?, ?, ?, ?, ?)", 
+            cursor.execute("INSERT INTO directorio (nombre, telefono, area, creador, correo) VALUES (%s, %s, %s, %s, %s)", 
                            (nombre, telefono, area, session['usuario'], correo))
             conn.commit()
+            cursor.close()
             conn.close()
     return redirect(url_for('inicio'))
 
 @app.route('/borrar_contacto/<int:id>')
 def borrar_contacto(id):
     if 'usuario' in session:
-        conn = sqlite3.connect('intranet_nueva.db')
+        conn = get_db_connection()
         cursor = conn.cursor()
-        cursor.execute("SELECT creador FROM directorio WHERE id=?", (id,))
+        cursor.execute("SELECT creador FROM directorio WHERE id=%s", (id,))
         contacto = cursor.fetchone()
         if contacto and (contacto[0] == session['usuario'] or session['puesto'] == 'Administrador'):
-            cursor.execute("DELETE FROM directorio WHERE id=?", (id,))
+            cursor.execute("DELETE FROM directorio WHERE id=%s", (id,))
             conn.commit()
+        cursor.close()
         conn.close()
     return redirect(url_for('inicio'))
 
@@ -457,17 +468,18 @@ def editar_contacto(id):
         nuevo_tel = request.form.get('nuevo_telefono', '').strip()
         nuevo_correo = request.form.get('nuevo_correo', '').strip()
         
-        conn = sqlite3.connect('intranet_nueva.db')
+        conn = get_db_connection()
         cursor = conn.cursor()
-        cursor.execute("SELECT creador FROM directorio WHERE id=?", (id,))
+        cursor.execute("SELECT creador FROM directorio WHERE id=%s", (id,))
         contacto = cursor.fetchone()
         
         if contacto and (contacto[0] == session['usuario'] or session['puesto'] == 'Administrador'):
             if nuevo_tel:
-                cursor.execute("UPDATE directorio SET telefono=? WHERE id=?", (nuevo_tel, id))
+                cursor.execute("UPDATE directorio SET telefono=%s WHERE id=%s", (nuevo_tel, id))
             if nuevo_correo:
-                cursor.execute("UPDATE directorio SET correo=? WHERE id=?", (nuevo_correo, id))
+                cursor.execute("UPDATE directorio SET correo=%s WHERE id=%s", (nuevo_correo, id))
             conn.commit()
+        cursor.close()
         conn.close()
     return redirect(url_for('inicio'))
 
@@ -482,24 +494,21 @@ def actualizar_dolar():
                 hora_actual = datetime.now().strftime('%H:%M')
                 usuario_cambio = session['usuario']
                 
-                conn = sqlite3.connect('intranet_nueva.db')
+                conn = get_db_connection()
                 cursor = conn.cursor()
                 
-                # 1. ¡EL TRUCO! Primero leemos el valor actual en la BD antes de borrarlo
                 cursor.execute("SELECT valor FROM configuracion WHERE clave = 'dolar'")
                 precio_actual_bd = cursor.fetchone()
                 precio_viejo = precio_actual_bd[0] if precio_actual_bd else "17.35"
                 
-                # 2. Guardamos el precio viejo en la casilla 'dolar_anterior'
-                cursor.execute("UPDATE configuracion SET valor = ? WHERE clave = 'dolar_anterior'", (precio_viejo,))
-                
-                # 3. Guardamos los nuevos datos de la bitácora normal
-                cursor.execute("UPDATE configuracion SET valor = ? WHERE clave = 'dolar'", (nuevo_precio,))
-                cursor.execute("UPDATE configuracion SET valor = ? WHERE clave = 'dolar_fecha'", (fecha_actual,))
-                cursor.execute("UPDATE configuracion SET valor = ? WHERE clave = 'dolar_hora'", (hora_actual,))
-                cursor.execute("UPDATE configuracion SET valor = ? WHERE clave = 'dolar_usuario'", (usuario_cambio,))
+                cursor.execute("UPDATE configuracion SET valor = %s WHERE clave = 'dolar_anterior'", (precio_viejo,))
+                cursor.execute("UPDATE configuracion SET valor = %s WHERE clave = 'dolar'", (nuevo_precio,))
+                cursor.execute("UPDATE configuracion SET valor = %s WHERE clave = 'dolar_fecha'", (fecha_actual,))
+                cursor.execute("UPDATE configuracion SET valor = %s WHERE clave = 'dolar_hora'", (hora_actual,))
+                cursor.execute("UPDATE configuracion SET valor = %s WHERE clave = 'dolar_usuario'", (usuario_cambio,))
                 
                 conn.commit()
+                cursor.close()
                 conn.close()
     return redirect(url_for('inicio'))
 
@@ -513,29 +522,30 @@ def crear_link():
             enlace = 'https://' + enlace
             
         if titulo and enlace:
-            conn = sqlite3.connect('intranet_nueva.db')
+            conn = get_db_connection()
             cursor = conn.cursor()
-            cursor.execute("INSERT INTO links_interes (titulo, enlace, creador) VALUES (?, ?, ?)", 
+            cursor.execute("INSERT INTO links_interes (titulo, enlace, creador) VALUES (%s, %s, %s)", 
                            (titulo, enlace, session['usuario']))
             conn.commit()
+            cursor.close()
             conn.close()
     return redirect(url_for('inicio'))
 
 @app.route('/borrar_link/<int:id>')
 def borrar_link(id):
     if 'usuario' in session:
-        conn = sqlite3.connect('intranet_nueva.db')
+        conn = get_db_connection()
         cursor = conn.cursor()
-        cursor.execute("SELECT creador FROM links_interes WHERE id=?", (id,))
+        cursor.execute("SELECT creador FROM links_interes WHERE id=%s", (id,))
         link_info = cursor.fetchone()
         
         if link_info and (link_info[0] == session['usuario'] or session['puesto'] == 'Administrador'):
-            cursor.execute("DELETE FROM links_interes WHERE id=?", (id,))
+            cursor.execute("DELETE FROM links_interes WHERE id=%s", (id,))
             conn.commit()
+        cursor.close()
         conn.close()
     return redirect(url_for('inicio'))
 
 if __name__ == '__main__':
-    init_db()
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)
