@@ -511,7 +511,7 @@
                     {% endif %}                    
                    
                     <div style="margin-top: 10px;">
-                        <a href="/like/{{ id_m }}" style="background: #ffc107; color: black; text-decoration: none; padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: bold; display: inline-block;">👍 Me gusta ({{ likes_count }})</a>
+                       <button onclick="darLike('{{ id_m }}', this)" style="background: #ffc107; color: black; border: none; padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: bold; cursor: pointer;">👍 Me gusta (<span class="like-count">{{ likes_count }}</span>)</button>
                     </div>
                 </div>
                 {% else %}
