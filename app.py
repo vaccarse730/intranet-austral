@@ -31,7 +31,7 @@ def init_db():
     conn = get_db_connection()
     cursor = conn.cursor()
     
-    # 1. Tabla de Usuarios
+    # 1. Usuarios
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS usuarios (
             id SERIAL PRIMARY KEY,
@@ -42,7 +42,7 @@ def init_db():
         )
     ''')
     
-    # 2. Tabla de Mensajes del Muro
+    # 2. Mensajes
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS mensajes (
             id SERIAL PRIMARY KEY,
@@ -54,7 +54,7 @@ def init_db():
         )
     ''')
     
-    # 3. Tabla de Likes
+    # 3. Likes
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS likes (
             id SERIAL PRIMARY KEY,
@@ -64,27 +64,43 @@ def init_db():
         )
     ''')
     
-    # 4. Tabla de Archivos
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS archivos (
-            id SERIAL PRIMARY KEY,
-            nombre_archivo TEXT UNIQUE,
-            subido_por TEXT,
-            fecha TEXT,
-            carpeta TEXT DEFAULT 'General'
-        )
-    ''')
-    
-    # 5. Tabla de Carpetas
+    # 4. Carpetas con Soporte de Subcarpetas (padre_id)
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS carpetas (
             id SERIAL PRIMARY KEY,
-            nombre TEXT UNIQUE,
-            creador TEXT DEFAULT 'Sistema'
+            nombre TEXT,
+            creador TEXT DEFAULT 'Sistema',
+            padre_id INTEGER REFERENCES carpetas(id) ON DELETE CASCADE NULL
         )
     ''')
     
-    # 6. Tabla del Directorio Telefónico
+    # Migración de seguridad por si la columna padre_id no existe aún en Supabase
+    try:
+        cursor.execute("ALTER TABLE carpetas ADD COLUMN IF NOT EXISTS padre_id INTEGER REFERENCES carpetas(id) ON DELETE CASCADE NULL;")
+        conn.commit()
+    except Exception as e:
+        conn.rollback()
+
+    # 5. Archivos asociados a carpeta_id
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS archivos (
+            id SERIAL PRIMARY KEY,
+            nombre_archivo TEXT,
+            subido_por TEXT,
+            fecha TEXT,
+            carpeta TEXT DEFAULT 'General',
+            carpeta_id INTEGER REFERENCES carpetas(id) ON DELETE CASCADE NULL
+        )
+    ''')
+
+    # Migración de seguridad para asociar archivos directamente por ID de carpeta
+    try:
+        cursor.execute("ALTER TABLE archivos ADD COLUMN IF NOT EXISTS carpeta_id INTEGER REFERENCES carpetas(id) ON DELETE CASCADE NULL;")
+        conn.commit()
+    except Exception as e:
+        conn.rollback()
+
+    # 6. Directorio Telefónico
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS directorio (
             id SERIAL PRIMARY KEY,
@@ -96,7 +112,7 @@ def init_db():
         )
     ''')
     
-    # 7. Tabla de Configuración del Dólar
+    # 7. Configuración
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS configuracion (
             clave TEXT PRIMARY KEY,
@@ -104,7 +120,7 @@ def init_db():
         )
     ''')
 
-    # 8. Tabla de Links de Interés
+    # 8. Links de Interés
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS links_interes (
             id SERIAL PRIMARY KEY,
@@ -114,34 +130,51 @@ def init_db():
         )
     ''')
     
-    # Inyección segura de valores por defecto
+    # Insertar valores por defecto
     try:
-        cursor.execute("INSERT INTO carpetas (nombre, creador) VALUES ('General', 'Sistema') ON CONFLICT (nombre) DO NOTHING")
         cursor.execute("INSERT INTO configuracion (clave, valor) VALUES ('dolar', '17.35') ON CONFLICT (clave) DO NOTHING")
         cursor.execute("INSERT INTO configuracion (clave, valor) VALUES ('dolar_fecha', '16/09/2026') ON CONFLICT (clave) DO NOTHING")
         cursor.execute("INSERT INTO configuracion (clave, valor) VALUES ('dolar_hora', '12:00') ON CONFLICT (clave) DO NOTHING")
         cursor.execute("INSERT INTO configuracion (clave, valor) VALUES ('dolar_usuario', 'Sistema') ON CONFLICT (clave) DO NOTHING")
         cursor.execute("INSERT INTO configuracion (clave, valor) VALUES ('dolar_anterior', '17.35') ON CONFLICT (clave) DO NOTHING")
-
         conn.commit()
     except Exception as e:
-        print(f"Aviso en base de datos: {e}")
         conn.rollback()
         
     cursor.close()
     conn.close()
 
-# Inicializamos las tablas en Supabase
 init_db()
+
+def obtener_ruta_carpetas(carpeta_actual_id):
+    """Devuelve la miga de pan (breadcrumbs) hasta la carpeta actual"""
+    ruta = []
+    curr_id = carpeta_actual_id
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    while curr_id is not None:
+        cursor.execute("SELECT id, nombre, padre_id FROM carpetas WHERE id=%s", (curr_id,))
+        res = cursor.fetchone()
+        if res:
+            ruta.insert(0, {'id': res[0], 'nombre': res[1]})
+            curr_id = res[2]
+        else:
+            break
+    cursor.close()
+    conn.close()
+    return ruta
 
 @app.route('/')
 def inicio():
     if 'usuario' not in session or 'puesto' not in session:
         return redirect(url_for('logout'))
     
+    carpeta_actual_id = request.args.get('folder_id', type=int)
+    
     conn = get_db_connection()
     cursor = conn.cursor()
     
+    # 1. Mensajes y Likes
     cursor.execute('''
         SELECT m.id, m.autor, m.contenido, m.es_foto, m.puesto_autor, m.fecha,
                (SELECT COUNT(*) FROM likes WHERE mensaje_id = m.id) as total_likes
@@ -152,20 +185,26 @@ def inicio():
     cursor.execute("SELECT mensaje_id FROM likes WHERE usuario = %s", (session['usuario'],))
     mis_likes = [fila[0] for fila in cursor.fetchall()]
     
-    cursor.execute("SELECT nombre, creador FROM carpetas ORDER BY nombre ASC")
+    # 2. Subcarpetas de la carpeta actual
+    if carpeta_actual_id is None:
+        cursor.execute("SELECT id, nombre, creador FROM carpetas WHERE padre_id IS NULL ORDER BY nombre ASC")
+    else:
+        cursor.execute("SELECT id, nombre, creador FROM carpetas WHERE padre_id = %s ORDER BY nombre ASC", (carpeta_actual_id,))
     carpetas = cursor.fetchall()
     
-    cursor.execute("SELECT nombre_archivo, subido_por, fecha, carpeta FROM archivos ORDER BY id DESC")
+    # 3. Archivos de la carpeta actual
+    if carpeta_actual_id is None:
+        cursor.execute("SELECT id, nombre_archivo, subido_por, fecha FROM archivos WHERE carpeta_id IS NULL ORDER BY id DESC")
+    else:
+        cursor.execute("SELECT id, nombre_archivo, subido_por, fecha FROM archivos WHERE carpeta_id = %s ORDER BY id DESC", (carpeta_actual_id,))
     archivos = cursor.fetchall()
 
+    # 4. Cumpleaños
     cursor.execute("SELECT usuario, puesto, cumpleanos FROM usuarios ORDER BY cumpleanos ASC")
     todos_cumpleanos = cursor.fetchall()
     
     dia_hoy = datetime.now().day
     mes_hoy = datetime.now().month
-    
-    cursor.execute("SELECT id, nombre, telefono, area, creador, correo FROM directorio ORDER BY nombre ASC")
-    contactos = cursor.fetchall()
     
     cumpleanos_limpios = []
     for usuario_c, puesto_c, fecha_str in todos_cumpleanos:
@@ -174,14 +213,16 @@ def inicio():
             fecha_obj = datetime.strptime(fecha_str, '%Y-%m-%d')
             meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
             fecha_bonita = f"{fecha_obj.day} de {meses[fecha_obj.month - 1]}"
-            
             if fecha_obj.day == dia_hoy and fecha_obj.month == mes_hoy:
                 es_hoy = 1
         except:
             fecha_bonita = fecha_str
-            
         cumpleanos_limpios.append((usuario_c, puesto_c, fecha_bonita, es_hoy))
-        
+
+    # 5. Directorio y Configuración
+    cursor.execute("SELECT id, nombre, telefono, area, creador, correo FROM directorio ORDER BY nombre ASC")
+    contactos = cursor.fetchall()
+    
     cursor.execute("SELECT valor FROM configuracion WHERE clave = 'dolar'")
     f_dolar = cursor.fetchone()
     tipo_cambio = f_dolar[0] if f_dolar else "17.35"
@@ -208,23 +249,114 @@ def inicio():
     cursor.close()
     conn.close()
 
-    return render_template('intranet.html', mensajes=mensajes, mis_likes=mis_likes, archivos=archivos, 
-                           carpetas=carpetas, cumpleanos=cumpleanos_limpios, usuario=session['usuario'], puesto=session['puesto'], contactos=contactos, 
-                           tipo_cambio=tipo_cambio, d_fecha=d_fecha, d_hora=d_hora, d_usuario=d_usuario, d_anterior=d_anterior, links=links)
+    # Miga de pan / Breadcrumbs
+    breadcrumbs = obtener_ruta_carpetas(carpeta_actual_id)
 
+    return render_template('intranet.html', mensajes=mensajes, mis_likes=mis_likes, archivos=archivos, 
+                           carpetas=carpetas, carpeta_actual_id=carpeta_actual_id, breadcrumbs=breadcrumbs,
+                           cumpleanos=cumpleanos_limpios, usuario=session['usuario'], puesto=session['puesto'], 
+                           contactos=contactos, tipo_cambio=tipo_cambio, d_fecha=d_fecha, d_hora=d_hora, 
+                           d_usuario=d_usuario, d_anterior=d_anterior, links=links)
+
+@app.route('/crear_carpeta', methods=['POST'])
+def crear_carpeta():
+    if 'usuario' in session:
+        nombre_carpeta = request.form.get('nombre_carpeta', '').strip()
+        padre_id = request.form.get('padre_id', type=int)
+        
+        if nombre_carpeta:
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            cursor.execute("INSERT INTO carpetas (nombre, creador, padre_id) VALUES (%s, %s, %s)", 
+                           (nombre_carpeta, session['usuario'], padre_id))
+            conn.commit()
+            cursor.close()
+            conn.close()
+            
+    if padre_id:
+        return redirect(url_for('inicio', folder_id=padre_id))
+    return redirect(url_for('inicio'))
+
+@app.route('/borrar_carpeta/<int:id>')
+def borrar_carpeta(id):
+    if 'usuario' in session:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT creador, padre_id FROM carpetas WHERE id=%s", (id,))
+        carpeta_info = cursor.fetchone()
+        
+        padre_id = None
+        if carpeta_info:
+            padre_id = carpeta_info[1]
+            if carpeta_info[0] == session['usuario'] or session['puesto'] == 'Administrador':
+                cursor.execute("DELETE FROM carpetas WHERE id=%s", (id,))
+                conn.commit()
+        cursor.close()
+        conn.close()
+        
+        if padre_id:
+            return redirect(url_for('inicio', folder_id=padre_id))
+    return redirect(url_for('inicio'))
+
+@app.route('/subir', methods=['POST'])
+def subir_archivo():
+    if 'usuario' in session and 'archivo' in request.files:
+        f = request.files['archivo']
+        carpeta_id = request.form.get('carpeta_id', type=int)
+        
+        if f.filename != '':
+            filename = secure_filename(f.filename)
+            fecha_actual = datetime.now().strftime('%d/%m/%Y %H:%M')
+            f.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            cursor.execute("INSERT INTO archivos (nombre_archivo, subido_por, fecha, carpeta_id) VALUES (%s, %s, %s, %s)", 
+                           (filename, session['usuario'], fecha_actual, carpeta_id))
+            conn.commit()
+            cursor.close()
+            conn.close()
+            
+    if carpeta_id:
+        return redirect(url_for('inicio', folder_id=carpeta_id))
+    return redirect(url_for('inicio'))
+
+@app.route('/borrar_archivo/<int:id>')
+def borrar_archivo(id):
+    if 'usuario' in session:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT subido_por, nombre_archivo, carpeta_id FROM archivos WHERE id=%s", (id,))
+        archivo_info = cursor.fetchone()
+        
+        carpeta_id = None
+        if archivo_info:
+            carpeta_id = archivo_info[2]
+            if archivo_info[0] == session['usuario'] or session['puesto'] == 'Administrador':
+                cursor.execute("DELETE FROM archivos WHERE id=%s", (id,))
+                conn.commit()
+                ruta_archivo = os.path.join(app.config['UPLOAD_FOLDER'], archivo_info[1])
+                if os.path.exists(ruta_archivo):
+                    os.remove(ruta_archivo)
+        cursor.close()
+        conn.close()
+        
+        if carpeta_id:
+            return redirect(url_for('inicio', folder_id=carpeta_id))
+    return redirect(url_for('inicio'))
+
+# Resto de rutas (login, registro, logout, mensajes, likes, etc.)
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         usuario = request.form['usuario']
         clave = request.form['clave']
-        
         conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute("SELECT puesto FROM usuarios WHERE usuario=%s AND clave=%s", (usuario, clave))
         user = cursor.fetchone()
         cursor.close()
         conn.close()
-        
         if user:
             session['usuario'] = usuario
             session['puesto'] = user[0]
@@ -240,7 +372,6 @@ def registro():
         clave = request.form['clave']
         puesto = request.form['puesto']
         cumpleanos = request.form['cumpleanos']
-        
         conn = get_db_connection()
         cursor = conn.cursor()
         try:
@@ -263,111 +394,11 @@ def logout():
     session.pop('puesto', None)
     return redirect(url_for('login'))
 
-@app.route('/mensaje', methods=['POST'])
-def nuevo_mensaje():
-    if 'usuario' not in session:
-        return redirect(url_for('login'))
-        
-    contenido = request.form.get('contenido', '')
-    foto = request.files.get('foto')
-    es_foto = 0
-    fecha_actual = datetime.now().strftime('%d/%m/%Y %H:%M')
-
-    if foto and foto.filename != '' and es_imagen(foto.filename):
-        filename = secure_filename(foto.filename)
-        foto.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-        contenido = filename
-        es_foto = 1
-
-    if contenido or es_foto:
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute("INSERT INTO mensajes (autor, contenido, es_foto, puesto_autor, fecha) VALUES (%s, %s, %s, %s, %s)", 
-                       (session['usuario'], contenido, es_foto, session['puesto'], fecha_actual))
-        conn.commit()
-        cursor.close()
-        conn.close()
-    return redirect(url_for('inicio'))
-
-@app.route('/crear_carpeta', methods=['POST'])
-def crear_carpeta():
-    if 'usuario' in session:
-        nombre_carpeta = request.form.get('nombre_carpeta', '').strip()
-        if nombre_carpeta:
-            conn = get_db_connection()
-            cursor = conn.cursor()
-            try:
-                usuario_activo = session['usuario']
-                cursor.execute("INSERT INTO carpetas (nombre, creador) VALUES (%s, %s)", (nombre_carpeta, usuario_activo))
-                conn.commit()
-            except psycopg2.IntegrityError:
-                conn.rollback()
-            cursor.close()
-            conn.close()
-    return redirect(url_for('inicio'))
-
-@app.route('/borrar_carpeta/<string:nombre>')
-def borrar_carpeta(nombre):
-    if 'usuario' in session:
-        if nombre == 'General':
-            return redirect(url_for('inicio'))
-            
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute("SELECT creador FROM carpetas WHERE nombre=%s", (nombre,))
-        carpeta_info = cursor.fetchone()
-        
-        if carpeta_info and (carpeta_info[0] == session['usuario'] or session['puesto'] == 'Administrador'):
-            cursor.execute("UPDATE archivos SET carpeta='General' WHERE carpeta=%s", (nombre,))
-            cursor.execute("DELETE FROM carpetas WHERE nombre=%s", (nombre,))
-            conn.commit()
-        cursor.close()
-        conn.close()
-    return redirect(url_for('inicio'))
-
-@app.route('/subir', methods=['POST'])
-def subir_archivo():
-    if 'usuario' in session and 'archivo' in request.files:
-        f = request.files['archivo']
-        carpeta_destino = request.form.get('carpeta_destino', 'General')
-        if f.filename != '':
-            filename = secure_filename(f.filename)
-            fecha_actual = datetime.now().strftime('%d/%m/%Y %H:%M')
-            f.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            conn = get_db_connection()
-            cursor = conn.cursor()
-            try:
-                cursor.execute("INSERT INTO archivos (nombre_archivo, subido_por, fecha, carpeta) VALUES (%s, %s, %s, %s)", 
-                               (filename, session['usuario'], fecha_actual, carpeta_destino))
-                conn.commit()
-            except psycopg2.IntegrityError:
-                conn.rollback()
-            cursor.close()
-            conn.close()
-    return redirect(url_for('inicio'))
-
 @app.route('/descargar/<filename>')
 def descargar_archivo(filename):
     if 'usuario' not in session:
         return redirect(url_for('login'))
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename, as_attachment=True)
-
-@app.route('/borrar_archivo/<filename>')
-def borrar_archivo(filename):
-    if 'usuario' in session:
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute("SELECT subido_por FROM archivos WHERE nombre_archivo=%s", (filename,))
-        archivo_info = cursor.fetchone()
-        if archivo_info and archivo_info[0] == session['usuario']:
-            cursor.execute("DELETE FROM archivos WHERE nombre_archivo=%s", (filename,))
-            conn.commit()
-            ruta_archivo = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-            if os.path.exists(ruta_archivo):
-                os.remove(ruta_archivo)
-        cursor.close()
-        conn.close()
-    return redirect(url_for('inicio'))
 
 @app.route('/publicar', methods=['POST'])
 def publicar():
@@ -388,17 +419,14 @@ def publicar():
             fecha_actual = datetime.now().strftime('%d/%m/%Y %H:%M')
             conn = get_db_connection()
             cursor = conn.cursor()
-            
             texto_guardar = nombre_imagen_bd if es_foto else contenido
             if es_foto and contenido:
                 texto_guardar = f"{contenido}|{nombre_imagen_bd}"
-                
             cursor.execute("INSERT INTO mensajes (autor, contenido, es_foto, puesto_autor, fecha) VALUES (%s, %s, %s, %s, %s)",
                            (session['usuario'], texto_guardar, es_foto, session['puesto'], fecha_actual))
             conn.commit()
             cursor.close()
             conn.close()
-            
     return redirect(url_for('inicio'))
 
 @app.route('/borrar_mensaje/<int:id>')
@@ -467,12 +495,10 @@ def editar_contacto(id):
     if 'usuario' in session:
         nuevo_tel = request.form.get('nuevo_telefono', '').strip()
         nuevo_correo = request.form.get('nuevo_correo', '').strip()
-        
         conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute("SELECT creador FROM directorio WHERE id=%s", (id,))
         contacto = cursor.fetchone()
-        
         if contacto and (contacto[0] == session['usuario'] or session['puesto'] == 'Administrador'):
             if nuevo_tel:
                 cursor.execute("UPDATE directorio SET telefono=%s WHERE id=%s", (nuevo_tel, id))
@@ -493,20 +519,16 @@ def actualizar_dolar():
                 fecha_actual = datetime.now().strftime('%d/%m/%Y')
                 hora_actual = datetime.now().strftime('%H:%M')
                 usuario_cambio = session['usuario']
-                
                 conn = get_db_connection()
                 cursor = conn.cursor()
-                
                 cursor.execute("SELECT valor FROM configuracion WHERE clave = 'dolar'")
                 precio_actual_bd = cursor.fetchone()
                 precio_viejo = precio_actual_bd[0] if precio_actual_bd else "17.35"
-                
                 cursor.execute("UPDATE configuracion SET valor = %s WHERE clave = 'dolar_anterior'", (precio_viejo,))
                 cursor.execute("UPDATE configuracion SET valor = %s WHERE clave = 'dolar'", (nuevo_precio,))
                 cursor.execute("UPDATE configuracion SET valor = %s WHERE clave = 'dolar_fecha'", (fecha_actual,))
                 cursor.execute("UPDATE configuracion SET valor = %s WHERE clave = 'dolar_hora'", (hora_actual,))
                 cursor.execute("UPDATE configuracion SET valor = %s WHERE clave = 'dolar_usuario'", (usuario_cambio,))
-                
                 conn.commit()
                 cursor.close()
                 conn.close()
@@ -517,10 +539,8 @@ def crear_link():
     if 'usuario' in session:
         titulo = request.form.get('tit_link', '').strip()
         enlace = request.form.get('url_link', '').strip()
-        
         if enlace and not enlace.startswith(('http://', 'https://')):
             enlace = 'https://' + enlace
-            
         if titulo and enlace:
             conn = get_db_connection()
             cursor = conn.cursor()
@@ -538,7 +558,6 @@ def borrar_link(id):
         cursor = conn.cursor()
         cursor.execute("SELECT creador FROM links_interes WHERE id=%s", (id,))
         link_info = cursor.fetchone()
-        
         if link_info and (link_info[0] == session['usuario'] or session['puesto'] == 'Administrador'):
             cursor.execute("DELETE FROM links_interes WHERE id=%s", (id,))
             conn.commit()
