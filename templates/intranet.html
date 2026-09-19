@@ -775,27 +775,30 @@
 
 function actualizarTipoCambio(event, form) {
     event.preventDefault();
+    let btnSubmit = form.querySelector('button[type="submit"]');
+    let textoOriginal = '';
+
+    if (btnSubmit) {
+        textoOriginal = btnSubmit.innerHTML;
+        btnSubmit.disabled = true;
+        btnSubmit.classList.add('loading-state');
+        btnSubmit.innerHTML = 'Guardando... <span class="spinner"></span>';
+    }
+
     let formData = new FormData(form);
 
     fetch('/actualizar_tipo_cambio', {
         method: 'POST',
         body: formData
     })
-    .then(res => {
-        if (!res.ok) throw new Error("Error en el servidor");
-        return res.json();
-    })
-    .then(data => {
-        if (data.success) {
-            // 1. Cambia el valor visual en el badge superior de inmediato
+    .then(async res => {
+        let data = await res.json();
+        if (res.ok && data.success) {
             let elementoValor = document.getElementById('val-tipo-cambio');
             if (elementoValor) {
                 elementoValor.innerText = '$' + parseFloat(data.nuevo_valor).toFixed(2);
             }
-            // 2. Cierra el modal
             cerrarModalTC();
-            
-            // 3. Refresca la pantalla para actualizar la hora, fecha y usuario en el tooltip/encabezado
             window.location.reload();
         } else {
             alert(data.error || "Error al actualizar el tipo de cambio.");
@@ -804,9 +807,15 @@ function actualizarTipoCambio(event, form) {
     .catch(err => {
         console.error("Error en TC:", err);
         alert("No se pudo guardar el tipo de cambio.");
+    })
+    .finally(() => {
+        if (btnSubmit) {
+            btnSubmit.disabled = false;
+            btnSubmit.classList.remove('loading-state');
+            btnSubmit.innerHTML = textoOriginal;
+        }
     });
 }
-
     /* MODAL CAMBIO DE CLAVE */
     function abrirModalPassword() {
         document.getElementById('modalPassword').style.display = 'flex';
@@ -852,45 +861,77 @@ function actualizarTipoCambio(event, form) {
         });
     }
 
-    function cargarCarpeta(url, e) {
-        if (e) e.preventDefault();
-        fetch(url)
-            .then(response => response.text())
-            .then(html => {
-                let parser = new DOMParser();
-                let doc = parser.parseFromString(html, 'text/html');
-                let nuevoDrive = doc.querySelector('.drive-container');
-                let driveActual = document.querySelector('.drive-container');
-
-                if (nuevoDrive && driveActual) {
-                    driveActual.innerHTML = nuevoDrive.innerHTML;
-                    window.history.pushState({}, '', url);
-                }
-            })
-            .catch(err => console.error("Error:", err));
+function cargarCarpeta(url, e) {
+    if (e) e.preventDefault();
+    
+    let driveActual = document.querySelector('.drive-container');
+    if (driveActual) {
+        // Aplica efecto de carga y muestra indicador
+        driveActual.classList.add('container-loading');
     }
+
+    fetch(url)
+        .then(response => response.text())
+        .then(html => {
+            let parser = new DOMParser();
+            let doc = parser.parseFromString(html, 'text/html');
+            let nuevoDrive = doc.querySelector('.drive-container');
+
+            if (nuevoDrive && driveActual) {
+                driveActual.innerHTML = nuevoDrive.innerHTML;
+                window.history.pushState({}, '', url);
+            }
+        })
+        .catch(err => console.error("Error al cargar carpeta:", err))
+        .finally(() => {
+            if (driveActual) {
+                driveActual.classList.remove('container-loading');
+            }
+        });
+}
 
     window.onpopstate = function() {
         cargarCarpeta(window.location.href);
     };
 
-    function enviarFormularioAjax(event, form, urlAccion) {
-        event.preventDefault();
-        let formData = new FormData(form);
+function enviarFormularioAjax(event, form, urlAccion) {
+    event.preventDefault();
+    let btnSubmit = form.querySelector('button[type="submit"]');
+    let textoOriginal = '';
 
-        fetch(urlAccion, {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => {
-            if (response.ok) {
-                cargarCarpeta(window.location.href);
-                form.reset();
-                ocultarForms();
-            }
-        })
-        .catch(err => console.error("Error en formulario:", err));
+    // Deshabilitar botón y mostrar ícono de carga
+    if (btnSubmit) {
+        textoOriginal = btnSubmit.innerHTML;
+        btnSubmit.disabled = true;
+        btnSubmit.classList.add('loading-state');
+        btnSubmit.innerHTML = 'Procesando... <span class="spinner"></span>';
     }
+
+    let formData = new FormData(form);
+
+    fetch(urlAccion, {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => {
+        if (response.ok) {
+            cargarCarpeta(window.location.href);
+            form.reset();
+            ocultarForms();
+        } else {
+            alert("Ocurrió un error al procesar la solicitud.");
+        }
+    })
+    .catch(err => console.error("Error en formulario:", err))
+    .finally(() => {
+        // Restaurar botón
+        if (btnSubmit) {
+            btnSubmit.disabled = false;
+            btnSubmit.classList.remove('loading-state');
+            btnSubmit.innerHTML = textoOriginal;
+        }
+    });
+}
 
     function darLike(idMensaje, btn) {
         fetch('/like/' + idMensaje)
