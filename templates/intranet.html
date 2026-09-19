@@ -4,572 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Austral - Portal Intranet</title>
-    <!-- Fuentes e Íconos -->
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <style>
-        :root {
-            --primary: #0b1f3a;        /* Azul Marino Profundo Austral */
-            --primary-hover: #15325b;
-            --accent: #c5a059;         /* Dorado sutil */
-            --bg-body: #f4f6f8;
-            --card-bg: #ffffff;
-            --text-main: #2b2b2b;
-            --text-muted: #6c757d;
-            --border-color: #e2e8f0;
-        }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Montserrat', 'Segoe UI', sans-serif; }
-        body { background: var(--bg-body); color: var(--text-main); padding-bottom: 260px; transition: background 0.3s; }
-
-        /* HEADER PRINCIPAL */
-        header { 
-            background: var(--primary); 
-            color: white; 
-            padding: 18px 35px; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15); 
-            border-bottom: 3px solid var(--accent);
-            position: relative; 
-            z-index: 10; 
-        }
-        header h1 { font-size: 24px; display: flex; align-items: center; gap: 10px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; }
-        header h1 span { color: var(--accent); }
-
-        /* CONTENEDOR PRINCIPAL */
-        .container { max-width: 1050px; margin: 30px auto; padding: 0 20px; }
-
-        /* TARJETAS */
-        .card { 
-            background: var(--card-bg); 
-            padding: 24px; 
-            border-radius: 6px; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.03); 
-            margin-bottom: 25px; 
-            border: 1px solid var(--border-color);
-        }
-        .card h2 { 
-            color: var(--primary); 
-            font-size: 16px; 
-            font-weight: 700;
-            margin-bottom: 18px; 
-            border-bottom: 2px solid var(--border-color); 
-            padding-bottom: 10px; 
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        /* FORMULARIOS Y ELEMENTOS */
-        textarea { 
-            width: 100%; 
-            height: 90px; 
-            padding: 12px; 
-            border: 1px solid var(--border-color); 
-            border-radius: 4px; 
-            resize: none; 
-            font-size: 13px; 
-            margin-bottom: 12px; 
-            outline: none;
-            transition: border-color 0.2s;
-        }
-        textarea:focus { border-color: var(--primary); }
-        
-        button, .btn-submit { 
-            background: var(--primary); 
-            color: white; 
-            border: none; 
-            padding: 10px 22px; 
-            border-radius: 4px; 
-            font-weight: 600; 
-            cursor: pointer; 
-            font-size: 13px; 
-            letter-spacing: 0.5px;
-            transition: background 0.2s;
-        }
-        button:hover { background: var(--primary-hover); }
-
-        /* MURO DE ANUNCIOS */
-        .msg-item { 
-            border-left: 4px solid var(--accent); 
-            padding: 16px; 
-            margin-bottom: 18px; 
-            background: #fafbfc; 
-            border-radius: 0 6px 6px 0; 
-            border-top: 1px solid var(--border-color);
-            border-right: 1px solid var(--border-color);
-            border-bottom: 1px solid var(--border-color);
-        }
-        .msg-meta { font-size: 12px; color: var(--text-muted); margin-bottom: 8px; }
-        .role-tag { 
-            background: #e9ecef; 
-            color: var(--primary); 
-            padding: 3px 8px; 
-            border-radius: 3px; 
-            font-weight: 700; 
-            font-size: 10px; 
-            margin-left: 5px; 
-            text-transform: uppercase;
-        }
-
-        /* BOTÓN HERRAMIENTAS FLOTANTE */
-        .btn-menu-flotante { 
-            position: fixed; 
-            bottom: 90px; 
-            right: 1px; 
-            background: var(--primary); 
-            color: white; 
-            border: 1px solid var(--accent); 
-            padding: 12px; 
-            border-radius: 0; 
-            font-weight: 700; 
-            cursor: pointer; 
-            box-shadow: 0 6px 16px rgba(0,0,0,0.2); 
-            z-index: 1500; 
-            font-size: 12px; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center;
-            gap: 8px; 
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        .btn-menu-flotante:hover { background: var(--primary-hover); }
-
-        /* PANEL LATERAL DE HERRAMIENTAS */
-        .sidebar-panel { 
-            position: fixed; 
-            top: 0; 
-            right: -360px; 
-            width: 350px; 
-            height: 100%; 
-            background: #ffffff; 
-            box-shadow: -6px 0 20px rgba(0,0,0,0.15); 
-            padding: 25px; 
-            overflow-y: auto; 
-            transition: right 0.3s ease; 
-            z-index: 2000; 
-            padding-bottom: 260px; 
-            border-left: 3px solid var(--accent);
-        }
-        .sidebar-panel.active { right: 0; }
-        .sidebar-close { font-size: 22px; color: #dc3545; cursor: pointer; float: right; font-weight: bold; }
-        .folder-header { 
-            background: #f1f5f9; 
-            padding: 10px 14px; 
-            border-radius: 4px; 
-            font-weight: 700; 
-            color: var(--primary); 
-            cursor: pointer; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            user-select: none; 
-            margin-bottom: 5px; 
-            font-size: 13px;
-        }
-
-        /* FOOTER DIRECTORIO */
-        .fixed-footer { 
-            position: fixed; 
-            bottom: 0; 
-            left: 0; 
-            width: 100%; 
-            background: #111827; 
-            color: white; 
-            z-index: 3000; 
-            box-shadow: 0 -4px 15px rgba(0,0,0,0.2); 
-            border-top: 3px solid var(--accent); 
-            padding: 10px 25px 6px 25px; 
-        }
-        .footer-top-layout { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            background: #1f2937; 
-            padding: 8px 16px; 
-            border-radius: 4px; 
-            margin-bottom: 8px; 
-            cursor: pointer; 
-            user-select: none; 
-        }
-        .footer-dir-content { display: none; max-height: 150px; overflow-y: auto; margin-bottom: 10px; padding: 5px 0; }
-        
-        .table-dir { width: 100%; border-collapse: collapse; text-align: left; font-size: 12px; }
-        .table-dir th { color: var(--accent); padding: 6px 8px; border-bottom: 1px solid #374151; font-size: 11px; text-transform: uppercase; font-weight: 700; }
-        .table-dir td { padding: 6px 8px; border-bottom: 1px solid #1f2937; vertical-align: middle; }
-        .table-dir input { background: transparent; border: none; color: #fff; font-weight: 600; width: 100%; font-size: 12px; padding: 2px; }
-        
-        .footer-bottom-bar { display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: #9ca3af; border-top: 1px solid #1f2937; padding-top: 6px; }
-        .footer-redes { display: flex; gap: 15px; }
-        .footer-redes a { color: #d1d5db; text-decoration: none; font-weight: 600; display: flex; align-items: center; gap: 5px; font-size: 11px; }
-        .footer-redes a:hover { color: var(--accent); 
-
-/* CONTENEDOR DRIVE */
-.drive-container {
-    background: #ffffff;
-    border-radius: 12px;
-    border: 1px solid #e2e8f0;
-    overflow: hidden;
-    padding: 0 !important;
-}
-
-/* HEADER: BREADCRUMBS Y BOTÓN NUEVO */
-.drive-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 16px 20px;
-    background: #ffffff;
-    border-bottom: 1px solid #e2e8f0;
-}
-
-/* BREADCRUMBS */
-.drive-breadcrumbs {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 15px;
-    flex-wrap: wrap;
-}
-
-.crumb-item {
-    color: #475569;
-    text-decoration: none;
-    font-weight: 600;
-    padding: 4px 8px;
-    border-radius: 6px;
-    transition: background 0.2s;
-}
-
-.crumb-item:hover {
-    background: #f1f5f9;
-    color: #0b1f3a;
-}
-
-.crumb-item.active {
-    color: #0b1f3a;
-    font-weight: 800;
-}
-
-.crumb-separator {
-    color: #cbd5e1;
-    font-size: 11px;
-}
-
-/* BOTÓN + NUEVO Y DESPLEGABLE */
-.dropdown-nuevo {
-    position: relative;
-}
-
-.btn-nuevo {
-    background: #ffffff;
-    color: #1e293b;
-    border: 1px solid #cbd5e1;
-    padding: 8px 18px;
-    border-radius: 20px; /* Estilo píldora tipo Google Drive */
-    font-weight: 700;
-    font-size: 14px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-    transition: all 0.2s;
-}
-
-.btn-nuevo:hover {
-    background: #f8fafc;
-    box-shadow: 0 3px 8px rgba(0,0,0,0.12);
-}
-
-.dropdown-menu {
-    display: none;
-    position: absolute;
-    right: 0;
-    top: 45px;
-    background: white;
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-    z-index: 100;
-    width: 170px;
-    padding: 6px 0;
-}
-
-.dropdown-menu.show { display: block; }
-
-.dropdown-menu button {
-    width: 100%;
-    text-align: left;
-    background: none;
-    border: none;
-    padding: 10px 16px;
-    font-size: 13px;
-    color: #334155;
-    font-weight: 600;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.dropdown-menu button:hover {
-    background: #f1f5f9;
-}
-
-/* FORMULARIOS RÁPIDOS */
-.drive-inline-form {
-    background: #f8fafc;
-    border-bottom: 1px solid #e2e8f0;
-    padding: 12px 20px;
-}
-
-.drive-inline-form form {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.drive-inline-form input[type="text"] {
-    flex: 1;
-    padding: 8px 12px;
-    border: 1px solid #cbd5e1;
-    border-radius: 6px;
-    font-size: 13px;
-    outline: none;
-}
-
-.btn-confirm { background: #28a745; color: white; border: none; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600; }
-.btn-cancel { background: #94a3b8; color: white; border: none; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; }
-
-/* CUERPO Y ELEMENTOS */
-.drive-body { padding: 20px; }
-.drive-section-title { font-size: 12px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; }
-
-/* CUADRÍCULA DE CARPETAS */
-.drive-folder-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 12px;
-    margin-bottom: 15px;
-}
-
-.drive-folder-card {
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
-    padding: 10px 14px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    transition: all 0.2s;
-}
-
-.drive-folder-card:hover {
-    background: #ffffff;
-    border-color: #cbd5e1;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-}
-
-.folder-link {
-    text-decoration: none;
-    color: #1e293b;
-    font-weight: 600;
-    font-size: 13px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    overflow: hidden;
-}
-
-.folder-name {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.btn-delete-item { color: #94a3b8; text-decoration: none; font-size: 12px; padding: 2px 6px; }
-.btn-delete-item:hover { color: #ef4444; }
-
-/* TABLA DE ARCHIVOS */
-.drive-file-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-.drive-file-table th { text-align: left; padding: 10px; color: #64748b; font-weight: 700; border-bottom: 1px solid #e2e8f0; }
-.drive-file-table td { padding: 12px 10px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
-.drive-file-table tr:hover { background: #f8fafc; }
-
-.user-badge { background: #e2e8f0; color: #334155; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
-
-.btn-action-icon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 28px;
-    height: 28px;
-    border-radius: 6px;
-    text-decoration: none;
-    margin-left: 4px;
-}
-.btn-download { background: #e0f2fe; color: #0284c7; }
-.btn-download:hover { background: #0284c7; color: white; }
-.btn-delete { background: #fee2e2; color: #ef4444; }
-.btn-delete:hover { background: #ef4444; color: white; }
-
-.drive-empty-state {
-    text-align: center;
-    padding: 35px 20px;
-    color: #94a3b8;
-    font-size: 13px;
-}
-                               
-    </style>
+    <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
-
-    <!-- BOTÓN FLOTANTE PARA PANEL DE HERRAMIENTAS -->
-    <button class="btn-menu-flotante" onclick="toggleSidebar()">
-        <i class="fa-solid fa-folder-open"></i> Herramientas de Oficina
-    </button>
-
-    <!-- HEADER PRINCIPAL -->
-    <header>
-        <h1>🏢 Austral</h1>
-        
-        <!-- Tablero del Dólar e Info de Usuario -->
-        <div style="display: flex; align-items: center; gap: 20px;">
-            <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 3px;">
-                <div style="background: rgba(255, 255, 255, 0.12); padding: 5px 12px; border-radius: 4px; font-size: 13px; font-weight: bold; border: 1px solid rgba(255,255,255,0.2); display: flex; align-items: center; gap: 6px;">
-                    <span>💵 Dólar (Austral):</span>
-                    {% if 'administrador' in puesto|lower or 'administración' in puesto|lower or 'administracion' in puesto|lower %}
-                    <form action="/actualizar_dolar" method="POST" style="display: flex; align-items: center; gap: 3px; margin: 0;">
-                        <span>$</span>
-                        <input type="text" name="nuevo_dolar" value="{{ tipo_cambio }}" style="width: 50px; padding: 2px; border-radius: 3px; border: none; font-weight: bold; text-align: center; color: #333; font-size: 13px;">
-                        <button type="submit" style="background: #28a745; border: none; padding: 2px 6px; border-radius: 3px; color: white; font-size: 11px; cursor: pointer; height: auto;">💾</button>
-                    </form>
-                    {% else %}
-                    <span style="color: #28a745; background: white; padding: 2px 6px; border-radius: 3px; font-size: 13px;">${{ tipo_cambio }}</span>
-                    {% endif %}
-                </div>
-                <span style="font-size: 10px; color: rgba(255,255,255,0.75); font-weight: normal;">
-                    ⏪ Antes: <b style="color:#ffc107;">${{ d_anterior }}</b> | Modificó: <b>{{ d_usuario }}</b> ({{ d_fecha }} - {{ d_hora }})
-                </span>
-            </div>
-            
-            <div style="font-size: 14px;">Bienvenido, <b>{{ usuario }}</b> <span class="role-tag" style="color:#333; background:white; font-size: 12px; padding: 3px 8px;">{{ puesto }}</span> | <a href="/logout" style="color: #ffc107; text-decoration: none; font-weight: bold; margin-left: 5px;">Salir</a></div>
-        </div>
-    </header>
-
-    <!-- COLUMNA CENTRAL ÚNICA -->
-    <div class="container">
-        <!-- Publicar en el Muro (Desplegable) -->
-        <div class="card">
-            <h2 onclick="toggleFolder('form-publicar')" style="cursor: pointer; display: flex; justify-content: space-between; align-items: center; user-select: none;">
-                <span>📢 Publicar en el Muro</span>
-                <span style="font-size: 12px; color: var(--text-muted); font-weight: normal;">(Clic para desplegar)</span>
-            </h2>
-            <div id="form-publicar" style="display: none; margin-top: 15px;">
-                <form action="/publicar" method="POST" enctype="multipart/form-data">
-                    <textarea name="contenido" placeholder="Escribe un anuncio para el equipo..."></textarea>
-                    <p style="margin: 5px 0 10px 0; font-size: 13px; color: var(--text-muted);">O sube una foto desde tu PC:</p>
-                    <input type="file" name="foto" accept="image/*" style="font-size: 12px; margin-bottom: 15px;"><br>
-                    <button type="submit">Publicar</button>
-                </form>        
-            </div>
-        </div>
-
-        <!-- Historial del Muro -->
-        <div class="card">
-            <h2>📋 Muro de Anuncios General</h2>
-            <input type="text" id="buscarAnuncio" placeholder="🔍 Buscar anuncios..." style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; margin-bottom: 20px;">
-            
-            <div id="contenedorAnuncios">
-                {% for id_m, autor, contenido, es_foto, puesto_a, fecha, likes_count in mensajes %}
-                <div class="msg-item">
-                    <div class="msg-meta">
-                        👤 Por: <b>{{ autor }}</b> <span class="role-tag">{{ puesto_a }}</span> | 📅 {{ fecha }}
-                        {% if autor == usuario or puesto == 'Administrador' %}
-                        <a href="/borrar_mensaje/{{ id_m }}" onclick="return confirm('¿Borrar anuncio?')" style="color: #dc3545; text-decoration: none; font-weight: bold; float: right;">❌</a>
-                        {% endif %}
-                    </div>
-                   
-                    {% if '|' in contenido %}
-                        <p style="font-size: 14px; line-height: 1.5; margin: 8px 0; white-space: pre-wrap;">{{ contenido.split('|')[0] }}</p>
-                        {% if es_foto == 1 %}
-                        <img src="/static/uploads/{{ contenido.split('|')[1] }}" style="max-width: 100%; max-height: 350px; border-radius: 6px; margin-top: 5px; display: block; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                        {% endif %}
-                    {% else %}
-                        {% if es_foto == 1 %}
-                        <img src="/static/uploads/{{ contenido }}" style="max-width: 100%; max-height: 350px; border-radius: 6px; margin-top: 5px; display: block; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                        {% else %}
-                        <p style="font-size: 14px; line-height: 1.5; margin: 8px 0; white-space: pre-wrap;">{{ contenido }}</p>
-                        {% endif %}
-                    {% endif %}                    
-                   
-                    <div style="margin-top: 10px;">
-                       <button onclick="darLike('{{ id_m }}', this)" style="background: #ffc107; color: black; border: none; padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: bold; cursor: pointer;">👍 Me gusta (<span class="like-count">{{ likes_count }}</span>)</button>
-                    </div>
-                </div>
-                {% else %}
-                <p style="text-align: center; color: #888; font-size: 14px; padding: 20px;">No hay anuncios publicados en el muro.</p>
-                {% endfor %}
-            </div>
-        </div>
-    </div>
-
-    <!-- PANEL LATERAL DE HERRAMIENTAS RETRÁCTIL -->
-    <div id="sidebarHerramientas" class="sidebar-panel">
-        <span class="sidebar-close" onclick="toggleSidebar()">×</span>
-        <h3 style="color: #0056b3; margin-bottom: 20px; font-size: 18px; border-bottom: 2px solid #ccc; padding-bottom: 5px;">🛠️ Herramientas</h3>
-        
-        <!-- 1. CUMPLEANOS DESPLEGABLE -->
-        <div class="card" style="padding: 10px; margin-bottom: 15px; box-shadow: none; border: 1px solid #ddd;">
-            <div class="folder-header" onclick="toggleFolder('cal-cumple')">
-                <span>🎂 Cumpleaños de Hoy</span>
-            </div>
-            <div id="cal-cumple" style="display: none; margin-top: 10px;">
-                {% for nombre, puesto_emp, fecha_b, es_hoy in cumpleanos %}
-                    {% if es_hoy == 1 %}
-                    <div style="background: #fff3cd; border: 1px solid #ffeeba; padding: 8px; border-radius: 4px; font-size: 13px; margin-bottom: 5px;">
-                        🎈 <b>¡HOY! {{ nombre }}</b> ({{ puesto_emp }})
-                    </div>
-                    {% else %}
-                    <div style="font-size: 12px; padding: 4px 0; border-bottom: 1px dashed #eee;">
-                        🎉 {{ nombre }} - <span style="color:#28a745; font-weight:bold;">{{ fecha_b }}</span>
-                    </div>
-                    {% endif %}
-                {% endfor %}
-            </div>
-        </div>
-
-        <!-- 2. LINKS DE INTERÉS DESPLEGABLE -->
-        <div class="card" style="padding: 10px; margin-bottom: 15px; box-shadow: none; border: 1px solid #ddd;">
-            <div class="folder-header" onclick="toggleFolder('links-side')">
-                <span>🔗 Links de Interés</span>
-            </div>
-            <div id="links-side" style="display: none; margin-top: 10px;">
-                <ul style="list-style: none; padding: 0; font-size: 13px; margin-top: 0; margin-bottom: 10px;">
-                    {% for id_l, tit_l, url_l, creador_l in links %}
-                    <li style="display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid #eee;">
-                        <a href="{{ url_l }}" target="_blank" style="color:#0056b3; text-decoration:none;">🔗 {{ tit_l }}</a>
-                        {% if creador_l == usuario or puesto == 'Administrador' %}
-                        <a href="/borrar_link/{{ id_l }}" style="color:red; text-decoration:none;">❌</a>
-                        {% endif %}
-                    </li>
-                    {% endfor %}
-                </ul>
-
-                <form action="/crear_link" method="POST" style="display: flex; flex-direction: column; gap: 5px; border-top: 1px solid #eee; padding-top: 8px;">
-                    <input type="text" name="tit_link" placeholder="Título..." required style="padding:4px; font-size:12px;">
-                    <input type="text" name="url_link" placeholder="Dirección..." required style="padding:4px; font-size:12px;">
-                    <button type="submit" style="padding:4px; font-size:12px;">+ Añadir</button>
-                </form>
-            </div>
-        </div>
 
 <!-- MÓDULO ESTILO GOOGLE DRIVE -->
 <div class="card drive-container">
@@ -579,12 +17,12 @@
         
         <!-- Breadcrumb dinámico estilizado -->
         <nav class="drive-breadcrumbs" style="font-size: 13px; font-weight: 500; display: flex; align-items: center; gap: 6px;">
-            <a href="/?folder_id=" class="crumb-item {% if not carpeta_actual_id %}active{% endif %}" title="Mi Unidad" style="color: #475569; text-decoration: none; padding: 4px 6px; border-radius: 4px;">
+            <a href="/?folder_id=" onclick="cargarCarpeta(this.href, event)" class="crumb-item {% if not carpeta_actual_id %}active{% endif %}" title="Mi Unidad" style="color: #475569; text-decoration: none; padding: 4px 6px; border-radius: 4px;">
                 <i class="fa-solid fa-house" style="font-size: 14px;"></i>
             </a>
             {% for crumb in breadcrumbs %}
                 <span class="crumb-separator" style="color: #cbd5e1; font-size: 10px;"><i class="fa-solid fa-chevron-right"></i></span>
-                <a href="/?folder_id={{ crumb.id }}" class="crumb-item {% if loop.last %}active{% endif %}" style="color: #334155; text-decoration: none; padding: 2px 6px; border-radius: 4px;">
+                <a href="/?folder_id={{ crumb.id }}" onclick="cargarCarpeta(this.href, event)" class="crumb-item {% if loop.last %}active{% endif %}" style="color: #334155; text-decoration: none; padding: 2px 6px; border-radius: 4px;">
                     {{ crumb.nombre }}
                 </a>
             {% endfor %}
@@ -608,7 +46,7 @@
 
     <!-- FORMULARIO OCULTO: CREAR CARPETA -->
     <div id="form-nueva-carpeta" class="drive-inline-form" style="display: none; padding: 10px 15px; background: #f8fafc; border-bottom: 1px solid #e2e8f0;">
-        <form action="/crear_carpeta" method="POST" style="display: flex; gap: 8px; align-items: center;">
+        <form onsubmit="enviarFormularioAjax(event, this, '/crear_carpeta')" style="display: flex; gap: 8px; align-items: center;">
             <input type="hidden" name="padre_id" value="{{ carpeta_actual_id or '' }}">
             <i class="fa-solid fa-folder" style="color: #f59e0b;"></i>
             <input type="text" name="nombre_carpeta" placeholder="Nombre de la carpeta..." required autofocus style="padding: 6px 10px; font-size: 12px; border: 1px solid #cbd5e1; border-radius: 4px; flex-grow: 1;">
@@ -619,7 +57,7 @@
 
     <!-- FORMULARIO OCULTO: SUBIR ARCHIVO -->
     <div id="form-subir-archivo" class="drive-inline-form" style="display: none; padding: 10px 15px; background: #f8fafc; border-bottom: 1px solid #e2e8f0;">
-        <form action="/subir" method="POST" enctype="multipart/form-data" style="display: flex; gap: 8px; align-items: center;">
+        <form onsubmit="enviarFormularioAjax(event, this, '/subir')" enctype="multipart/form-data" style="display: flex; gap: 8px; align-items: center;">
             <input type="hidden" name="carpeta_id" value="{{ carpeta_actual_id or '' }}">
             <i class="fa-solid fa-cloud-arrow-up" style="color: #3b82f6;"></i>
             <input type="file" name="archivo" required style="font-size: 12px; flex-grow: 1;">
@@ -631,18 +69,18 @@
     <!-- ÁREA DE CONTENIDO (CARPETAS Y ARCHIVOS) -->
     <div class="drive-body" style="padding: 15px;">
         
-        <!-- SUB-CARPETAS (CUADRÍCULA VISTA RAPIDA) -->
+        <!-- SUB-CARPETAS -->
         {% if carpetas %}
         <div class="drive-section-title" style="font-size: 12px; font-weight: 600; color: #64748b; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px;">Carpetas</div>
         <div class="drive-folder-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; margin-bottom: 20px;">
             {% for id_c, nom_carp, creador_carp in carpetas %}
             <div class="drive-folder-card" style="display: flex; align-items: center; justify-content: space-between; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 8px 12px;">
-                <a href="/?folder_id={{ id_c }}" class="folder-link" style="text-decoration: none; color: #334155; font-size: 13px; display: flex; align-items: center; gap: 8px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                <a href="/?folder_id={{ id_c }}" onclick="cargarCarpeta(this.href, event)" class="folder-link" style="text-decoration: none; color: #334155; font-size: 13px; display: flex; align-items: center; gap: 8px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                     <i class="fa-solid fa-folder" style="color: #f59e0b; font-size: 16px;"></i>
                     <span class="folder-name">{{ nom_carp }}</span>
                 </a>
                 {% if creador_carp|lower == usuario|lower or puesto|lower == 'administrador' %}
-                <a href="/borrar_carpeta/{{ id_c }}" onclick="return confirm('¿Eliminar esta carpeta?')" style="color: #ef4444; text-decoration: none; font-size: 12px; padding: 2px 4px;" title="Eliminar">
+                <a href="javascript:void(0)" onclick="eliminarRegistro('/borrar_carpeta/{{ id_c }}', this)" style="color: #ef4444; text-decoration: none; font-size: 12px; padding: 2px 4px;" title="Eliminar">
                     <i class="fa-solid fa-xmark"></i>
                 </a>
                 {% endif %}
@@ -651,7 +89,7 @@
         </div>
         {% endif %}
 
-        <!-- ARCHIVOS (LISTA LIMPIA) -->
+        <!-- ARCHIVOS -->
         <div class="drive-section-title" style="font-size: 12px; font-weight: 600; color: #64748b; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px;">Archivos</div>
         {% if archivos %}
         <table class="drive-file-table" style="width: 100%; border-collapse: collapse; font-size: 13px;">
@@ -664,7 +102,7 @@
                 </tr>
             </thead>
             <tbody>
-                {% for id_a, nombre_archivo, subido_por, fecha, folder_id in archivos %}
+                {% for id_a, nombre_archivo, subido_por, fecha, _ in archivos %}
                 <tr style="border-bottom: 1px solid #f1f5f9;">
                     <td style="padding: 8px;" class="file-name-cell">
                         <i class="fa-regular fa-file-lines" style="color: #64748b; margin-right: 6px;"></i>
@@ -677,7 +115,7 @@
                             <i class="fa-solid fa-download"></i>
                         </a>
                         {% if subido_por == usuario or puesto == 'Administrador' %}
-                        <a href="/borrar_archivo/{{ id_a }}" onclick="return confirm('¿Borrar archivo?')" style="color: #ef4444; text-decoration: none;" title="Borrar">
+                        <a href="javascript:void(0)" onclick="eliminarRegistro('/borrar_archivo/{{ id_a }}', this)" style="color: #ef4444; text-decoration: none;" title="Borrar">
                             <i class="fa-solid fa-trash-can"></i>
                         </a>
                         {% endif %}
@@ -703,7 +141,7 @@
         <span style="font-size: 12px; color: var(--text-muted); font-weight: normal;">(Clic para desplegar)</span>
     </h2>
     <div id="form-publicar" style="display: none; margin-top: 15px;">
-        <form action="/publicar" method="POST" enctype="multipart/form-data">
+        <form onsubmit="enviarFormularioAjax(event, this, '/publicar')" enctype="multipart/form-data">
             <textarea name="contenido" placeholder="Escribe un anuncio para el equipo..."></textarea>
             <p style="margin: 5px 0 10px 0; font-size: 13px; color: var(--text-muted);">O sube una foto desde tu PC:</p>
             <input type="file" name="foto" accept="image/*" style="font-size: 12px; margin-bottom: 15px;"><br>
@@ -722,7 +160,7 @@
             <div class="msg-meta">
                 👤 Por: <b>{{ autor }}</b> <span class="role-tag">{{ puesto_a }}</span> | 📅 {{ fecha }}
                 {% if autor == usuario or puesto == 'Administrador' %}
-                <a href="/borrar_mensaje/{{ id_m }}" onclick="return confirm('¿Borrar anuncio?')" style="color: #dc3545; text-decoration: none; font-weight: bold; float: right;">❌</a>
+                <a href="javascript:void(0)" onclick="eliminarRegistro('/borrar_mensaje/{{ id_m }}', this)" style="color: #dc3545; text-decoration: none; font-weight: bold; float: right;">❌</a>
                 {% endif %}
             </div>
            
@@ -740,7 +178,9 @@
             {% endif %}                    
            
             <div style="margin-top: 10px;">
-                <a href="/like/{{ id_m }}" style="background: #ffc107; color: black; text-decoration: none; padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: bold; display: inline-block;">👍 Me gusta ({{ likes_count }})</a>
+                <button onclick="darLike('{{ id_m }}', this)" style="background: #ffc107; color: black; border: none; padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: bold; cursor: pointer;">
+                    👍 Me gusta (<span class="like-count">{{ likes_count }}</span>)
+                </button>
             </div>
         </div>
         {% else %}
@@ -749,7 +189,7 @@
     </div>
 </div>
 
-<!-- PANEL LATERAL RETRÁCTIL (HERRAMIENTAS AUXILIARES) -->
+<!-- PANEL LATERAL RETRÁCTIL -->
 <div id="sidebarHerramientas" class="sidebar-panel">
     <span class="sidebar-close" onclick="toggleSidebar()">×</span>
     <h3 style="color: #0056b3; margin-bottom: 20px; font-size: 18px; border-bottom: 2px solid #ccc; padding-bottom: 5px;">🛠️ Utilidades</h3>
@@ -778,13 +218,13 @@
             <li style="display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid #eee;">
                 <a href="{{ url_l }}" target="_blank" style="color:#0056b3; text-decoration:none;">🔗 {{ tit_l }}</a>
                 {% if creador_l == usuario or puesto == 'Administrador' %}
-                <a href="/borrar_link/{{ id_l }}" style="color:red; text-decoration:none;">❌</a>
+                <a href="javascript:void(0)" onclick="eliminarRegistro('/borrar_link/{{ id_l }}', this)" style="color:red; text-decoration:none;">❌</a>
                 {% endif %}
             </li>
             {% endfor %}
         </ul>
 
-        <form action="/crear_link" method="POST" style="display: flex; flex-direction: column; gap: 5px; border-top: 1px solid #eee; padding-top: 8px;">
+        <form onsubmit="enviarFormularioAjax(event, this, '/crear_link')" style="display: flex; flex-direction: column; gap: 5px; border-top: 1px solid #eee; padding-top: 8px;">
             <input type="text" name="tit_link" placeholder="Título..." required style="padding:4px; font-size:12px;">
             <input type="text" name="url_link" placeholder="Dirección..." required style="padding:4px; font-size:12px;">
             <button type="submit" style="padding:4px; font-size:12px;">+ Añadir Link</button>
@@ -792,7 +232,7 @@
     </div>
 </div>
 
-<!-- FOOTER STICKY FIJO DIRECTORIO -->
+<!-- FOOTER DIRECTORIO -->
 <footer class="fixed-footer">
     <div class="footer-top-layout" onclick="toggleFooterDir()">
         <div style="display: flex; align-items: center; gap: 10px;">
@@ -806,7 +246,7 @@
     </div>
     
     <div id="footerDirectorioContent" class="footer-dir-content">
-        <form action="/crear_contacto" method="POST" style="display: flex; gap: 8px; margin-bottom: 8px; background: rgba(255,255,255,0.05); padding: 5px; border-radius: 4px;">
+        <form onsubmit="enviarFormularioAjax(event, this, '/crear_contacto')" style="display: flex; gap: 8px; margin-bottom: 8px; background: rgba(255,255,255,0.05); padding: 5px; border-radius: 4px;">
             <input type="text" name="nom_contacto" placeholder="Nombre..." required style="background:#fff; color:#333; padding:4px; border-radius:3px; font-size:12px;">
             <input type="text" name="tel_contacto" placeholder="Teléfono..." required style="background:#fff; color:#333; padding:4px; border-radius:3px; font-size:12px;">
             <input type="text" name="area_contacto" placeholder="Área..." style="background:#fff; color:#333; padding:4px; border-radius:3px; font-size:12px;">
@@ -831,7 +271,7 @@
                     <td><span style="background:rgba(255,255,255,0.1); padding:2px 5px; border-radius:3px;">{{ area_c }}</span></td>
                     <td><input type="text" name="nuevo_telefono" value="{{ tel_c }}" id="input-tel-{{ id_c }}" readonly></td>
                     <td>
-                        <form action="/editar_contacto/{{ id_c }}" method="POST" id="form-edit-{{ id_c }}" style="display: inline; margin:0;">
+                        <form onsubmit="enviarFormularioAjax(event, this, '/editar_contacto/{{ id_c }}')" id="form-edit-{{ id_c }}" style="display: inline; margin:0;">
                             <input type="text" name="nuevo_correo" value="{{ corr_c }}" id="input-corr-{{ id_c }}" readonly style="color:rgba(255,255,255,0.75);">
                             <button type="submit" id="btn-save-{{ id_c }}" style="display: none; background: #28a745; padding: 1px 4px; font-size: 10px; color:white; border:none; border-radius:2px;">💾</button>
                         </form>
@@ -840,7 +280,7 @@
                         <button onclick="copiarContacto('{{ nom_c }}', '{{ area_c }}', '{{ tel_c }}', '{{ corr_c }}')" style="background: #6c757d; padding: 2px 6px; font-size: 11px; color:white; border:none; border-radius:3px; cursor:pointer;">📋 Copiar</button>
                         {% if creador_c == usuario or puesto == 'Administrador' %}
                         <button onclick="habilitarEdicion('{{ id_c }}')" style="background: #ffc107; color: black; padding: 2px 6px; font-size: 11px; border:none; border-radius:3px; cursor:pointer;">✏️</button>
-                        <a href="/borrar_contacto/{{ id_c }}" onclick="return confirm('¿Borrar contacto?')" style="background: #dc3545; color: white; padding: 2px 5px; border-radius: 3px; font-size: 11px; text-decoration:none; font-weight:bold;">❌</a>
+                        <a href="javascript:void(0)" onclick="eliminarRegistro('/borrar_contacto/{{ id_c }}', this)" style="background: #dc3545; color: white; padding: 2px 5px; border-radius: 3px; font-size: 11px; text-decoration:none; font-weight:bold;">❌</a>
                         {% endif %}
                     </td>
                 </tr>
@@ -860,28 +300,88 @@
     </div>
 </footer>
 
-<!-- SCRIPTS DE INTERACCIÓN -->
+<!-- SCRIPTS JS SPA (SINO RECARGA) -->
 <script>
+    // CARGAR CARPETAS Y VISTAS VÍA FETCH SINO RECARGAR
+    function cargarCarpeta(url, e) {
+        if (e) e.preventDefault();
+        fetch(url)
+            .then(response => response.text())
+            .then(html => {
+                let parser = new DOMParser();
+                let doc = parser.parseFromString(html, 'text/html');
+                let nuevoDrive = doc.querySelector('.drive-container');
+                let driveActual = document.querySelector('.drive-container');
+
+                if (nuevoDrive && driveActual) {
+                    driveActual.innerHTML = nuevoDrive.innerHTML;
+                    window.history.pushState({}, '', url);
+                }
+            })
+            .catch(err => console.error("Error:", err));
+    }
+
+    window.onpopstate = function() {
+        cargarCarpeta(window.location.href);
+    };
+
+    function enviarFormularioAjax(event, form, urlAccion) {
+        event.preventDefault();
+        let formData = new FormData(form);
+
+        fetch(urlAccion, {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => {
+            if (response.ok) {
+                cargarCarpeta(window.location.href);
+                form.reset();
+                ocultarForms();
+            }
+        })
+        .catch(err => console.error("Error en formulario:", err));
+    }
+
+    function darLike(idMensaje, btn) {
+        fetch('/like/' + idMensaje)
+            .then(response => {
+                if (response.ok) {
+                    let contador = btn.querySelector('.like-count');
+                    if(contador) contador.innerText = parseInt(contador.innerText) + 1;
+                }
+            })
+            .catch(err => console.error("Error al dar like:", err));
+    }
+
+    function eliminarRegistro(url, elementoHtml) {
+        if (!confirm('¿Seguro que deseas eliminar este registro?')) return;
+
+        fetch(url)
+            .then(response => {
+                if (response.ok) {
+                    let contenedor = elementoHtml.closest('.msg-item, li, tr, .drive-folder-card');
+                    if (contenedor) contenedor.remove();
+                }
+            })
+            .catch(err => console.error("Error al eliminar:", err));
+    }
+
     function toggleMenuNuevo(event) {
         event.stopPropagation();
         let menu = document.getElementById("menuNuevo");
-        if (menu.style.display === "none" || menu.style.display === "") {
-            menu.style.display = "block";
-        } else {
-            menu.style.display = "none";
-        }
+        if (menu) menu.style.display = (menu.style.display === "none" || menu.style.display === "") ? "block" : "none";
     }
 
     window.addEventListener('click', function() {
         let menu = document.getElementById("menuNuevo");
-        if (menu && menu.style.display === "block") {
-            menu.style.display = "none";
-        }
+        if (menu && menu.style.display === "block") menu.style.display = "none";
     });
 
     function mostrarForm(idForm) {
         ocultarForms();
-        document.getElementById(idForm).style.display = 'block';
+        let el = document.getElementById(idForm);
+        if (el) el.style.display = 'block';
     }
 
     function ocultarForms() {
@@ -892,54 +392,73 @@
     }
 
     function toggleSidebar() {
-        document.getElementById('sidebarHerramientas').classList.toggle('active');
+        let sb = document.getElementById('sidebarHerramientas');
+        if (sb) sb.classList.toggle('active');
     }
 
     function toggleFooterDir() {
         let content = document.getElementById('footerDirectorioContent');
         let ind = document.getElementById('txt-indicador-foot');
-        if (content.style.display === "none" || content.style.display === "") {
-            content.style.display = "block";
-            ind.innerText = "(Hacer clic para Ocultar)";
-        } else {
-            content.style.display = "none";
-            ind.innerText = "(Hacer clic para Desplegar)";
+        if (content) {
+            if (content.style.display === "none" || content.style.display === "") {
+                content.style.display = "block";
+                if (ind) ind.innerText = "(Hacer clic para Ocultar)";
+            } else {
+                content.style.display = "none";
+                if (ind) ind.innerText = "(Hacer clic para Desplegar)";
+            }
         }
     }
 
     function toggleFolder(id) {
         let el = document.getElementById(id);
-        el.style.display = (el.style.display === "none" || el.style.display === "") ? "block" : "none";
+        if (el) el.style.display = (el.style.display === "none" || el.style.display === "") ? "block" : "none";
     }
 
-    document.getElementById('buscarContacto').addEventListener('keyup', function() {
-        let filter = this.value.toLowerCase();
-        document.querySelectorAll('.contacto-row').forEach(function(fila) {
-            let textoFila = fila.innerText.toLowerCase();
-            fila.querySelectorAll('input').forEach(function(input) {
-                textoFila += ' ' + input.value.toLowerCase();
+    let buscadorContactos = document.getElementById('buscarContacto');
+    if (buscadorContactos) {
+        buscadorContactos.addEventListener('keyup', function() {
+            let filter = this.value.toLowerCase();
+            document.querySelectorAll('.contacto-row').forEach(function(fila) {
+                let textoFila = fila.innerText.toLowerCase();
+                fila.querySelectorAll('input').forEach(function(input) {
+                    textoFila += ' ' + input.value.toLowerCase();
+                });
+                fila.style.display = textoFila.includes(filter) ? "table-row" : "none";
             });
-            fila.style.display = textoFila.includes(filter) ? "table-row" : "none";
         });
-    });
+    }
+
+    let buscadorAnuncios = document.getElementById('buscarAnuncio');
+    if (buscadorAnuncios) {
+        buscadorAnuncios.addEventListener('keyup', function() {
+            let filter = this.value.toLowerCase().trim();
+            document.querySelectorAll('.msg-item').forEach(function(card) {
+                let textoCard = (card.textContent || card.innerText).toLowerCase();
+                card.style.display = (filter === '' || textoCard.includes(filter)) ? "block" : "none";
+            });
+        });
+    }
 
     function habilitarEdicion(id) {
         let inputTel = document.getElementById('input-tel-' + id);
         let inputCorr = document.getElementById('input-corr-' + id);
         let btnGuardar = document.getElementById('btn-save-' + id);
         
-        inputTel.readOnly = false;
-        inputTel.style.border = "1px solid #0056b3";
-        inputTel.style.background = "#fff";
-        inputTel.style.color = "#333";
-        
-        inputCorr.readOnly = false;
-        inputCorr.style.border = "1px solid #0056b3";
-        inputCorr.style.background = "#fff";
-        inputCorr.style.color = "#333";
-        
-        inputTel.focus();
-        btnGuardar.style.display = "inline-block";
+        if (inputTel) {
+            inputTel.readOnly = false;
+            inputTel.style.border = "1px solid #0056b3";
+            inputTel.style.background = "#fff";
+            inputTel.style.color = "#333";
+            inputTel.focus();
+        }
+        if (inputCorr) {
+            inputCorr.readOnly = false;
+            inputCorr.style.border = "1px solid #0056b3";
+            inputCorr.style.background = "#fff";
+            inputCorr.style.color = "#333";
+        }
+        if (btnGuardar) btnGuardar.style.display = "inline-block";
     }
 
     function copiarContacto(nombre, area, telefono, correo) {
@@ -948,14 +467,6 @@
             alert("Contacto copiado: " + nombre);
         });
     }
-
-    document.getElementById('buscarAnuncio').addEventListener('keyup', function() {
-        let filter = this.value.toLowerCase().trim();
-        document.querySelectorAll('.msg-item').forEach(function(card) {
-            let textoCard = (card.textContent || card.innerText).toLowerCase();
-            card.style.display = (filter === '' || textoCard.includes(filter)) ? "block" : "none";
-        });
-    });
 </script>
 </body>
 </html>
