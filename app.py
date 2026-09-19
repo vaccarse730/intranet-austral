@@ -249,9 +249,6 @@ def inicio():
     cursor.close()
     conn.close()
 
-    # Miga de pan / Breadcrumbs
-    breadcrumbs = obtener_ruta_carpetas(carpeta_actual_id)
-
 # Miga de pan / Breadcrumbs
     breadcrumbs = obtener_ruta_carpetas(carpeta_actual_id)
 
