@@ -187,9 +187,9 @@ def inicio():
     
     # 2. Subcarpetas de la carpeta actual
     if carpeta_actual_id is None:
-        cursor.execute("SELECT nombre, creador FROM carpetas WHERE padre_id IS NULL ORDER BY nombre ASC")
+        cursor.execute("SELECT id, nombre, creador FROM carpetas WHERE padre_id IS NULL ORDER BY nombre ASC")
     else:
-        cursor.execute("SELECT nombre, creador FROM carpetas WHERE padre_id = %s ORDER BY nombre ASC", (carpeta_actual_id,))
+        cursor.execute("SELECT id, nombre, creador FROM carpetas WHERE padre_id = %s ORDER BY nombre ASC", (carpeta_actual_id,))
     carpetas = cursor.fetchall()
     
     # 3. Archivos de la carpeta actual
