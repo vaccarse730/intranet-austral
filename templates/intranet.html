@@ -574,31 +574,32 @@
 <!-- MÓDULO ESTILO GOOGLE DRIVE -->
 <div class="card drive-container">
     
-    <!-- BARRA SUPERIOR: BREADCRUMB Y BOTÓN NUEVO -->
-    <div class="drive-header">
-        <!-- Breadcrumb dinámico -->
-        <nav class="drive-breadcrumbs">
-            <a href="/" class="crumb-item {% if not carpeta_actual_id %}active{% endif %}">
-                <i class="fa-solid fa-house"></i> Mi Unidad
+    <!-- BARRA SUPERIOR: BREADCRUMB COMPACTO Y BOTÓN "+" -->
+    <div class="drive-header" style="display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; border-bottom: 1px solid #e2e8f0;">
+        
+        <!-- Breadcrumb dinámico estilizado -->
+        <nav class="drive-breadcrumbs" style="font-size: 13px; font-weight: 500; display: flex; align-items: center; gap: 6px;">
+            <a href="/?folder_id=" class="crumb-item {% if not carpeta_actual_id %}active{% endif %}" title="Mi Unidad" style="color: #475569; text-decoration: none; padding: 4px 6px; border-radius: 4px;">
+                <i class="fa-solid fa-house" style="font-size: 14px;"></i>
             </a>
             {% for crumb in breadcrumbs %}
-                <span class="crumb-separator"><i class="fa-solid fa-chevron-right"></i></span>
-                <a href="/?folder_id={{ crumb.id }}" class="crumb-item {% if loop.last %}active{% endif %}">
+                <span class="crumb-separator" style="color: #cbd5e1; font-size: 10px;"><i class="fa-solid fa-chevron-right"></i></span>
+                <a href="/?folder_id={{ crumb.id }}" class="crumb-item {% if loop.last %}active{% endif %}" style="color: #334155; text-decoration: none; padding: 2px 6px; border-radius: 4px;">
                     {{ crumb.nombre }}
                 </a>
             {% endfor %}
         </nav>
 
-        <!-- Botón + Nuevo con Menú Desplegable -->
-        <div class="dropdown-nuevo">
-            <button class="btn-nuevo" onclick="toggleMenuNuevo(event)">
-                <i class="fa-solid fa-plus"></i> Nuevo
+        <!-- Botón circular "+" con Menú Desplegable -->
+        <div class="dropdown-nuevo" style="position: relative;">
+            <button class="btn-nuevo-plus" onclick="toggleMenuNuevo(event)" title="Crear o subir..." style="width: 36px; height: 36px; border-radius: 50%; background: #2563eb; color: white; border: none; display: flex; align-items: center; justify-content: center; font-size: 16px; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.15); transition: transform 0.2s, background-color 0.2s;">
+                <i class="fa-solid fa-plus"></i>
             </button>
-            <div id="menuNuevo" class="dropdown-menu">
-                <button onclick="mostrarForm('form-nueva-carpeta')">
+            <div id="menuNuevo" class="dropdown-menu" style="display: none; position: absolute; right: 0; top: 42px; background: white; border: 1px solid #e2e8f0; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); width: 170px; z-index: 100; overflow: hidden;">
+                <button onclick="mostrarForm('form-nueva-carpeta')" style="width: 100%; text-align: left; padding: 10px 14px; background: none; border: none; font-size: 13px; cursor: pointer; color: #334155; display: flex; align-items: center; gap: 8px;">
                     <i class="fa-solid fa-folder-plus" style="color: #f59e0b;"></i> Nueva carpeta
                 </button>
-                <button onclick="mostrarForm('form-subir-archivo')">
+                <button onclick="mostrarForm('form-subir-archivo')" style="width: 100%; text-align: left; padding: 10px 14px; background: none; border: none; border-top: 1px solid #f1f5f9; font-size: 13px; cursor: pointer; color: #334155; display: flex; align-items: center; gap: 8px;">
                     <i class="fa-solid fa-file-circle-plus" style="color: #3b82f6;"></i> Subir archivo
                 </button>
             </div>
@@ -606,42 +607,42 @@
     </div>
 
     <!-- FORMULARIO OCULTO: CREAR CARPETA -->
-    <div id="form-nueva-carpeta" class="drive-inline-form" style="display: none;">
-        <form action="/crear_carpeta" method="POST">
+    <div id="form-nueva-carpeta" class="drive-inline-form" style="display: none; padding: 10px 15px; background: #f8fafc; border-bottom: 1px solid #e2e8f0;">
+        <form action="/crear_carpeta" method="POST" style="display: flex; gap: 8px; align-items: center;">
             <input type="hidden" name="padre_id" value="{{ carpeta_actual_id or '' }}">
             <i class="fa-solid fa-folder" style="color: #f59e0b;"></i>
-            <input type="text" name="nombre_carpeta" placeholder="Nombre de la carpeta..." required autofocus>
-            <button type="submit" class="btn-confirm">Crear</button>
-            <button type="button" onclick="ocultarForms()" class="btn-cancel">Cancelar</button>
+            <input type="text" name="nombre_carpeta" placeholder="Nombre de la carpeta..." required autofocus style="padding: 6px 10px; font-size: 12px; border: 1px solid #cbd5e1; border-radius: 4px; flex-grow: 1;">
+            <button type="submit" style="padding: 6px 12px; font-size: 12px; background: #2563eb; color: white; border: none; border-radius: 4px; cursor: pointer;">Crear</button>
+            <button type="button" onclick="ocultarForms()" style="padding: 6px 10px; font-size: 12px; background: #94a3b8; color: white; border: none; border-radius: 4px; cursor: pointer;">Cancelar</button>
         </form>
     </div>
 
     <!-- FORMULARIO OCULTO: SUBIR ARCHIVO -->
-    <div id="form-subir-archivo" class="drive-inline-form" style="display: none;">
-        <form action="/subir" method="POST" enctype="multipart/form-data">
+    <div id="form-subir-archivo" class="drive-inline-form" style="display: none; padding: 10px 15px; background: #f8fafc; border-bottom: 1px solid #e2e8f0;">
+        <form action="/subir" method="POST" enctype="multipart/form-data" style="display: flex; gap: 8px; align-items: center;">
             <input type="hidden" name="carpeta_id" value="{{ carpeta_actual_id or '' }}">
             <i class="fa-solid fa-cloud-arrow-up" style="color: #3b82f6;"></i>
-            <input type="file" name="archivo" required>
-            <button type="submit" class="btn-confirm">Subir</button>
-            <button type="button" onclick="ocultarForms()" class="btn-cancel">Cancelar</button>
+            <input type="file" name="archivo" required style="font-size: 12px; flex-grow: 1;">
+            <button type="submit" style="padding: 6px 12px; font-size: 12px; background: #2563eb; color: white; border: none; border-radius: 4px; cursor: pointer;">Subir</button>
+            <button type="button" onclick="ocultarForms()" style="padding: 6px 10px; font-size: 12px; background: #94a3b8; color: white; border: none; border-radius: 4px; cursor: pointer;">Cancelar</button>
         </form>
     </div>
 
     <!-- ÁREA DE CONTENIDO (CARPETAS Y ARCHIVOS) -->
-    <div class="drive-body">
+    <div class="drive-body" style="padding: 15px;">
         
-        <!-- SUB-CARPETAS (VISTA EN CUADRÍCULA ESTILO DRIVE) -->
+        <!-- SUB-CARPETAS (CUADRÍCULA VISTA RAPIDA) -->
         {% if carpetas %}
-        <div class="drive-section-title">Carpetas</div>
-        <div class="drive-folder-grid">
+        <div class="drive-section-title" style="font-size: 12px; font-weight: 600; color: #64748b; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px;">Carpetas</div>
+        <div class="drive-folder-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; margin-bottom: 20px;">
             {% for id_c, nom_carp, creador_carp in carpetas %}
-            <div class="drive-folder-card">
-                <a href="/?folder_id={{ id_c }}" class="folder-link">
-                    <i class="fa-solid fa-folder" style="color: #fca5a5; font-size: 18px;"></i>
+            <div class="drive-folder-card" style="display: flex; align-items: center; justify-content: space-between; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 8px 12px;">
+                <a href="/?folder_id={{ id_c }}" class="folder-link" style="text-decoration: none; color: #334155; font-size: 13px; display: flex; align-items: center; gap: 8px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                    <i class="fa-solid fa-folder" style="color: #f59e0b; font-size: 16px;"></i>
                     <span class="folder-name">{{ nom_carp }}</span>
                 </a>
                 {% if creador_carp|lower == usuario|lower or puesto|lower == 'administrador' %}
-                <a href="/borrar_carpeta/{{ id_c }}" onclick="return confirm('¿Eliminar esta carpeta?')" class="btn-delete-item" title="Eliminar">
+                <a href="/borrar_carpeta/{{ id_c }}" onclick="return confirm('¿Eliminar esta carpeta?')" style="color: #ef4444; text-decoration: none; font-size: 12px; padding: 2px 4px;" title="Eliminar">
                     <i class="fa-solid fa-xmark"></i>
                 </a>
                 {% endif %}
@@ -651,32 +652,32 @@
         {% endif %}
 
         <!-- ARCHIVOS (LISTA LIMPIA) -->
-        <div class="drive-section-title" style="margin-top: 20px;">Archivos</div>
+        <div class="drive-section-title" style="font-size: 12px; font-weight: 600; color: #64748b; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px;">Archivos</div>
         {% if archivos %}
-        <table class="drive-file-table">
+        <table class="drive-file-table" style="width: 100%; border-collapse: collapse; font-size: 13px;">
             <thead>
-                <tr>
-                    <th>Nombre</th>
-                    <th>Subido por</th>
-                    <th>Fecha</th>
-                    <th style="text-align: right;">Acciones</th>
+                <tr style="border-bottom: 1px solid #e2e8f0; color: #64748b; text-align: left; font-size: 11px;">
+                    <th style="padding: 8px;">Nombre</th>
+                    <th style="padding: 8px;">Subido por</th>
+                    <th style="padding: 8px;">Fecha</th>
+                    <th style="padding: 8px; text-align: right;">Acciones</th>
                 </tr>
             </thead>
             <tbody>
                 {% for id_a, nombre_archivo, subido_por, fecha in archivos %}
-                <tr>
-                    <td class="file-name-cell">
-                        <i class="fa-regular fa-file-lines" style="color: #64748b; margin-right: 8px;"></i>
+                <tr style="border-bottom: 1px solid #f1f5f9;">
+                    <td style="padding: 8px;" class="file-name-cell">
+                        <i class="fa-regular fa-file-lines" style="color: #64748b; margin-right: 6px;"></i>
                         <b>{{ nombre_archivo }}</b>
                     </td>
-                    <td><span class="user-badge">{{ subido_por }}</span></td>
-                    <td style="color: #64748b; font-size: 12px;">{{ fecha }}</td>
-                    <td style="text-align: right;">
-                        <a href="/descargar/{{ nombre_archivo }}" class="btn-action-icon btn-download" title="Descargar">
+                    <td style="padding: 8px;"><span class="user-badge" style="background: #e2e8f0; padding: 2px 6px; border-radius: 4px; font-size: 11px;">{{ subido_por }}</span></td>
+                    <td style="padding: 8px; color: #64748b; font-size: 12px;">{{ fecha }}</td>
+                    <td style="padding: 8px; text-align: right;">
+                        <a href="/descargar/{{ nombre_archivo }}" style="color: #2563eb; margin-right: 8px; text-decoration: none;" title="Descargar">
                             <i class="fa-solid fa-download"></i>
                         </a>
                         {% if subido_por == usuario or puesto == 'Administrador' %}
-                        <a href="/borrar_archivo/{{ id_a }}" onclick="return confirm('¿Borrar archivo?')" class="btn-action-icon btn-delete" title="Borrar">
+                        <a href="/borrar_archivo/{{ id_a }}" onclick="return confirm('¿Borrar archivo?')" style="color: #ef4444; text-decoration: none;" title="Borrar">
                             <i class="fa-solid fa-trash-can"></i>
                         </a>
                         {% endif %}
@@ -686,9 +687,9 @@
             </tbody>
         </table>
         {% else %}
-        <div class="drive-empty-state">
+        <div class="drive-empty-state" style="text-align: center; padding: 30px 10px; color: #94a3b8;">
             <i class="fa-regular fa-folder-open" style="font-size: 32px; color: #cbd5e1; margin-bottom: 8px;"></i>
-            <p>Esta carpeta está vacía</p>
+            <p style="font-size: 13px; margin: 0;">Esta carpeta está vacía</p>
         </div>
         {% endif %}
 
@@ -864,13 +865,17 @@
     function toggleMenuNuevo(event) {
         event.stopPropagation();
         let menu = document.getElementById("menuNuevo");
-        menu.classList.toggle("show");
+        if (menu.style.display === "none" || menu.style.display === "") {
+            menu.style.display = "block";
+        } else {
+            menu.style.display = "none";
+        }
     }
 
     window.addEventListener('click', function() {
         let menu = document.getElementById("menuNuevo");
-        if (menu && menu.classList.contains('show')) {
-            menu.classList.remove('show');
+        if (menu && menu.style.display === "block") {
+            menu.style.display = "none";
         }
     });
 
