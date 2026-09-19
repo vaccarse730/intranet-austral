@@ -399,7 +399,7 @@
                     {% endif %}
                     
                     <ul id="subfolder-{{ loop.index }}" class="subfolder-list" style="display:none; padding-left:10px; list-style:none; font-size:11px; color:#555; margin-top:3px;">
-                        {% for id_a, nombre_archivo, subido_por, fecha, carpeta_archivo in archivos %}
+                        {% for nombre_archivo, subido_por, fecha, carpeta_archivo in archivos %}
                             {% if carpeta_archivo == nom_carp %}
                             <li class="file-item" style="margin-bottom:4px; display:flex; justify-content:space-between; align-items:center;">
                                 <span title="{{ nombre_archivo }}">📄 {{ nombre_archivo[:12] }}...</span>
