@@ -392,16 +392,16 @@
             <div id="arch-carp-side" style="display: none; margin-top: 10px;">
                 <input type="text" id="buscarArchivo" placeholder="🔍 Buscar archivos..." style="width:100%; padding:4px; font-size:12px; margin-bottom:10px;">
                 {% for nom_carp, creador_carp in carpetas %}
-                <div style="margin-bottom: 5px; border-bottom: 1px solid #eee; padding-bottom: 5px;">
+                <div class="folder-item" style="margin-bottom: 5px; border-bottom: 1px solid #eee; padding-bottom: 5px;">
                     <span style="font-size:12px; font-weight:bold; color:#0056b3; cursor:pointer;" onclick="toggleFolder('subfolder-{{ loop.index }}')">📁 {{ nom_carp }}</span>
                     {% if (creador_carp|lower == usuario|lower or puesto|lower == 'administrador') and nom_carp != 'General' %}
                     <a href="/borrar_carpeta/{{ nom_carp }}" style="color:red; font-size:10px; text-decoration:none; margin-left:5px;">❌</a>
                     {% endif %}
                     
-                    <ul id="subfolder-{{ loop.index }}" style="display:none; padding-left:10px; list-style:none; font-size:11px; color:#555; margin-top:3px;">
+                    <ul id="subfolder-{{ loop.index }}" class="subfolder-list" style="display:none; padding-left:10px; list-style:none; font-size:11px; color:#555; margin-top:3px;">
                         {% for nombre_archivo, subido_por, fecha, carpeta_archivo in archivos %}
                             {% if carpeta_archivo == nom_carp %}
-                            <li style="margin-bottom:4px; display:flex; justify-content:space-between; align-items:center;">
+                            <li class="file-item" style="margin-bottom:4px; display:flex; justify-content:space-between; align-items:center;">
                                 <span title="{{ nombre_archivo }}">📄 {{ nombre_archivo[:12] }}...</span>
                                 <div>
                                     <a href="/descargar/{{ nombre_archivo }}" style="color:green; text-decoration:none; font-weight:bold; margin-right:4px;">⬇️</a>
@@ -567,21 +567,50 @@
                 console.error('Error al copiar: ', err);
             });
         }
-   
 
+        // Búsqueda en Muro de Anuncios General
         document.getElementById('buscarAnuncio').addEventListener('keyup', function() {
             let filter = this.value.toLowerCase().trim();
 
             document.querySelectorAll('.msg-item').forEach(function(card) {
-                // Obtiene todo el texto visible e interno de la tarjeta del anuncio
                 let textoCard = card.textContent || card.innerText;
                 textoCard = textoCard.toLowerCase();
 
-                // Si hay coincidencia con la búsqueda, se muestra; de lo contrario se oculta
                 if (filter === '' || textoCard.includes(filter)) {
                     card.style.display = "block";
                 } else {
                     card.style.display = "none";
+                }
+            });
+        });
+
+        // Búsqueda de Archivos en el Panel Lateral
+        document.getElementById('buscarArchivo').addEventListener('keyup', function() {
+            let filter = this.value.toLowerCase().trim();
+
+            document.querySelectorAll('.folder-item').forEach(function(folder) {
+                let subfolder = folder.querySelector('.subfolder-list');
+                let files = folder.querySelectorAll('.file-item');
+                let coincidenciaEnCarpeta = false;
+
+                files.forEach(function(file) {
+                    let textFile = file.textContent.toLowerCase();
+                    if (filter === '' || textFile.includes(filter)) {
+                        file.style.display = "flex";
+                        coincidenciaEnCarpeta = true;
+                    } else {
+                        file.style.display = "none";
+                    }
+                });
+
+                if (filter !== '' && coincidenciaEnCarpeta) {
+                    subfolder.style.display = "block";
+                    folder.style.display = "block";
+                } else if (filter !== '' && !coincidenciaEnCarpeta) {
+                    folder.style.display = "none";
+                } else {
+                    folder.style.display = "block";
+                    subfolder.style.display = "none";
                 }
             });
         });
