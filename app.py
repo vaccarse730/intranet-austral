@@ -508,6 +508,35 @@ def editar_contacto(id):
         conn.close()
     return redirect(url_for('inicio'))
 
+@app.route('/actualizar_tipo_cambio', methods=['POST'])
+def actualizar_tipo_cambio():
+    if 'usuario' in session:
+        puesto_usuario = session.get('puesto', '').lower()
+        if 'administrador' in puesto_usuario or 'administración' in puesto_usuario or 'administracion' in puesto_usuario:
+            nuevo_precio = request.form.get('nuevo_tc', '').strip()
+            if nuevo_precio:
+                fecha_actual = datetime.now().strftime('%d/%m/%Y')
+                hora_actual = datetime.now().strftime('%H:%M')
+                usuario_cambio = session['usuario']
+                
+                conn = get_db_connection()
+                cursor = conn.cursor()
+                cursor.execute("SELECT valor FROM configuracion WHERE clave = 'dolar'")
+                precio_actual_bd = cursor.fetchone()
+                precio_viejo = precio_actual_bd[0] if precio_actual_bd else "17.35"
+                
+                cursor.execute("UPDATE configuracion SET valor = %s WHERE clave = 'dolar_anterior'", (precio_viejo,))
+                cursor.execute("UPDATE configuracion SET valor = %s WHERE clave = 'dolar'", (nuevo_precio,))
+                cursor.execute("UPDATE configuracion SET valor = %s WHERE clave = 'dolar_fecha'", (fecha_actual,))
+                cursor.execute("UPDATE configuracion SET valor = %s WHERE clave = 'dolar_hora'", (hora_actual,))
+                cursor.execute("UPDATE configuracion SET valor = %s WHERE clave = 'dolar_usuario'", (usuario_cambio,))
+                conn.commit()
+                cursor.close()
+                conn.close()
+                
+                return jsonify({"success": True, "nuevo_valor": nuevo_precio})
+    return jsonify({"success": False, "error": "No autorizado o valor inválido"}), 400
+
 @app.route('/actualizar_dolar', methods=['POST'])
 def actualizar_dolar():
     if 'usuario' in session:
