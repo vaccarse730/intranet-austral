@@ -14,7 +14,7 @@
             --text-color: #333333;
             --text-muted: #6c757d;
             --border-color: #e2e8f0;
-            --sidebar-width: 420px; /* Panel lateral más ancho */
+            --sidebar-width: 420px; /* Panel lateral ancho */
         }
 
         body {
@@ -26,41 +26,65 @@
             overflow-x: hidden;
         }
 
-        /* Botón fijo superior para desplegar herramientas */
+        /* HEADER PRINCIPAL RECONSTRUIDO */
+        .main-header {
+            background-color: #ffffff;
+            border-bottom: 1px solid var(--border-color);
+            padding: 12px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 900;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .header-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .header-user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        /* Botón para desplegar utilidades ubicado en el Header */
         .btn-open-sidebar {
-            position: fixed;
-            top: 15px;
-            right: 20px;
             background: var(--primary);
             color: white;
             border: none;
-            padding: 10px 16px;
+            padding: 8px 16px;
             border-radius: 20px;
             font-size: 13px;
             font-weight: 600;
             cursor: pointer;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-            z-index: 999;
             display: flex;
             align-items: center;
             gap: 8px;
-            transition: transform 0.2s, background 0.2s;
+            transition: background 0.2s, transform 0.2s;
         }
 
         .btn-open-sidebar:hover {
             background: var(--primary-hover);
-            transform: scale(1.03);
+            transform: scale(1.02);
         }
 
         /* COLUMNA CENTRAL (Muro de anuncios) */
         .main-content {
             max-width: 1000px;
             margin: 0 auto;
-            padding: 20px 20px 120px 20px;
+            padding: 25px 20px 120px 20px;
             transition: margin-right 0.3s ease-in-out, max-width 0.3s ease-in-out;
         }
 
-        /* Autoajuste de la columna central cuando el panel lateral está desplegado */
+        /* Autoajuste de la columna central cuando el panel lateral está activo */
         body.sidebar-open .main-content {
             margin-right: calc(var(--sidebar-width) + 20px);
             max-width: calc(100% - var(--sidebar-width) - 60px);
@@ -230,10 +254,27 @@
 </head>
 <body>
 
-<!-- BOTÓN SUPERIOR PARA ABRIR/CERRAR PANEL DE HERRAMIENTAS -->
-<button class="btn-open-sidebar" onclick="toggleSidebar()">
-    <i class="fa-solid fa-wrench"></i> Herramientas & Drive
-</button>
+<!-- HEADER PRINCIPAL RECUPERADO -->
+<header class="main-header">
+    <div class="header-logo">
+        🏢 <span>Austral Intranet</span>
+    </div>
+    
+    <div class="header-user-info">
+        <span style="font-size: 14px; color: var(--text-muted);">
+            Hola, <b>{{ usuario }}</b> <span class="role-tag">{{ puesto }}</span>
+        </span>
+        
+        <!-- Botón para desplegar las utilidades/drive -->
+        <button class="btn-open-sidebar" onclick="toggleSidebar()">
+            <i class="fa-solid fa-wrench"></i> Herramientas & Drive
+        </button>
+
+        <a href="/logout" style="color: #dc3545; text-decoration: none; font-size: 13px; font-weight: 600; margin-left: 10px;">
+            <i class="fa-solid fa-right-from-bracket"></i> Salir
+        </a>
+    </div>
+</header>
 
 <!-- COLUMNA CENTRAL (MURO Y PUBLICACIONES) -->
 <div class="main-content">
