@@ -208,7 +208,225 @@
         .footer-bottom-bar { display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: #9ca3af; border-top: 1px solid #1f2937; padding-top: 6px; }
         .footer-redes { display: flex; gap: 15px; }
         .footer-redes a { color: #d1d5db; text-decoration: none; font-weight: 600; display: flex; align-items: center; gap: 5px; font-size: 11px; }
-        .footer-redes a:hover { color: var(--accent); }
+        .footer-redes a:hover { color: var(--accent); 
+
+/* CONTENEDOR DRIVE */
+.drive-container {
+    background: #ffffff;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    overflow: hidden;
+    padding: 0 !important;
+}
+
+/* HEADER: BREADCRUMBS Y BOTÓN NUEVO */
+.drive-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    background: #ffffff;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+/* BREADCRUMBS */
+.drive-breadcrumbs {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 15px;
+    flex-wrap: wrap;
+}
+
+.crumb-item {
+    color: #475569;
+    text-decoration: none;
+    font-weight: 600;
+    padding: 4px 8px;
+    border-radius: 6px;
+    transition: background 0.2s;
+}
+
+.crumb-item:hover {
+    background: #f1f5f9;
+    color: #0b1f3a;
+}
+
+.crumb-item.active {
+    color: #0b1f3a;
+    font-weight: 800;
+}
+
+.crumb-separator {
+    color: #cbd5e1;
+    font-size: 11px;
+}
+
+/* BOTÓN + NUEVO Y DESPLEGABLE */
+.dropdown-nuevo {
+    position: relative;
+}
+
+.btn-nuevo {
+    background: #ffffff;
+    color: #1e293b;
+    border: 1px solid #cbd5e1;
+    padding: 8px 18px;
+    border-radius: 20px; /* Estilo píldora tipo Google Drive */
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    transition: all 0.2s;
+}
+
+.btn-nuevo:hover {
+    background: #f8fafc;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.12);
+}
+
+.dropdown-menu {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 45px;
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    z-index: 100;
+    width: 170px;
+    padding: 6px 0;
+}
+
+.dropdown-menu.show { display: block; }
+
+.dropdown-menu button {
+    width: 100%;
+    text-align: left;
+    background: none;
+    border: none;
+    padding: 10px 16px;
+    font-size: 13px;
+    color: #334155;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.dropdown-menu button:hover {
+    background: #f1f5f9;
+}
+
+/* FORMULARIOS RÁPIDOS */
+.drive-inline-form {
+    background: #f8fafc;
+    border-bottom: 1px solid #e2e8f0;
+    padding: 12px 20px;
+}
+
+.drive-inline-form form {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.drive-inline-form input[type="text"] {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font-size: 13px;
+    outline: none;
+}
+
+.btn-confirm { background: #28a745; color: white; border: none; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600; }
+.btn-cancel { background: #94a3b8; color: white; border: none; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; }
+
+/* CUERPO Y ELEMENTOS */
+.drive-body { padding: 20px; }
+.drive-section-title { font-size: 12px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; }
+
+/* CUADRÍCULA DE CARPETAS */
+.drive-folder-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+    margin-bottom: 15px;
+}
+
+.drive-folder-card {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: all 0.2s;
+}
+
+.drive-folder-card:hover {
+    background: #ffffff;
+    border-color: #cbd5e1;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.folder-link {
+    text-decoration: none;
+    color: #1e293b;
+    font-weight: 600;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    overflow: hidden;
+}
+
+.folder-name {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.btn-delete-item { color: #94a3b8; text-decoration: none; font-size: 12px; padding: 2px 6px; }
+.btn-delete-item:hover { color: #ef4444; }
+
+/* TABLA DE ARCHIVOS */
+.drive-file-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.drive-file-table th { text-align: left; padding: 10px; color: #64748b; font-weight: 700; border-bottom: 1px solid #e2e8f0; }
+.drive-file-table td { padding: 12px 10px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
+.drive-file-table tr:hover { background: #f8fafc; }
+
+.user-badge { background: #e2e8f0; color: #334155; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
+
+.btn-action-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    text-decoration: none;
+    margin-left: 4px;
+}
+.btn-download { background: #e0f2fe; color: #0284c7; }
+.btn-download:hover { background: #0284c7; color: white; }
+.btn-delete { background: #fee2e2; color: #ef4444; }
+.btn-delete:hover { background: #ef4444; color: white; }
+
+.drive-empty-state {
+    text-align: center;
+    padding: 35px 20px;
+    color: #94a3b8;
+    font-size: 13px;
+}
+                               
     </style>
 </head>
 <body>
@@ -353,251 +571,386 @@
             </div>
         </div>
 
-        <!-- 3. CREAR CARPETA DESPLEGABLE -->
-        <div class="card" style="padding: 10px; margin-bottom: 15px; box-shadow: none; border: 1px solid #ddd;">
-            <div class="folder-header" onclick="toggleFolder('carp-side')">
-                <span>📂 Crear Nueva Carpeta</span>
-            </div>
-            <div id="carp-side" style="display: none; margin-top: 10px;">
-                <form action="/crear_carpeta" method="POST">
-                    <input type="hidden" name="padre_id" value="{{ carpeta_actual_id or '' }}">
-                    <input type="text" name="nombre_carpeta" placeholder="Nombre..." required style="width:100%; padding:5px; font-size:12px; margin-bottom:5px;">
-                    <button type="submit" style="padding:4px 10px; font-size:12px;">Crear</button>
-                </form>
-            </div>
-        </div>
+<!-- MÓDULO ESTILO GOOGLE DRIVE -->
+<div class="card drive-container">
+    
+    <!-- BARRA SUPERIOR: BREADCRUMB Y BOTÓN NUEVO -->
+    <div class="drive-header">
+        <!-- Breadcrumb dinámico -->
+        <nav class="drive-breadcrumbs">
+            <a href="/" class="crumb-item {% if not carpeta_actual_id %}active{% endif %}">
+                <i class="fa-solid fa-house"></i> Mi Unidad
+            </a>
+            {% for crumb in breadcrumbs %}
+                <span class="crumb-separator"><i class="fa-solid fa-chevron-right"></i></span>
+                <a href="/?folder_id={{ crumb.id }}" class="crumb-item {% if loop.last %}active{% endif %}">
+                    {{ crumb.nombre }}
+                </a>
+            {% endfor %}
+        </nav>
 
-        <!-- 4. SUBIR DOCUMENTO DESPLEGABLE -->
-        <div class="card" style="padding: 10px; margin-bottom: 15px; box-shadow: none; border: 1px solid #ddd;">
-            <div class="folder-header" onclick="toggleFolder('subir-side')">
-                <span>📄 Subir Documento</span>
-            </div>
-            <div id="subir-side" style="display: none; margin-top: 10px;">
-                <form action="/subir" method="POST" enctype="multipart/form-data">
-                    <input type="file" name="archivo" required style="font-size:11px; margin-bottom:5px;"><br>
-                    <select name="carpeta_id" style="width:100%; padding:3px; font-size:12px; margin-bottom:8px;">
-                        <option value="">Raíz (Sin carpeta)</option>
-                        {% for id_c, carpeta, creador_c in carpetas %}
-                        <option value="{{ id_c }}" {% if id_c == carpeta_actual_id %}selected{% endif %}>{{ carpeta }}</option>
-                        {% endfor %}
-                    </select>
-                    <button type="submit" style="padding:4px 10px; font-size:12px;">Subir</button>
-                </form>
-            </div>
-        </div>
-
-        <!-- 5. ARCHIVOS GUARDADOS Y CARPETAS -->
-        <div class="card" style="padding: 10px; margin-bottom: 15px; box-shadow: none; border: 1px solid #ddd;">
-            <div class="folder-header" onclick="toggleFolder('arch-carp-side')">
-                <span>🔍📄 Explorador de Archivos</span>
-            </div>
-            <div id="arch-carp-side" style="display: none; margin-top: 10px;">
-                
-                <!-- Migas de pan (Navegación) -->
-                <div style="font-size: 11px; margin-bottom: 10px;">
-                    <a href="/" style="text-decoration:none; font-weight:bold; color:#0056b3;">🏠 Raíz</a>
-                    {% for crumb in breadcrumbs %}
-                        / <a href="/?folder_id={{ crumb.id }}" style="text-decoration:none; color:#0056b3;">{{ crumb.nombre }}</a>
-                    {% endfor %}
-                </div>
-
-                <!-- Lista de Subcarpetas -->
-                <div style="margin-bottom: 10px;">
-                    <b style="font-size:11px; color:#666;">Carpetas:</b>
-                    {% for id_c, nom_carp, creador_carp in carpetas %}
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:3px; font-size:12px;">
-                        <a href="/?folder_id={{ id_c }}" style="text-decoration:none; color:#0056b3; font-weight:bold;">📁 {{ nom_carp }}</a>
-                        {% if creador_carp|lower == usuario|lower or puesto|lower == 'administrador' %}
-                        <a href="/borrar_carpeta/{{ id_c }}" onclick="return confirm('¿Borrar carpeta?')" style="color:red; font-size:10px; text-decoration:none;">❌</a>
-                        {% endif %}
-                    </div>
-                    {% else %}
-                    <p style="font-size:11px; color:#999;">Sin subcarpetas.</p>
-                    {% endfor %}
-                </div>
-
-                <!-- Lista de Archivos -->
-                <div>
-                    <b style="font-size:11px; color:#666;">Archivos:</b>
-                    {% for id_a, nombre_archivo, subido_por, fecha, c_id in archivos %}
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:4px; font-size:11px;">
-                        <span title="{{ nombre_archivo }}">📄 {{ nombre_archivo[:14] }}...</span>
-                        <div>
-                            <a href="/descargar/{{ nombre_archivo }}" style="color:green; text-decoration:none; font-weight:bold; margin-right:4px;">⬇️</a>
-                            {% if subido_por == usuario or puesto == 'Administrador' %}
-                            <a href="/borrar_archivo/{{ id_a }}" onclick="return confirm('¿Borrar archivo?')" style="color:red; text-decoration:none;">❌</a>
-                            {% endif %}
-                        </div>
-                    </div>
-                    {% else %}
-                    <p style="font-size:11px; color:#999;">Sin archivos aquí.</p>
-                    {% endfor %}
-                </div>
-
+        <!-- Botón + Nuevo con Menú Desplegable -->
+        <div class="dropdown-nuevo">
+            <button class="btn-nuevo" onclick="toggleMenuNuevo(event)">
+                <i class="fa-solid fa-plus"></i> Nuevo
+            </button>
+            <div id="menuNuevo" class="dropdown-menu">
+                <button onclick="mostrarForm('form-nueva-carpeta')">
+                    <i class="fa-solid fa-folder-plus" style="color: #f59e0b;"></i> Nueva carpeta
+                </button>
+                <button onclick="mostrarForm('form-subir-archivo')">
+                    <i class="fa-solid fa-file-circle-plus" style="color: #3b82f6;"></i> Subir archivo
+                </button>
             </div>
         </div>
     </div>
 
-    <!-- FOOTER STICKY FIJO -->
-    <footer class="fixed-footer">
-        <div class="footer-top-layout" onclick="toggleFooterDir()">
-            <div style="display: flex; align-items: center; gap: 10px;">
-                <span style="font-size:16px;">📞</span>
-                <b style="font-size: 13px;">Directorio Telefónico Corporativo Austral</b>
-            </div>
-            <div style="display: flex; align-items: center; gap: 15px;">
-                <input type="text" id="buscarContacto" placeholder="🔍 Buscar número o correo..." onclick="event.stopPropagation();" style="background:#fff; border:none; padding:4px 10px; border-radius:4px; font-size:12px; width:220px; color:#333; font-weight:normal;">
-                <span id="txt-indicador-foot" style="font-size: 11px; color: rgba(255,255,255,0.6);">(Hacer clic para Desplegar)</span>
-            </div>
-        </div>
+    <!-- FORMULARIO OCULTO: CREAR CARPETA -->
+    <div id="form-nueva-carpeta" class="drive-inline-form" style="display: none;">
+        <form action="/crear_carpeta" method="POST">
+            <input type="hidden" name="padre_id" value="{{ carpeta_actual_id or '' }}">
+            <i class="fa-solid fa-folder" style="color: #f59e0b;"></i>
+            <input type="text" name="nombre_carpeta" placeholder="Nombre de la carpeta..." required autofocus>
+            <button type="submit" class="btn-confirm">Crear</button>
+            <button type="button" onclick="ocultarForms()" class="btn-cancel">Cancelar</button>
+        </form>
+    </div>
+
+    <!-- FORMULARIO OCULTO: SUBIR ARCHIVO -->
+    <div id="form-subir-archivo" class="drive-inline-form" style="display: none;">
+        <form action="/subir" method="POST" enctype="multipart/form-data">
+            <input type="hidden" name="carpeta_id" value="{{ carpeta_actual_id or '' }}">
+            <i class="fa-solid fa-cloud-arrow-up" style="color: #3b82f6;"></i>
+            <input type="file" name="archivo" required>
+            <button type="submit" class="btn-confirm">Subir</button>
+            <button type="button" onclick="ocultarForms()" class="btn-cancel">Cancelar</button>
+        </form>
+    </div>
+
+    <!-- ÁREA DE CONTENIDO (CARPETAS Y ARCHIVOS) -->
+    <div class="drive-body">
         
-        <div id="footerDirectorioContent" class="footer-dir-content">
-            <form action="/crear_contacto" method="POST" style="display: flex; gap: 8px; margin-bottom: 8px; background: rgba(255,255,255,0.05); padding: 5px; border-radius: 4px;">
-                <input type="text" name="nom_contacto" placeholder="Nombre..." required style="background:#fff; color:#333; padding:4px; border-radius:3px; font-size:12px;">
-                <input type="text" name="tel_contacto" placeholder="Teléfono..." required style="background:#fff; color:#333; padding:4px; border-radius:3px; font-size:12px;">
-                <input type="text" name="area_contacto" placeholder="Área..." style="background:#fff; color:#333; padding:4px; border-radius:3px; font-size:12px;">
-                <input type="email" name="correo_contacto" placeholder="Correo..." style="background:#fff; color:#333; padding:4px; border-radius:3px; font-size:12px;">
-                <button type="submit" style="padding: 2px 10px; font-size: 12px; background:#28a745; color:white; border:none; border-radius:3px; font-weight:bold; cursor:pointer;">+ Añadir</button>
-            </form>
-
-            <table class="table-dir">
-                <thead>
-                    <tr>
-                        <th>Contacto</th>
-                        <th>Área / Puesto</th>
-                        <th>Teléfono Guardado</th>
-                        <th>Correo Corporativo</th>
-                        <th style="text-align: right;">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for id_c, nom_c, tel_c, area_c, creador_c, corr_c in contactos %}
-                    <tr class="contacto-row">
-                        <td><b>{{ nom_c }}</b></td>
-                        <td><span style="background:rgba(255,255,255,0.1); padding:2px 5px; border-radius:3px;">{{ area_c }}</span></td>
-                        <td>
-                            <input type="text" name="nuevo_telefono" value="{{ tel_c }}" id="input-tel-{{ id_c }}" readonly>
-                        </td>
-                        <td>
-                            <form action="/editar_contacto/{{ id_c }}" method="POST" id="form-edit-{{ id_c }}" style="display: inline; margin:0;">
-                                <input type="text" name="nuevo_correo" value="{{ corr_c }}" id="input-corr-{{ id_c }}" readonly style="color:rgba(255,255,255,0.75);">
-                                <button type="submit" id="btn-save-{{ id_c }}" style="display: none; background: #28a745; padding: 1px 4px; font-size: 10px; color:white; border:none; border-radius:2px;">💾</button>
-                            </form>
-                        </td>
-                        <td style="text-align: right; display: flex; justify-content: flex-end; gap: 5px; align-items: center;">
-                            <button onclick="copiarContacto('{{ nom_c }}', '{{ area_c }}', '{{ tel_c }}', '{{ corr_c }}')" style="background: #6c757d; padding: 2px 6px; font-size: 11px; color:white; border:none; border-radius:3px; cursor:pointer;">📋 Copiar</button>
-                            {% if creador_c == usuario or puesto == 'Administrador' %}
-                            <button onclick="habilitarEdicion('{{ id_c }}')" style="background: #ffc107; color: black; padding: 2px 6px; font-size: 11px; border:none; border-radius:3px; cursor:pointer;">✏️</button>
-                            <a href="/borrar_contacto/{{ id_c }}" onclick="return confirm('¿Borrar contacto?')" style="background: #dc3545; color: white; padding: 2px 5px; border-radius: 3px; font-size: 11px; text-decoration:none; font-weight:bold;">❌</a>
-                            {% endif %}
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+        <!-- SUB-CARPETAS (VISTA EN CUADRÍCULA ESTILO DRIVE) -->
+        {% if carpetas %}
+        <div class="drive-section-title">Carpetas</div>
+        <div class="drive-folder-grid">
+            {% for id_c, nom_carp, creador_carp in carpetas %}
+            <div class="drive-folder-card">
+                <a href="/?folder_id={{ id_c }}" class="folder-link">
+                    <i class="fa-solid fa-folder" style="color: #fca5a5; font-size: 18px;"></i>
+                    <span class="folder-name">{{ nom_carp }}</span>
+                </a>
+                {% if creador_carp|lower == usuario|lower or puesto|lower == 'administrador' %}
+                <a href="/borrar_carpeta/{{ id_c }}" onclick="return confirm('¿Eliminar esta carpeta?')" class="btn-delete-item" title="Eliminar">
+                    <i class="fa-solid fa-xmark"></i>
+                </a>
+                {% endif %}
+            </div>
+            {% endfor %}
         </div>
+        {% endif %}
 
-        <div class="footer-bottom-bar">
-            <div>© 2026 <b>Austral</b>. Portal Interno.</div>
-            <div class="footer-redes">
-                <a href="https://www.nuestronorteeselsur.com" target="_blank" style="color: #e2eafc;">
-                    <svg style="width:12px; height:12px; fill:currentColor;" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.53c-.26-.81-1-1.4-1.9-1.4h-1v-3c0-.55-.45-1-1-1h-6v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg> Web
-                </a>
-                <a href="https://mx.linkedin.com/in/martin-montemurro-bb8712b4" target="_blank" style="color: #0077b5;">
-                    <svg style="width:12px; height:12px; fill:currentColor;" viewBox="0 0 24 24"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1-2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.32 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.79M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/></svg> LinkedIn
-                </a>
-                <a href="https://www.instagram.com/austral.mx/" target="_blank" style="color: #e1306c;">
-                    <svg style="width:12px; height:12px; fill:currentColor;" viewBox="0 0 24 24"><path d="M7.8 2h8.4C19.4 2 22 4.6 22 7.8v8.4a5.8 5.8 0 0 1-5.8 5.8H7.8C4.6 22 2 19.4 2 16.2V7.8A5.8 5.8 0 0 1 7.8 2m-.2 2A3.6 3.6 0 0 0 4 7.6v8.8A3.6 3.6 0 0 0 7.6 20h8.8a3.6 3.6 0 0 0 3.6-3.6V7.6A3.6 3.6 0 0 0 16.4 4H7.6m11.4 2a1.2 1.2 0 1 1-1.2 1.2A1.2 1.2 0 0 1 19 6m-7 2a4 4 0 1 1-4 4 4 4 0 0 1 4-4m0 2a2 2 0 1 0 2 2 2 2 0 0 1-2-2z"/></svg> Instagram
-                </a>
-                <a href="https://www.youtube.com/@australmx4858" target="_blank" style="color: #ff0000;">
-                    <svg style="width:12px; height:12px; fill:currentColor;" viewBox="0 0 24 24"><path d="M23.498 6.163a3.003 3.003 0 0 0-2.11-2.11C19.517 3.545 12 3.545 12 3.545s-7.516 0-9.387.508a3.003 3.003 0 0 0-2.11 2.11C0 8.033 0 12 0 12s0 3.967.503 5.837a3.003 3.003 0 0 0 2.11 2.11c1.871.508 9.387.508 9.387.508s7.517 0 9.387-.508a3.003 3.003 0 0 0 2.11-2.11c.503-1.87.503-5.837.503-5.837s0-3.967-.503-5.837zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg> YouTube
-                </a>
+        <!-- ARCHIVOS (LISTA LIMPIA) -->
+        <div class="drive-section-title" style="margin-top: 20px;">Archivos</div>
+        {% if archivos %}
+        <table class="drive-file-table">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Subido por</th>
+                    <th>Fecha</th>
+                    <th style="text-align: right;">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for id_a, nombre_archivo, subido_por, fecha in archivos %}
+                <tr>
+                    <td class="file-name-cell">
+                        <i class="fa-regular fa-file-lines" style="color: #64748b; margin-right: 8px;"></i>
+                        <b>{{ nombre_archivo }}</b>
+                    </td>
+                    <td><span class="user-badge">{{ subido_por }}</span></td>
+                    <td style="color: #64748b; font-size: 12px;">{{ fecha }}</td>
+                    <td style="text-align: right;">
+                        <a href="/descargar/{{ nombre_archivo }}" class="btn-action-icon btn-download" title="Descargar">
+                            <i class="fa-solid fa-download"></i>
+                        </a>
+                        {% if subido_por == usuario or puesto == 'Administrador' %}
+                        <a href="/borrar_archivo/{{ id_a }}" onclick="return confirm('¿Borrar archivo?')" class="btn-action-icon btn-delete" title="Borrar">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="drive-empty-state">
+            <i class="fa-regular fa-folder-open" style="font-size: 32px; color: #cbd5e1; margin-bottom: 8px;"></i>
+            <p>Esta carpeta está vacía</p>
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+
+<!-- MURO DE PUBLICACIONES -->
+<div class="card">
+    <h2 onclick="toggleFolder('form-publicar')" style="cursor: pointer; display: flex; justify-content: space-between; align-items: center; user-select: none;">
+        <span>📢 Publicar en el Muro</span>
+        <span style="font-size: 12px; color: var(--text-muted); font-weight: normal;">(Clic para desplegar)</span>
+    </h2>
+    <div id="form-publicar" style="display: none; margin-top: 15px;">
+        <form action="/publicar" method="POST" enctype="multipart/form-data">
+            <textarea name="contenido" placeholder="Escribe un anuncio para el equipo..."></textarea>
+            <p style="margin: 5px 0 10px 0; font-size: 13px; color: var(--text-muted);">O sube una foto desde tu PC:</p>
+            <input type="file" name="foto" accept="image/*" style="font-size: 12px; margin-bottom: 15px;"><br>
+            <button type="submit">Publicar</button>
+        </form>        
+    </div>
+</div>
+
+<div class="card">
+    <h2>📋 Muro de Anuncios General</h2>
+    <input type="text" id="buscarAnuncio" placeholder="🔍 Buscar anuncios..." style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; margin-bottom: 20px;">
+    
+    <div id="contenedorAnuncios">
+        {% for id_m, autor, contenido, es_foto, puesto_a, fecha, likes_count in mensajes %}
+        <div class="msg-item">
+            <div class="msg-meta">
+                👤 Por: <b>{{ autor }}</b> <span class="role-tag">{{ puesto_a }}</span> | 📅 {{ fecha }}
+                {% if autor == usuario or puesto == 'Administrador' %}
+                <a href="/borrar_mensaje/{{ id_m }}" onclick="return confirm('¿Borrar anuncio?')" style="color: #dc3545; text-decoration: none; font-weight: bold; float: right;">❌</a>
+                {% endif %}
+            </div>
+           
+            {% if '|' in contenido %}
+                <p style="font-size: 14px; line-height: 1.5; margin: 8px 0; white-space: pre-wrap;">{{ contenido.split('|')[0] }}</p>
+                {% if es_foto == 1 %}
+                <img src="/static/uploads/{{ contenido.split('|')[1] }}" style="max-width: 100%; max-height: 350px; border-radius: 6px; margin-top: 5px; display: block; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                {% endif %}
+            {% else %}
+                {% if es_foto == 1 %}
+                <img src="/static/uploads/{{ contenido }}" style="max-width: 100%; max-height: 350px; border-radius: 6px; margin-top: 5px; display: block; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                {% else %}
+                <p style="font-size: 14px; line-height: 1.5; margin: 8px 0; white-space: pre-wrap;">{{ contenido }}</p>
+                {% endif %}
+            {% endif %}                    
+           
+            <div style="margin-top: 10px;">
+                <a href="/like/{{ id_m }}" style="background: #ffc107; color: black; text-decoration: none; padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: bold; display: inline-block;">👍 Me gusta ({{ likes_count }})</a>
             </div>
         </div>
-    </footer>
+        {% else %}
+        <p style="text-align: center; color: #888; font-size: 14px; padding: 20px;">No hay anuncios publicados en el muro.</p>
+        {% endfor %}
+    </div>
+</div>
 
-    <!-- SCRIPTS -->
-    <script>
-        function toggleSidebar() {
-            let panel = document.getElementById('sidebarHerramientas');
-            panel.classList.toggle('active');
+<!-- PANEL LATERAL RETRÁCTIL (HERRAMIENTAS AUXILIARES) -->
+<div id="sidebarHerramientas" class="sidebar-panel">
+    <span class="sidebar-close" onclick="toggleSidebar()">×</span>
+    <h3 style="color: #0056b3; margin-bottom: 20px; font-size: 18px; border-bottom: 2px solid #ccc; padding-bottom: 5px;">🛠️ Utilidades</h3>
+    
+    <!-- CUMPLEANOS -->
+    <div class="card" style="padding: 10px; margin-bottom: 15px; box-shadow: none; border: 1px solid #ddd;">
+        <h4 style="font-size: 14px; color: var(--primary); margin-bottom: 10px;">🎂 Cumpleaños</h4>
+        {% for nombre, puesto_emp, fecha_b, es_hoy in cumpleanos %}
+            {% if es_hoy == 1 %}
+            <div style="background: #fff3cd; border: 1px solid #ffeeba; padding: 8px; border-radius: 4px; font-size: 12px; margin-bottom: 5px;">
+                🎈 <b>¡HOY! {{ nombre }}</b> ({{ puesto_emp }})
+            </div>
+            {% else %}
+            <div style="font-size: 12px; padding: 4px 0; border-bottom: 1px dashed #eee;">
+                🎉 {{ nombre }} - <span style="color:#28a745; font-weight:bold;">{{ fecha_b }}</span>
+            </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+
+    <!-- LINKS DE INTERÉS -->
+    <div class="card" style="padding: 10px; margin-bottom: 15px; box-shadow: none; border: 1px solid #ddd;">
+        <h4 style="font-size: 14px; color: var(--primary); margin-bottom: 10px;">🔗 Links de Interés</h4>
+        <ul style="list-style: none; padding: 0; font-size: 12px; margin-bottom: 10px;">
+            {% for id_l, tit_l, url_l, creador_l in links %}
+            <li style="display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid #eee;">
+                <a href="{{ url_l }}" target="_blank" style="color:#0056b3; text-decoration:none;">🔗 {{ tit_l }}</a>
+                {% if creador_l == usuario or puesto == 'Administrador' %}
+                <a href="/borrar_link/{{ id_l }}" style="color:red; text-decoration:none;">❌</a>
+                {% endif %}
+            </li>
+            {% endfor %}
+        </ul>
+
+        <form action="/crear_link" method="POST" style="display: flex; flex-direction: column; gap: 5px; border-top: 1px solid #eee; padding-top: 8px;">
+            <input type="text" name="tit_link" placeholder="Título..." required style="padding:4px; font-size:12px;">
+            <input type="text" name="url_link" placeholder="Dirección..." required style="padding:4px; font-size:12px;">
+            <button type="submit" style="padding:4px; font-size:12px;">+ Añadir Link</button>
+        </form>
+    </div>
+</div>
+
+<!-- FOOTER STICKY FIJO DIRECTORIO -->
+<footer class="fixed-footer">
+    <div class="footer-top-layout" onclick="toggleFooterDir()">
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <span style="font-size:16px;">📞</span>
+            <b style="font-size: 13px;">Directorio Telefónico Corporativo Austral</b>
+        </div>
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <input type="text" id="buscarContacto" placeholder="🔍 Buscar número o correo..." onclick="event.stopPropagation();" style="background:#fff; border:none; padding:4px 10px; border-radius:4px; font-size:12px; width:220px; color:#333;">
+            <span id="txt-indicador-foot" style="font-size: 11px; color: rgba(255,255,255,0.6);">(Hacer clic para Desplegar)</span>
+        </div>
+    </div>
+    
+    <div id="footerDirectorioContent" class="footer-dir-content">
+        <form action="/crear_contacto" method="POST" style="display: flex; gap: 8px; margin-bottom: 8px; background: rgba(255,255,255,0.05); padding: 5px; border-radius: 4px;">
+            <input type="text" name="nom_contacto" placeholder="Nombre..." required style="background:#fff; color:#333; padding:4px; border-radius:3px; font-size:12px;">
+            <input type="text" name="tel_contacto" placeholder="Teléfono..." required style="background:#fff; color:#333; padding:4px; border-radius:3px; font-size:12px;">
+            <input type="text" name="area_contacto" placeholder="Área..." style="background:#fff; color:#333; padding:4px; border-radius:3px; font-size:12px;">
+            <input type="email" name="correo_contacto" placeholder="Correo..." style="background:#fff; color:#333; padding:4px; border-radius:3px; font-size:12px;">
+            <button type="submit" style="padding: 2px 10px; font-size: 12px; background:#28a745; color:white; border:none; border-radius:3px; font-weight:bold; cursor:pointer;">+ Añadir</button>
+        </form>
+
+        <table class="table-dir">
+            <thead>
+                <tr>
+                    <th>Contacto</th>
+                    <th>Área / Puesto</th>
+                    <th>Teléfono Guardado</th>
+                    <th>Correo Corporativo</th>
+                    <th style="text-align: right;">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for id_c, nom_c, tel_c, area_c, creador_c, corr_c in contactos %}
+                <tr class="contacto-row">
+                    <td><b>{{ nom_c }}</b></td>
+                    <td><span style="background:rgba(255,255,255,0.1); padding:2px 5px; border-radius:3px;">{{ area_c }}</span></td>
+                    <td><input type="text" name="nuevo_telefono" value="{{ tel_c }}" id="input-tel-{{ id_c }}" readonly></td>
+                    <td>
+                        <form action="/editar_contacto/{{ id_c }}" method="POST" id="form-edit-{{ id_c }}" style="display: inline; margin:0;">
+                            <input type="text" name="nuevo_correo" value="{{ corr_c }}" id="input-corr-{{ id_c }}" readonly style="color:rgba(255,255,255,0.75);">
+                            <button type="submit" id="btn-save-{{ id_c }}" style="display: none; background: #28a745; padding: 1px 4px; font-size: 10px; color:white; border:none; border-radius:2px;">💾</button>
+                        </form>
+                    </td>
+                    <td style="text-align: right; display: flex; justify-content: flex-end; gap: 5px; align-items: center;">
+                        <button onclick="copiarContacto('{{ nom_c }}', '{{ area_c }}', '{{ tel_c }}', '{{ corr_c }}')" style="background: #6c757d; padding: 2px 6px; font-size: 11px; color:white; border:none; border-radius:3px; cursor:pointer;">📋 Copiar</button>
+                        {% if creador_c == usuario or puesto == 'Administrador' %}
+                        <button onclick="habilitarEdicion('{{ id_c }}')" style="background: #ffc107; color: black; padding: 2px 6px; font-size: 11px; border:none; border-radius:3px; cursor:pointer;">✏️</button>
+                        <a href="/borrar_contacto/{{ id_c }}" onclick="return confirm('¿Borrar contacto?')" style="background: #dc3545; color: white; padding: 2px 5px; border-radius: 3px; font-size: 11px; text-decoration:none; font-weight:bold;">❌</a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="footer-bottom-bar">
+        <div>© 2026 <b>Austral</b>. Portal Interno.</div>
+        <div class="footer-redes">
+            <a href="https://www.nuestronorteeselsur.com" target="_blank" style="color: #e2eafc;">Web</a>
+            <a href="https://mx.linkedin.com/in/martin-montemurro-bb8712b4" target="_blank" style="color: #0077b5;">LinkedIn</a>
+            <a href="https://www.instagram.com/austral.mx/" target="_blank" style="color: #e1306c;">Instagram</a>
+            <a href="https://www.youtube.com/@australmx4858" target="_blank" style="color: #ff0000;">YouTube</a>
+        </div>
+    </div>
+</footer>
+
+<!-- SCRIPTS DE INTERACCIÓN -->
+<script>
+    function toggleMenuNuevo(event) {
+        event.stopPropagation();
+        let menu = document.getElementById("menuNuevo");
+        menu.classList.toggle("show");
+    }
+
+    window.addEventListener('click', function() {
+        let menu = document.getElementById("menuNuevo");
+        if (menu && menu.classList.contains('show')) {
+            menu.classList.remove('show');
         }
+    });
 
-        function toggleFooterDir() {
-            let content = document.getElementById('footerDirectorioContent');
-            let ind = document.getElementById('txt-indicador-foot');
-            if (content.style.display === "none" || content.style.display === "") {
-                content.style.display = "block";
-                ind.innerText = "(Hacer clic para Ocultar)";
-            } else {
-                content.style.display = "none";
-                ind.innerText = "(Hacer clic para Desplegar)";
-            }
+    function mostrarForm(idForm) {
+        ocultarForms();
+        document.getElementById(idForm).style.display = 'block';
+    }
+
+    function ocultarForms() {
+        let fCarpeta = document.getElementById('form-nueva-carpeta');
+        let fArchivo = document.getElementById('form-subir-archivo');
+        if(fCarpeta) fCarpeta.style.display = 'none';
+        if(fArchivo) fArchivo.style.display = 'none';
+    }
+
+    function toggleSidebar() {
+        document.getElementById('sidebarHerramientas').classList.toggle('active');
+    }
+
+    function toggleFooterDir() {
+        let content = document.getElementById('footerDirectorioContent');
+        let ind = document.getElementById('txt-indicador-foot');
+        if (content.style.display === "none" || content.style.display === "") {
+            content.style.display = "block";
+            ind.innerText = "(Hacer clic para Ocultar)";
+        } else {
+            content.style.display = "none";
+            ind.innerText = "(Hacer clic para Desplegar)";
         }
+    }
 
-        function toggleFolder(id) {
-            let el = document.getElementById(id);
-            if (el.style.display === "none" || el.style.display === "") {
-                el.style.display = "block";
-            } else {
-                el.style.display = "none";
-            }
-        }
+    function toggleFolder(id) {
+        let el = document.getElementById(id);
+        el.style.display = (el.style.display === "none" || el.style.display === "") ? "block" : "none";
+    }
 
-        // Búsqueda en Directorio de Contactos
-        document.getElementById('buscarContacto').addEventListener('keyup', function() {
-            let filter = this.value.toLowerCase();
-            document.querySelectorAll('.contacto-row').forEach(function(fila) {
-                let textoFila = fila.innerText.toLowerCase();
-                let inputs = fila.querySelectorAll('input');
-                inputs.forEach(function(input) {
-                    textoFila += ' ' + input.value.toLowerCase();
-                });
-                fila.style.display = textoFila.includes(filter) ? "table-row" : "none";
+    document.getElementById('buscarContacto').addEventListener('keyup', function() {
+        let filter = this.value.toLowerCase();
+        document.querySelectorAll('.contacto-row').forEach(function(fila) {
+            let textoFila = fila.innerText.toLowerCase();
+            fila.querySelectorAll('input').forEach(function(input) {
+                textoFila += ' ' + input.value.toLowerCase();
             });
+            fila.style.display = textoFila.includes(filter) ? "table-row" : "none";
         });
+    });
 
-        function habilitarEdicion(id) {
-            let inputTel = document.getElementById('input-tel-' + id);
-            let inputCorr = document.getElementById('input-corr-' + id);
-            let btnGuardar = document.getElementById('btn-save-' + id);
-            
-            inputTel.readOnly = false;
-            inputTel.style.border = "1px solid #0056b3";
-            inputTel.style.background = "#fff";
-            inputTel.style.color = "#333";
-            
-            inputCorr.readOnly = false;
-            inputCorr.style.border = "1px solid #0056b3";
-            inputCorr.style.background = "#fff";
-            inputCorr.style.color = "#333";
-            
-            inputTel.focus();
-            btnGuardar.style.display = "inline-block";
-        }
+    function habilitarEdicion(id) {
+        let inputTel = document.getElementById('input-tel-' + id);
+        let inputCorr = document.getElementById('input-corr-' + id);
+        let btnGuardar = document.getElementById('btn-save-' + id);
+        
+        inputTel.readOnly = false;
+        inputTel.style.border = "1px solid #0056b3";
+        inputTel.style.background = "#fff";
+        inputTel.style.color = "#333";
+        
+        inputCorr.readOnly = false;
+        inputCorr.style.border = "1px solid #0056b3";
+        inputCorr.style.background = "#fff";
+        inputCorr.style.color = "#333";
+        
+        inputTel.focus();
+        btnGuardar.style.display = "inline-block";
+    }
 
-        function copiarContacto(nombre, area, telefono, correo) {
-            let textoCompleto = nombre + " (" + area + ") - Tel: " + telefono + " - Email: " + correo;
-            navigator.clipboard.writeText(textoCompleto).then(() => {
-                alert("Contacto copiado al portapapeles: " + nombre);
-            }).catch(err => {
-                console.error('Error al copiar: ', err);
-            });
-        }
-
-        // Búsqueda en Muro de Anuncios General
-        document.getElementById('buscarAnuncio').addEventListener('keyup', function() {
-            let filter = this.value.toLowerCase().trim();
-            document.querySelectorAll('.msg-item').forEach(function(card) {
-                let textoCard = card.textContent || card.innerText;
-                textoCard = textoCard.toLowerCase();
-                if (filter === '' || textoCard.includes(filter)) {
-                    card.style.display = "block";
-                } else {
-                    card.style.display = "none";
-                }
-            });
+    function copiarContacto(nombre, area, telefono, correo) {
+        let textoCompleto = nombre + " (" + area + ") - Tel: " + telefono + " - Email: " + correo;
+        navigator.clipboard.writeText(textoCompleto).then(() => {
+            alert("Contacto copiado: " + nombre);
         });
-    </script>
+    }
+
+    document.getElementById('buscarAnuncio').addEventListener('keyup', function() {
+        let filter = this.value.toLowerCase().trim();
+        document.querySelectorAll('.msg-item').forEach(function(card) {
+            let textoCard = (card.textContent || card.innerText).toLowerCase();
+            card.style.display = (filter === '' || textoCard.includes(filter)) ? "block" : "none";
+        });
+    });
+</script>
 </body>
 </html>
