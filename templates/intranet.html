@@ -391,7 +391,7 @@
             </div>
             <div id="arch-carp-side" style="display: none; margin-top: 10px;">
                 <input type="text" id="buscarArchivo" placeholder="🔍 Buscar archivos..." style="width:100%; padding:4px; font-size:12px; margin-bottom:10px;">
-                {% for nom_carp, creador_carp in carpetas %}
+                {% for id_a, nom_carp, creador_carp in carpetas %}
                 <div class="folder-item" style="margin-bottom: 5px; border-bottom: 1px solid #eee; padding-bottom: 5px;">
                     <span style="font-size:12px; font-weight:bold; color:#0056b3; cursor:pointer;" onclick="toggleFolder('subfolder-{{ loop.index }}')">📁 {{ nom_carp }}</span>
                     {% if (creador_carp|lower == usuario|lower or puesto|lower == 'administrador') and nom_carp != 'General' %}
@@ -399,7 +399,7 @@
                     {% endif %}
                     
                     <ul id="subfolder-{{ loop.index }}" class="subfolder-list" style="display:none; padding-left:10px; list-style:none; font-size:11px; color:#555; margin-top:3px;">
-                        {% for nombre_archivo, subido_por, fecha, carpeta_archivo in archivos %}
+                        {% for id_a, nombre_archivo, subido_por, fecha, carpeta_archivo in archivos %}
                             {% if carpeta_archivo == nom_carp %}
                             <li class="file-item" style="margin-bottom:4px; display:flex; justify-content:space-between; align-items:center;">
                                 <span title="{{ nombre_archivo }}">📄 {{ nombre_archivo[:12] }}...</span>
