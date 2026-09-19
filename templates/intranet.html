@@ -375,17 +375,24 @@
             🏢 <span>Austral Intranet</span>
         </div>
 
-        <!-- WIDGET DE TIPO DE CAMBIO EN EL HEADER -->
-        <div class="tc-widget" title="Última actualización: {{ fecha_tc or 'Hoy' }} por {{ usuario_tc or 'Sistema' }}">
-            <span class="tc-label"><i class="fa-solid fa-dollar-sign" style="color:#0f766e;"></i> TC USD:</span>
-            <span class="tc-value" id="val-tipo-cambio">${{ tipo_cambio or '0.00' }}</span>
-            
-            {% if puesto == 'Administrador' %}
-            <button class="tc-btn-edit" onclick="abrirModalTC()" title="Actualizar tipo de cambio">
-                <i class="fa-solid fa-pen"></i>
-            </button>
-            {% endif %}
-        </div>
+<!-- WIDGET DE TIPO DE CAMBIO EN EL HEADER -->
+<div style="display: flex; flex-direction: column; align-items: flex-start; gap: 2px;">
+    <div class="tc-widget" title="Última actualización: {{ d_fecha or 'Hoy' }} a las {{ d_hora or '' }} por {{ d_usuario or 'Sistema' }}">
+        <span class="tc-label"><i class="fa-solid fa-dollar-sign" style="color:#0f766e;"></i> TC USD:</span>
+        <span class="tc-value" id="val-tipo-cambio">${{ tipo_cambio or '0.00' }}</span>
+        
+        {% if 'administrador' in puesto|lower or 'administración' in puesto|lower or 'administracion' in puesto|lower %}
+        <button class="tc-btn-edit" onclick="abrirModalTC()" title="Actualizar tipo de cambio">
+            <i class="fa-solid fa-pen"></i>
+        </button>
+        {% endif %}
+    </div>
+
+    <!-- Etiqueta de historial / auditoría -->
+    <span style="font-size: 10px; color: #64748b; font-weight: normal; margin-left: 4px;">
+        ⏪ Antes: <b style="color: #d97706;">${{ d_anterior or '17.35' }}</b> | Modificó: <b>{{ d_usuario or 'Sistema' }}</b> ({{ d_fecha or '' }} - {{ d_hora or '' }})
+    </span>
+</div>
     </div>
     
     <div class="header-user-info">
