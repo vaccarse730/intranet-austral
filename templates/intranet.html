@@ -424,21 +424,35 @@ body.sidebar-open .main-content {
         </a>
 
 <!-- Widget Tipo de Cambio en el Header -->
-<div class="tc-widget" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); padding: 6px 14px; border-radius: 20px; color: white; font-size: 13px; display: flex; align-items: center; gap: 8px;">
-    <span class="tc-label" style="font-weight: 700; color: #e2e8f0;">
-        <i class="fa-solid fa-dollar-sign" style="color: var(--accent);"></i> TC USD:
-    </span>
-    <span class="tc-value" id="val-tipo-cambio" style="font-weight: 800; color: #4ade80;">
-        ${{ tipo_cambio or '0.00' }}
-    </span>
-    
-    <!-- Botón de Edición (Lápiz) -->
-    <button class="tc-btn-edit" onclick="abrirModalTC()" style="background: none; border: none; color: var(--accent); cursor: pointer; padding: 2px 4px; font-size: 13px;" title="Editar Tipo de Cambio">
+<div class="tc-widget" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); padding: 4px 12px; border-radius: 20px; color: white; font-size: 13px; display: flex; align-items: center; gap: 8px;">
+    <div style="display: flex; flex-direction: column; align-items: flex-start;">
+        <div style="display: flex; align-items: center; gap: 6px;">
+            <span class="tc-label" style="font-weight: 700; color: #e2e8f0;">
+                <i class="fa-solid fa-dollar-sign" style="color: var(--accent);"></i> TC USD:
+            </span>
+            <span class="tc-value" id="val-tipo-cambio" style="font-weight: 800; color: #4ade80;">
+                ${{ tipo_cambio or '0.00' }}
+            </span>
+        </div>
+        <!-- Etiqueta del último registro / cambio -->
+        <span class="tc-last-update" style="font-size: 10px; color: rgba(255, 255, 255, 0.7); line-height: 1;">
+            {% if tc_ultimo_usuario and tc_ultima_fecha %}
+                Actualizado por <b>{{ tc_ultimo_usuario }}</b> ({{ tc_ultima_fecha }})
+            {% else %}
+                Último cambio: {{ tc_ultima_fecha or 'Sin registro' }}
+            {% endif %}
+        </span>
+    </div>
+
+    <!-- Botón Editar (Lápiz) -->
+    {% if 'administra' in puesto|lower or 'admin' in puesto|lower %}
+    <button class="tc-btn-edit" onclick="abrirModalTC()" style="background: none; border: none; color: var(--accent); cursor: pointer; padding: 2px; font-size: 12px;" title="Actualizar Tipo de Cambio">
         ✏️
     </button>
+    {% endif %}
 
-    <!-- Botón de Historial (Log) -->
-    <button class="tc-btn-log" onclick="abrirModalLogTC()" style="background: none; border: none; color: #cbd5e1; cursor: pointer; padding: 2px 4px; font-size: 13px;" title="Ver Historial">
+    <!-- Botón Historial (Log) -->
+    <button class="tc-btn-log" onclick="abrirModalLogTC()" style="background: none; border: none; color: #cbd5e1; cursor: pointer; padding: 2px; font-size: 12px;" title="Ver Log de Cambios">
         📜
     </button>
 </div>
