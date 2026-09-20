@@ -155,7 +155,7 @@ def obtener_ruta_carpetas(carpeta_actual_id):
 @app.route('/')
 def inicio():
     if 'usuario' not in session or 'puesto' not in session:
-        return redirect(url_for('logout'))
+        return redirect(url_for('login'))
     
     carpeta_actual_id = request.args.get('folder_id', type=int)
     
