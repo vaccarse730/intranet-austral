@@ -434,12 +434,11 @@ body.sidebar-open .main-content {
                 ${{ tipo_cambio or '0.00' }}
             </span>
         </div>
-        <!-- Etiqueta del último registro / cambio -->
+        
+        <!-- Muestra quién y cuándo cambió el TC usando tus variables reales -->
         <span class="tc-last-update" style="font-size: 10px; color: rgba(255, 255, 255, 0.7); line-height: 1;">
-            {% if tc_ultimo_usuario and tc_ultima_fecha %}
-                Actualizado por <b>{{ tc_ultimo_usuario }}</b> ({{ tc_ultima_fecha }})
-            {% else %}
-                Último cambio: {{ tc_ultima_fecha or 'Sin registro' }}
+            {% if d_usuario and d_fecha %}
+                Modificado por <b>{{ d_usuario }}</b> ({{ d_fecha }} {{ d_hora }})
             {% endif %}
         </span>
     </div>
@@ -451,7 +450,7 @@ body.sidebar-open .main-content {
     </button>
     {% endif %}
 
-    <!-- Botón Historial (Log) -->
+    <!-- Botón Log de Cambios -->
     <button class="tc-btn-log" onclick="abrirModalLogTC()" style="background: none; border: none; color: #cbd5e1; cursor: pointer; padding: 2px; font-size: 12px;" title="Ver Log de Cambios">
         📜
     </button>
