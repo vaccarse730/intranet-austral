@@ -239,24 +239,25 @@ def inicio():
 
     breadcrumbs = obtener_ruta_carpetas(carpeta_actual_id)
 
-return render_template(
-    'intranet.html',
-    mensajes=mensajes,
-    mis_likes=mis_likes,
-    archivos=archivos,
-    carpetas=carpetas,
-    carpeta_actual_id=carpeta_actual_id,
-    breadcrumbs=breadcrumbs,
-    cumpleanos=cumpleanos_limpios,
-    contactos=contactos,
-    tipo_cambio=tipo_cambio,
-    d_fecha=d_fecha,        # <-- Fecha del último cambio
-    d_hora=d_hora,          # <-- Hora del último cambio
-    d_usuario=d_usuario,    # <-- Usuario que hizo el cambio
-    d_anterior=d_anterior,
-    links=links,
-    usuario=session.get('usuario'),
-    puesto=session.get('puesto'))
+    return render_template(
+        'intranet.html',
+        mensajes=mensajes,
+        mis_likes=mis_likes,
+        archivos=archivos,
+        carpetas=carpetas,
+        carpeta_actual_id=carpeta_actual_id,
+        breadcrumbs=breadcrumbs,
+        cumpleanos=cumpleanos_limpios,
+        contactos=contactos,
+        tipo_cambio=tipo_cambio,
+        d_fecha=d_fecha,        # <-- Fecha del último cambio
+        d_hora=d_hora,          # <-- Hora del último cambio
+        d_usuario=d_usuario,    # <-- Usuario que hizo el cambio
+        d_anterior=d_anterior,
+        links=links,
+        usuario=session.get('usuario'),
+        puesto=session.get('puesto')
+    )
     
 @app.route('/crear_carpeta', methods=['POST'])
 def crear_carpeta():
