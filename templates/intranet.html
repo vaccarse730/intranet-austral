@@ -436,10 +436,29 @@ body.sidebar-open .main-content {
         </div>
     </div>
 
-    <!-- Info Usuario -->
-    <div class="header-user-info" style="color: white; font-size: 13px;">
-        Hola, <b style="color: white;">{{ usuario }}</b> 
-        <span class="role-tag" style="background: var(--accent); color: white; padding: 2px 8px; border-radius: 3px; font-size: 11px; font-weight: 700; margin-left: 5px;">{{ puesto }}</span>
+    <!-- Info Usuario, Menú Desplegable y Cerrar Sesión -->
+    <div class="header-user-info" style="color: white; font-size: 13px; display: flex; align-items: center; gap: 12px;">
+        <span>Hola, <b style="color: white;">{{ usuario }}</b></span>
+        
+        <!-- Etiqueta con el puesto/rol -->
+        <span class="role-tag" style="background: var(--accent); color: #0b1f3a; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: 700;">
+            {{ puesto }}
+        </span>
+
+        <!-- Botón Menú Desplegable (Herramientas/Drive) -->
+        <button class="btn-open-sidebar" onclick="toggleSidebar()" style="background: rgba(255,255,255,0.15); color: white; border: 1px solid rgba(255,255,255,0.3); padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+            🛠️ Menú
+        </button>
+
+        <!-- Botón Cambio de Contraseña -->
+        <button class="btn-change-pass" onclick="abrirModalPassword()" title="Cambiar Contraseña" style="background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 6px 10px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer;">
+            🔑
+        </button>
+
+        <!-- Botón Logout -->
+        <a href="/logout" style="background: #ef4444; color: white; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; text-decoration: none; display: flex; align-items: center; gap: 4px;">
+            🚪 Salir
+        </a>
     </div>
 </header>
 
