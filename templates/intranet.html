@@ -170,25 +170,33 @@
             border: 1px solid var(--border-color);
         }
 
-        /* PANEL LATERAL DESPLEGABLE */
-        .sidebar-panel {
-            position: fixed;
-            top: 0;
-            right: calc(-1 * var(--sidebar-width) - 20px);
-            width: var(--sidebar-width);
-            height: 100vh;
-            background-color: #ffffff;
-            box-shadow: -4px 0 15px rgba(0, 0, 0, 0.15);
-            z-index: 1050;
-            transition: right 0.3s ease-in-out;
-            padding: 20px;
-            overflow-y: auto;
-            box-sizing: border-box;
-        }
+/* PANEL LATERAL DESPLEGABLE (Oculto a la derecha por defecto) */
+.sidebar-panel {
+    position: fixed;
+    top: 0;
+    right: -420px; /* Escondido totalmente fuera del margen derecho */
+    width: 420px;
+    height: 100vh;
+    background-color: #ffffff;
+    box-shadow: -4px 0 15px rgba(0, 0, 0, 0.15);
+    z-index: 2000;
+    transition: right 0.3s ease-in-out;
+    padding: 20px;
+    overflow-y: auto;
+    box-sizing: border-box;
+}
 
-        .sidebar-panel.active {
-            right: 0 !important;
-        }
+/* Estado Activo: Se desliza hacia adentro desde la derecha */
+.sidebar-panel.active {
+    right: 0 !important;
+}
+
+/* Evitar que el cuerpo empuje el contenido si no se desea */
+body.sidebar-open .main-content {
+    margin-right: 0; 
+}
+        
+        /* PANEL LATERAL DESPLEGABLE */
 
         .sidebar-close {
             position: absolute;
