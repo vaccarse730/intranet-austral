@@ -418,9 +418,9 @@ body.sidebar-open .main-content {
 
 <header class="main-header" style="background: var(--primary); padding: 12px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid var(--accent);">
     <div class="header-left" style="display: flex; align-items: center; gap: 20px;">
-        <!-- Logo Oficial Austral (Escalado más grande y forzado a blanco limpio) -->
+        <!-- Logo Oficial Austral (Tal cual al archivo PNG original) -->
         <a href="/" style="display: flex; align-items: center; text-decoration: none;">
-            <img src="/static/LogoAusralBlancoFondoTransparente.PNG" alt="Austral Logo" style="height: 60px; width: auto; display: block; object-fit: contain; filter: brightness(0) invert(1);">
+            <img src="/static/LogoAusralBlancoFondoTransparente.PNG" alt="Austral Logo" style="height: 50px; width: auto; display: block; object-fit: contain;">
         </a>
 
         <!-- Widget Tipo de Cambio -->
@@ -456,16 +456,15 @@ body.sidebar-open .main-content {
         </div>
     </div>
 
-    <!-- Info Usuario, Puesto sin cuadro y Acciones -->
-    <div class="header-user-info" style="color: white; font-size: 13px; display: flex; align-items: center; gap: 14px;">
-        <!-- Nombre de usuario y Puesto en texto plano en color blanco -->
+    <!-- Info Usuario y Acciones -->
+    <div class="header-user-info" style="color: white; font-size: 13px; display: flex; align-items: center; gap: 16px;">
         <div style="display: flex; align-items: center; gap: 6px;">
             <span>Hola, <b style="color: white;">{{ usuario }}</b></span>
             <span style="color: rgba(255,255,255,0.7); font-size: 13px;">| {{ puesto }}</span>
         </div>
 
-        <!-- Botón Menú / Herramientas estirado más a lo ancho -->
-        <button class="btn-open-sidebar" onclick="toggleSidebar()" style="background: rgba(255,255,255,0.15); color: white; border: 1px solid rgba(255,255,255,0.3); padding: 8px 22px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px;">
+        <!-- Botón Menú mas ancho (32px de relleno lateral) -->
+        <button class="btn-open-sidebar" onclick="toggleSidebar()" style="background: rgba(255,255,255,0.15); color: white; border: 1px solid rgba(255,255,255,0.3); padding: 8px 32px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px;">
             🛠️ Menú
         </button>
 
