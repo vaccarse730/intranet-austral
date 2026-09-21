@@ -590,7 +590,7 @@ body.sidebar-open .main-content {
     <span class="sidebar-close" onclick="toggleSidebar()">×</span>
     <h3 style="color: #0056b3; margin-bottom: 20px; font-size: 18px; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;">🛠️ Utilidades & Archivos</h3>
     
-    <!-- BLOQUE 1: DRIVE Y ARCHIVOS -->
+<!-- BLOQUE 1: DRIVE Y ARCHIVOS -->
     <div class="sidebar-section">
         <div class="sidebar-section-title"><i class="fa-solid fa-folder-tree"></i> Gestor de Documentos</div>
         
@@ -599,26 +599,26 @@ body.sidebar-open .main-content {
                 
                 <nav class="drive-breadcrumbs" style="font-size: 12px; font-weight: 500; display: flex; align-items: center; gap: 4px; flex-wrap: wrap;">
                     <a href="/?folder_id=" onclick="cargarCarpeta(this.href, event)" class="crumb-item {% if not carpeta_actual_id %}active{% endif %}" title="Mi Unidad" style="color: #475569; text-decoration: none; padding: 2px 4px;">
-                        <i class="fa-solid fa-house"></i>
+                        🏠 Inicio
                     </a>
                     {% for crumb in breadcrumbs %}
-                        <span style="color: #cbd5e1; font-size: 9px;"><i class="fa-solid fa-chevron-right"></i></span>
-                        <a href="/?folder_id={{ crumb.id }}" onclick="cargarCarpeta(this.href, event)" style="color: #334155; text-decoration: none; font-size: 12px;">
+                        <span style="color: #cbd5e1; font-size: 9px;">></span>
+                        <a href="/?folder_id={{ crumb.id }}" onclick="cargarCarpeta(this.href, event)" style="color: #334155; text-decoration: none; font-size: 12px; font-weight: 600;">
                             {{ crumb.nombre }}
                         </a>
                     {% endfor %}
                 </nav>
 
                 <div class="dropdown-nuevo" style="position: relative;">
-                    <button onclick="toggleMenuNuevo(event)" style="width: 30px; height: 30px; border-radius: 50%; background: #2563eb; color: white; border: none; font-size: 14px; cursor: pointer;">
-                        <i class="fa-solid fa-plus"></i>
+                    <button onclick="toggleMenuNuevo(event)" style="width: 30px; height: 30px; border-radius: 50%; background: #2563eb; color: white; border: none; font-size: 14px; cursor: pointer;" title="Nuevo elemento">
+                        ➕
                     </button>
                     <div id="menuNuevo" style="display: none; position: absolute; right: 0; top: 35px; background: white; border: 1px solid #e2e8f0; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); width: 150px; z-index: 100;">
                         <button onclick="mostrarForm('form-nueva-carpeta')" style="width: 100%; text-align: left; padding: 8px 10px; background: none; border: none; font-size: 12px; cursor: pointer; color: #334155;">
-                            <i class="fa-solid fa-folder-plus" style="color: #f59e0b;"></i> Nueva carpeta
+                            📁 Nueva carpeta
                         </button>
                         <button onclick="mostrarForm('form-subir-archivo')" style="width: 100%; text-align: left; padding: 8px 10px; background: none; border: none; border-top: 1px solid #f1f5f9; font-size: 12px; cursor: pointer; color: #334155;">
-                            <i class="fa-solid fa-file-circle-plus" style="color: #3b82f6;"></i> Subir archivo
+                            📄 Subir archivo
                         </button>
                     </div>
                 </div>
@@ -626,7 +626,7 @@ body.sidebar-open .main-content {
 
             <!-- Formulario Nueva Carpeta -->
             <div id="form-nueva-carpeta" style="display: none; margin-bottom: 10px; padding: 8px; background: #fff; border: 1px solid #cbd5e1; border-radius: 4px;">
-                <form onsubmit="enviarFormularioAjax(event, this, '/crear_carpeta')" style="display: flex; gap: 4px; flex-direction: column;">
+                <form onsubmit="enviarDriveForm(event, this, '/crear_carpeta')" style="display: flex; gap: 4px; flex-direction: column;">
                     <input type="hidden" name="padre_id" value="{{ carpeta_actual_id or '' }}">
                     <input type="text" name="nombre_carpeta" placeholder="Nombre carpeta..." required style="padding: 4px; font-size: 11px; border: 1px solid #ccc; border-radius: 3px;">
                     <div style="display: flex; gap: 5px; margin-top: 4px;">
@@ -638,7 +638,7 @@ body.sidebar-open .main-content {
 
             <!-- Formulario Subir Archivo -->
             <div id="form-subir-archivo" style="display: none; margin-bottom: 10px; padding: 8px; background: #fff; border: 1px solid #cbd5e1; border-radius: 4px;">
-                <form onsubmit="enviarFormularioAjax(event, this, '/subir')" enctype="multipart/form-data" style="display: flex; gap: 4px; flex-direction: column;">
+                <form onsubmit="enviarDriveForm(event, this, '/subir')" enctype="multipart/form-data" style="display: flex; gap: 4px; flex-direction: column;">
                     <input type="hidden" name="carpeta_id" value="{{ carpeta_actual_id or '' }}">
                     <input type="file" name="archivo" required style="font-size: 11px;">
                     <div style="display: flex; gap: 5px; margin-top: 4px;">
@@ -648,6 +648,16 @@ body.sidebar-open .main-content {
                 </form>
             </div>
 
+            <!-- Lista Carpeta Anterior / Subir de Nivel -->
+            {% if breadcrumbs|length > 0 %}
+            {% set prev_folder = breadcrumbs[-2].id if breadcrumbs|length > 1 else '' %}
+            <div style="margin-bottom: 8px;">
+                <a href="/?folder_id={{ prev_folder }}" onclick="cargarCarpeta(this.href, event)" style="font-size: 11px; color: #2563eb; text-decoration: none; font-weight: bold; display: flex; align-items: center; gap: 4px;">
+                    ⬆️ ... (Subir nivel)
+                </a>
+            </div>
+            {% endif %}
+
             <!-- Lista Carpetas -->
             {% if carpetas %}
             <div style="font-size: 11px; font-weight: bold; color: #64748b; margin: 8px 0 4px 0;">CARPETAS</div>
@@ -655,11 +665,10 @@ body.sidebar-open .main-content {
                 {% for id_c, nom_carp, creador_carp in carpetas %}
                 <div style="display: flex; align-items: center; justify-content: space-between; background: white; border: 1px solid #e2e8f0; border-radius: 4px; padding: 6px 8px;">
                     <a href="/?folder_id={{ id_c }}" onclick="cargarCarpeta(this.href, event)" style="text-decoration: none; color: #334155; font-size: 12px; display: flex; align-items: center; gap: 6px; overflow: hidden;">
-                        <i class="fa-solid fa-folder" style="color: #f59e0b;"></i>
-                        <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 280px;">{{ nom_carp }}</span>
+                        📂 <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 250px;">{{ nom_carp }}</span>
                     </a>
                     {% if creador_carp|lower == usuario|lower or puesto|lower == 'administrador' %}
-                    <a href="javascript:void(0)" onclick="eliminarRegistro('/borrar_carpeta/{{ id_c }}', this)" style="color: #ef4444; font-size: 11px;" title="Eliminar">❌</a>
+                    <a href="javascript:void(0)" onclick="eliminarRegistroDrive('/borrar_carpeta/{{ id_c }}', this)" style="color: #ef4444; font-size: 11px; text-decoration: none;" title="Eliminar">❌</a>
                     {% endif %}
                 </div>
                 {% endfor %}
@@ -672,14 +681,13 @@ body.sidebar-open .main-content {
             <div style="display: flex; flex-direction: column; gap: 4px;">
                 {% for id_a, nombre_archivo, subido_por, fecha, _ in archivos %}
                 <div style="display: flex; align-items: center; justify-content: space-between; background: white; border: 1px solid #e2e8f0; border-radius: 4px; padding: 6px 8px; font-size: 12px;">
-                    <div style="display: flex; align-items: center; gap: 6px; overflow: hidden; max-width: 270px;">
-                        <i class="fa-regular fa-file-lines" style="color: #64748b;"></i>
-                        <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="{{ nombre_archivo }}">{{ nombre_archivo }}</span>
+                    <div style="display: flex; align-items: center; gap: 6px; overflow: hidden; max-width: 240px;">
+                        📄 <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="{{ nombre_archivo }}">{{ nombre_archivo }}</span>
                     </div>
                     <div>
-                        <a href="/descargar/{{ nombre_archivo }}" style="color: #2563eb; margin-right: 6px; text-decoration: none;" title="Descargar"><i class="fa-solid fa-download"></i></a>
-                        {% if subido_por == usuario or puesto == 'Administrador' %}
-                        <a href="javascript:void(0)" onclick="eliminarRegistro('/borrar_archivo/{{ id_a }}', this)" style="color: #ef4444; text-decoration: none;" title="Borrar">❌</a>
+                        <a href="/descargar/{{ nombre_archivo }}" style="color: #2563eb; margin-right: 6px; text-decoration: none;" title="Descargar">⬇️</a>
+                        {% if subido_por|lower == usuario|lower or puesto|lower == 'administrador' %}
+                        <a href="javascript:void(0)" onclick="eliminarRegistroDrive('/borrar_archivo/{{ id_a }}', this)" style="color: #ef4444; text-decoration: none;" title="Borrar">❌</a>
                         {% endif %}
                     </div>
                 </div>
