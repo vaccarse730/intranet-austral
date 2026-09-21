@@ -1103,6 +1103,54 @@ function enviarFormularioAjax(event, form, urlAccion) {
             alert("Contacto copiado: " + nombre);
         });
     }
+
+function enviarDriveForm(event, form, urlAccion) {
+    event.preventDefault();
+    let btnSubmit = form.querySelector('button[type="submit"]');
+    let textoOriginal = btnSubmit ? btnSubmit.innerHTML : '';
+
+    if (btnSubmit) {
+        btnSubmit.disabled = true;
+        btnSubmit.innerHTML = 'Procesando...';
+    }
+
+    let formData = new FormData(form);
+
+    fetch(urlAccion, {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => {
+        if (response.ok) {
+            cargarCarpeta(window.location.href);
+            form.reset();
+            ocultarForms();
+        } else {
+            alert("Error al procesar la solicitud en Drive.");
+        }
+    })
+    .catch(err => console.error("Error en Drive:", err))
+    .finally(() => {
+        if (btnSubmit) {
+            btnSubmit.disabled = false;
+            btnSubmit.innerHTML = textoOriginal;
+        }
+    });
+}
+
+function eliminarRegistroDrive(url, elementoHtml) {
+    if (!confirm('¿Seguro que deseas eliminar este elemento?')) return;
+
+    fetch(url)
+        .then(response => {
+            if (response.ok) {
+                cargarCarpeta(window.location.href);
+            } else {
+                alert("No se pudo eliminar el elemento.");
+            }
+        })
+        .catch(err => console.error("Error al borrar:", err));
+}    
 </script>
 </body>
 </html>
