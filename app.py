@@ -332,20 +332,29 @@ def borrar_archivo(id):
         
         carpeta_id = None
         if archivo_info:
+            subido_por = (archivo_info[0] or '').lower().strip()
+            nombre_archivo = archivo_info[1]
             carpeta_id = archivo_info[2]
-            if archivo_info[0] == session['usuario'] or session['puesto'] == 'Administrador':
+            
+            usuario_actual = (session.get('usuario') or '').lower().strip()
+            puesto_actual = (session.get('puesto') or '').lower().strip()
+            
+            # Permite eliminar si es el creador o si su puesto contiene 'admin'
+            if subido_por == usuario_actual or 'admin' in puesto_actual:
                 cursor.execute("DELETE FROM archivos WHERE id=%s", (id,))
                 conn.commit()
-                ruta_archivo = os.path.join(app.config['UPLOAD_FOLDER'], archivo_info[1])
+                
+                # Borrar archivo físico si existe en static/uploads
+                ruta_archivo = os.path.join(app.config['UPLOAD_FOLDER'], nombre_archivo)
                 if os.path.exists(ruta_archivo):
                     os.remove(ruta_archivo)
+                    
         cursor.close()
         conn.close()
         
         if carpeta_id:
             return redirect(url_for('inicio', folder_id=carpeta_id))
     return redirect(url_for('inicio'))
-
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
