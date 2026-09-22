@@ -577,11 +577,20 @@ def actualizar_tipo_cambio():
                 precio_actual_bd = cursor.fetchone()
                 precio_viejo = precio_actual_bd[0] if precio_actual_bd else "17.35"
                 
+                # Actualización de la configuración existente
                 cursor.execute("UPDATE configuracion SET valor = %s WHERE clave = 'dolar_anterior'", (precio_viejo,))
                 cursor.execute("UPDATE configuracion SET valor = %s WHERE clave = 'dolar'", (nuevo_precio,))
                 cursor.execute("UPDATE configuracion SET valor = %s WHERE clave = 'dolar_fecha'", (fecha_actual,))
                 cursor.execute("UPDATE configuracion SET valor = %s WHERE clave = 'dolar_hora'", (hora_actual,))
                 cursor.execute("UPDATE configuracion SET valor = %s WHERE clave = 'dolar_usuario'", (usuario_cambio,))
+                
+                # --- PASO 2: INSERTAR EN EL HISTORIAL DE TIPO DE CAMBIO ---
+                cursor.execute("""
+                    INSERT INTO historial_tc (valor, modificado_por, fecha)
+                    VALUES (%s, %s, NOW())
+                """, (nuevo_precio, usuario_cambio))
+                # ---------------------------------------------------------
+
                 conn.commit()
                 cursor.close()
                 conn.close()
