@@ -302,30 +302,46 @@ def borrar_carpeta(id):
 
 @app.route('/subir', methods=['POST'])
 def subir_archivo():
-    if 'usuario' in session and 'archivo' in request.files:
+    if 'usuario' not in session:
+        return jsonify({'success': False, 'message': 'Sesión no activa'}), 200
+
+    if 'archivo' in request.files:
         f = request.files['archivo']
-        
-        # Obtener carpeta_id de manera segura (si no viene o viene vacío, es None)
         raw_carpeta_id = request.form.get('carpeta_id')
         carpeta_id = int(raw_carpeta_id) if raw_carpeta_id and raw_carpeta_id.isdigit() else None
         
         if f.filename != '':
             nombre_original = secure_filename(f.filename)
             
-            # Generar un nombre único para el almacenamiento físico y evitar sobrescrituras
-            ext = os.path.splitext(nombre_original)[1]
-            nombre_fisico = f"{uuid.uuid4().hex}{ext}"
+            conn = get_db_connection()
+            cursor = conn.cursor()
             
-            # Guardar archivo físico en la carpeta configurada
-            ruta_guardado = os.path.join(app.config['UPLOAD_FOLDER'], nombre_fisico)
+            # --- POLITICA DE ORDEN Y LIMPIEZA: Validar duplicados globales ---
+            cursor.execute("SELECT carpeta FROM archivos WHERE LOWER(nombre_archivo) = LOWER(%s)", (nombre_original,))
+            archivo_existente = cursor.fetchone()
+            
+            if archivo_existente:
+                carpeta_donde_esta = archivo_existente['carpeta'] if isinstance(archivo_existente, dict) else archivo_existente[0]
+                cursor.close()
+                conn.close()
+                
+                # Despliega la advertencia exacta solicitada
+                mensaje_duplicado = (
+                    f"El archivo '{nombre_original}' ya existe en la base de datos (ubicado en la carpeta '{carpeta_donde_esta}'). "
+                    "Verifique en las carpetas que no sea el mismo, cámbiele el nombre y vuelva a subirlo."
+                )
+                
+                return jsonify({
+                    'success': False, 
+                    'message': mensaje_duplicado
+                }), 200
+
+            # --- Guardado directo en la carpeta uploads ---
+            ruta_guardado = os.path.join(app.config['UPLOAD_FOLDER'], nombre_original)
             f.save(ruta_guardado)
             
             fecha_actual = datetime.now().strftime('%d/%m/%Y %H:%M')
             
-            conn = get_db_connection()
-            cursor = conn.cursor()
-            
-            # Obtener el nombre real de la carpeta asociada
             nombre_carpeta = 'General'
             if carpeta_id:
                 cursor.execute("SELECT nombre FROM carpetas WHERE id = %s", (carpeta_id,))
@@ -333,7 +349,6 @@ def subir_archivo():
                 if res:
                     nombre_carpeta = res['nombre'] if isinstance(res, dict) else res[0]
 
-            # Inserción limpia asegurando correspondencia exacta de 5 columnas y 5 valores
             cursor.execute("""
                 INSERT INTO archivos (nombre_archivo, subido_por, fecha, carpeta, carpeta_id) 
                 VALUES (%s, %s, %s, %s, %s)
@@ -343,11 +358,8 @@ def subir_archivo():
             cursor.close()
             conn.close()
 
-            # AQUÍ VA EL CÓDIGO SI TU FRONTEND USA FETCH/AJAX:
-            if request.headers.get('X-Requested-With') == 'XMLHttpRequest' or request.is_json:
-                return jsonify({'success': True, 'folder_id': carpeta_id})
+            return jsonify({'success': True, 'message': 'Archivo subido correctamente.'})
 
-    # Si se envía por un formulario HTML tradicional:
     if carpeta_id:
         return redirect(url_for('inicio', folder_id=carpeta_id))
     return redirect(url_for('inicio'))
