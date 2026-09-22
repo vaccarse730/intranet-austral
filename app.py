@@ -304,6 +304,7 @@ def subir_archivo():
     if 'usuario' in session and 'archivo' in request.files:
         f = request.files['archivo']
         carpeta_id = request.form.get('carpeta_id', type=int)
+        nombre_carpeta = request.form.get('nombre_carpeta', '').strip()
         
         if f.filename != '':
             filename = secure_filename(f.filename)
@@ -312,8 +313,8 @@ def subir_archivo():
             
             conn = get_db_connection()
             cursor = conn.cursor()
-            cursor.execute("INSERT INTO archivos (nombre_archivo, subido_por, fecha, carpeta_id) VALUES (%s, %s, %s, %s)", 
-                           (filename, session['usuario'], fecha_actual, carpeta_id))
+            cursor.execute("INSERT INTO archivos (nombre_archivo, subido_por, fecha, carpeta, carpeta_id) VALUES (%s, %s, %s, %s, %s)", 
+                           (filename, session['usuario'], fecha_actual, nombre_carpeta, carpeta_id))
             conn.commit()
             cursor.close()
             conn.close()
