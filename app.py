@@ -304,7 +304,7 @@ def subir_archivo():
     if 'usuario' in session and 'archivo' in request.files:
         f = request.files['archivo']
         carpeta_id = request.form.get('carpeta_id', type=int)
-                
+        
         if f.filename != '':
             filename = secure_filename(f.filename)
             fecha_actual = datetime.now().strftime('%d/%m/%Y %H:%M')
@@ -312,12 +312,26 @@ def subir_archivo():
             
             conn = get_db_connection()
             cursor = conn.cursor()
-            cursor.execute("INSERT INTO archivos (nombre_archivo, subido_por, fecha, carpeta_id) VALUES (%s, %s, %s, %s)", 
-                           (filename, session['usuario'], fecha_actual, carpeta_id))
+            
+            # Obtener el nombre real de la carpeta a partir del carpeta_id
+            nombre_carpeta = 'General'
+            if carpeta_id:
+                cursor.execute("SELECT nombre FROM carpetas WHERE id = %s", (carpeta_id,))
+                res = cursor.fetchone()
+                if res:
+                    # Si es una tupla o RealDictRow según tu configuración de psycopg2
+                    nombre_carpeta = res['nombre'] if isinstance(res, dict) else res[0]
+
+            # Inserción guardando tanto el nombre correcto de la carpeta como el carpeta_id
+            cursor.execute("""
+                INSERT INTO archivos (nombre_archivo, subido_por, fecha, carpeta, carpeta_id) 
+                VALUES (%s, %s, %s, %s, %s)
+            """, (filename, session['usuario'], fecha_actual, nombre_carpeta, carpeta_id))
+            
             conn.commit()
             cursor.close()
             conn.close()
-            
+
     if carpeta_id:
         return redirect(url_for('inicio', folder_id=carpeta_id))
     return redirect(url_for('inicio'))
