@@ -343,6 +343,11 @@ def subir_archivo():
             cursor.close()
             conn.close()
 
+            # AQUÍ VA EL CÓDIGO SI TU FRONTEND USA FETCH/AJAX:
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest' or request.is_json:
+                return jsonify({'success': True, 'folder_id': carpeta_id})
+
+    # Si se envía por un formulario HTML tradicional:
     if carpeta_id:
         return redirect(url_for('inicio', folder_id=carpeta_id))
     return redirect(url_for('inicio'))
