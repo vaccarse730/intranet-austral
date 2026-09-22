@@ -517,9 +517,13 @@ def descargar_archivo(filename):
 def abrir_archivo(filename):
     if 'usuario' not in session:
         return jsonify({'success': False, 'message': 'Sesión no activa'}), 401
-        
-    url_publica = supabase.storage.from_(BUCKET_NAME).get_public_url(f"archivos/{filename}")
-    return redirect(url_publica)
+
+    try:
+        # Obtener URL pública de Supabase Storage
+        url_publica = supabase.storage.from_(BUCKET_NAME).get_public_url(f"archivos/{filename}")
+        return redirect(url_publica)
+    except Exception as e:
+        return f"Error al abrir el archivo: {e}", 500
 
 # --- MODIFICACIÓN EN PUBLICAR (MURO DE ANUNCIOS) ---
 @app.route('/publicar', methods=['POST'])
