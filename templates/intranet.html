@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Austral - Portal Intranet</title>
     <!-- Importación de Fuentes Oficiales Austral -->
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Montserrat:wght@600;700;800&display=swap" rel="stylesheet">
@@ -497,6 +498,15 @@ body.sidebar-open .main-content {
         </form>
     </div>
 </div>
+
+<!-- Ejemplo del modal esperado -->
+<div id="modalLogTC" class="modal" style="display: none;">
+    <div class="modal-content">
+        <span class="close-btn" onclick="document.getElementById('modalLogTC').style.display='none'">&times;</span>
+        <h3>Historial de Tipo de Cambio</h3>
+        <!-- Contenido o tabla con el log del TC -->
+    </div>
+</div>    
 
 <!-- MODAL CAMBIO DE CONTRASEÑA -->
 <div id="modalPassword" class="modal-overlay">
@@ -1160,7 +1170,14 @@ function eliminarRegistroDrive(url, elementoHtml) {
         })
         .catch(err => console.error("Error al borrar:", err));
 }
-    
+function abrirModalLogTC() {
+    let modal = document.getElementById('modalLogTC');
+    if (modal) {
+        modal.style.display = 'flex'; // o 'block' según el diseño de tu modal
+    } else {
+        console.warn("El modal 'modalLogTC' no se encuentra en el DOM.");
+    }
+}
 </script>
 </body>
 </html>
