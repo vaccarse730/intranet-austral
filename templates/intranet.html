@@ -1273,13 +1273,17 @@ function renderizarArchivos(listaArchivos) {
 }    
 function abrirArchivo(nombreArchivo) {
     if (!nombreArchivo) return;
-    
-    // Construye la URL hacia la ruta de Flask
+    // Llama a la ruta /abrir_archivo
     const url = `/abrir_archivo/${encodeURIComponent(nombreArchivo)}`;
-    
-    // Abre el archivo en una nueva pestaña del navegador
     window.open(url, '_blank');
+}
+
+function descargarArchivo(nombreArchivo) {
+    if (!nombreArchivo) return;
+    // Llama a la ruta /descargar
+    window.location.href = `/descargar/${encodeURIComponent(nombreArchivo)}`;
 }    
+    
 </script>
 </body>
 </html>
