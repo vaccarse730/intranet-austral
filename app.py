@@ -5,6 +5,7 @@ from flask import Flask, render_template, request, redirect, url_for, session, s
 from werkzeug.utils import secure_filename
 import psycopg2
 from datetime import datetime
+import uuid
 
 app = Flask(__name__)
 app.secret_key = 'clave_secreta_para_sesiones'
@@ -306,27 +307,34 @@ def subir_archivo():
         carpeta_id = request.form.get('carpeta_id', type=int)
         
         if f.filename != '':
-            filename = secure_filename(f.filename)
+            nombre_original = secure_filename(f.filename)
+            
+            # 1. Generar un nombre físico único en el disco para evitar sobrescribir
+            ext = os.path.splitext(nombre_original)[1]
+            nombre_fisico = f"{uuid.uuid4().hex}_{nombre_original}"
+            
+            # Guardar en disco con el nombre único
+            f.save(os.path.join(app.config['UPLOAD_FOLDER'], nombre_fisico))
+            
             fecha_actual = datetime.now().strftime('%d/%m/%Y %H:%M')
-            f.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
             
             conn = get_db_connection()
             cursor = conn.cursor()
             
-            # Obtener el nombre real de la carpeta a partir del carpeta_id
+            # 2. Obtener el nombre de la carpeta actual
             nombre_carpeta = 'General'
             if carpeta_id:
                 cursor.execute("SELECT nombre FROM carpetas WHERE id = %s", (carpeta_id,))
                 res = cursor.fetchone()
                 if res:
-                    # Si es una tupla o RealDictRow según tu configuración de psycopg2
                     nombre_carpeta = res['nombre'] if isinstance(res, dict) else res[0]
 
-            # Inserción guardando tanto el nombre correcto de la carpeta como el carpeta_id
+            # 3. Guardar en BD: guardas el nombre original para mostrarlo, 
+            # pero puedes guardar el nombre físico si requieres descargarlo/eliminarlo.
             cursor.execute("""
                 INSERT INTO archivos (nombre_archivo, subido_por, fecha, carpeta, carpeta_id) 
                 VALUES (%s, %s, %s, %s, %s)
-            """, (filename, session['usuario'], fecha_actual, nombre_carpeta, carpeta_id))
+            """, (nombre_original, session['usuario'], fecha_actual, nombre_carpeta, carpeta_id))
             
             conn.commit()
             cursor.close()
@@ -335,7 +343,7 @@ def subir_archivo():
     if carpeta_id:
         return redirect(url_for('inicio', folder_id=carpeta_id))
     return redirect(url_for('inicio'))
-
+    
 @app.route('/borrar_archivo/<int:id>')
 def borrar_archivo(id):
     if 'usuario' in session:
