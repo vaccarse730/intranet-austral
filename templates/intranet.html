@@ -453,6 +453,18 @@ body.sidebar-open .main-content {
 .close-btn:hover {
     color: #000;
 }
+
+
+.item-archivo {
+    cursor: pointer;
+    user-select: none; /* Evita que el texto se seleccione al hacer doble clic */
+    -webkit-user-select: none;
+}
+
+/* IMPORTANTE: deshabilita eventos en el icono y el texto para que el doble clic siempre le dé al DIV */
+.item-archivo * {
+    pointer-events: none;
+}
         
     </style>
 </head>
@@ -1263,14 +1275,16 @@ function renderizarArchivos(listaArchivos) {
         let div = document.createElement('div');
         div.className = 'item-archivo';
         div.innerHTML = `<i class="fas fa-file"></i> <span>${archivo.nombre_archivo}</span>`;
-        
-        // Evento de doble clic para abrir
-        div.addEventListener('dblclick', () => {
+
+        // Evento de doble clic corregido
+        div.addEventListener('dblclick', (e) => {
+            e.stopPropagation(); // Evita interferencias con otros eventos de la página
             abrirArchivo(archivo.nombre_archivo);
         });
 
         contenedor.appendChild(div);
     });
+}
 }    
 function abrirArchivo(nombreArchivo) {
     if (!nombreArchivo) return;
