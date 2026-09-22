@@ -486,6 +486,14 @@ def descargar_archivo(filename):
         return redirect(url_for('login'))
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename, as_attachment=True)
 
+@app.route('/abrir_archivo/<filename>')
+def abrir_archivo(filename):
+    if 'usuario' not in session:
+        return jsonify({'success': False, 'message': 'Sesión no activa'}), 401
+    
+    # Sirve el archivo desde la carpeta uploads de forma segura
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+
 @app.route('/publicar', methods=['POST'])
 def publicar():
     if 'usuario' in session:
