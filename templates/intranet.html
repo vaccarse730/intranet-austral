@@ -1253,6 +1253,33 @@ function abrirModalLogTC() {
             });
     }
 }
+
+function renderizarArchivos(listaArchivos) {
+    let contenedor = document.getElementById('contenedor-archivos');
+    contenedor.innerHTML = '';
+
+    listaArchivos.forEach(archivo => {
+        let div = document.createElement('div');
+        div.className = 'item-archivo';
+        div.innerHTML = `<i class="fas fa-file"></i> <span>${archivo.nombre_archivo}</span>`;
+        
+        // Evento de doble clic para abrir
+        div.addEventListener('dblclick', () => {
+            abrirArchivo(archivo.nombre_archivo);
+        });
+
+        contenedor.appendChild(div);
+    });
+}    
+function abrirArchivo(nombreArchivo) {
+    if (!nombreArchivo) return;
+    
+    // Construye la URL hacia la ruta de Flask
+    const url = `/abrir_archivo/${encodeURIComponent(nombreArchivo)}`;
+    
+    // Abre el archivo en una nueva pestaña del navegador
+    window.open(url, '_blank');
+}    
 </script>
 </body>
 </html>
