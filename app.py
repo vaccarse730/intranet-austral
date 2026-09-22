@@ -262,18 +262,53 @@ def inicio():
     
 @app.route('/crear_carpeta', methods=['POST'])
 def crear_carpeta():
-    if 'usuario' in session:
-        nombre_carpeta = request.form.get('nombre_carpeta', '').strip()
-        padre_id = request.form.get('padre_id', type=int)
+    if 'usuario' not in session:
+        return jsonify({'success': False, 'message': 'Sesión no activa'}), 200
+
+    nombre_carpeta = request.form.get('nombre_carpeta', '').strip()
+    
+    # Manejar padre_id tanto si viene como entero o string vacío
+    raw_padre_id = request.form.get('padre_id')
+    padre_id = int(raw_padre_id) if raw_padre_id and raw_padre_id.isdigit() else None
+
+    if not nombre_carpeta:
+        return jsonify({'success': False, 'message': 'El nombre de la carpeta no puede estar vacío.'}), 200
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    try:
+        # 1. Validar si ya existe una carpeta con ese mismo nombre dentro del mismo nivel (padre_id)
+        cursor.execute("""
+            SELECT id FROM carpetas 
+            WHERE LOWER(nombre) = LOWER(%s) AND padre_id IS NOT DISTINCT FROM %s
+        """, (nombre_carpeta, padre_id))
         
-        if nombre_carpeta:
-            conn = get_db_connection()
-            cursor = conn.cursor()
-            cursor.execute("INSERT INTO carpetas (nombre, creador, padre_id) VALUES (%s, %s, %s)", 
-                           (nombre_carpeta, session['usuario'], padre_id))
-            conn.commit()
+        if cursor.fetchone():
             cursor.close()
             conn.close()
+            return jsonify({
+                'success': False, 
+                'message': f"La carpeta '{nombre_carpeta}' ya existe en esta ubicación."
+            }), 200
+
+        # 2. Insertar la carpeta respetando la estructura de tu tabla (creador / padre_id)
+        cursor.execute("""
+            INSERT INTO carpetas (nombre, creador, padre_id) 
+            VALUES (%s, %s, %s)
+        """, (nombre_carpeta, session['usuario'], padre_id))
+
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+        return jsonify({'success': True, 'message': 'Carpeta creada correctamente.'})
+
+    except Exception as e:
+        print("Error al crear carpeta:", e)
+        if conn:
+            conn.close()
+        return jsonify({'success': False, 'message': f'Error en el servidor: {str(e)}'}), 200
             
     if padre_id:
         return redirect(url_for('inicio', folder_id=padre_id))
