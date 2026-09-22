@@ -304,24 +304,28 @@ def borrar_carpeta(id):
 def subir_archivo():
     if 'usuario' in session and 'archivo' in request.files:
         f = request.files['archivo']
-        carpeta_id = request.form.get('carpeta_id', type=int)
+        
+        # Obtener carpeta_id de manera segura (si no viene o viene vacío, es None)
+        raw_carpeta_id = request.form.get('carpeta_id')
+        carpeta_id = int(raw_carpeta_id) if raw_carpeta_id and raw_carpeta_id.isdigit() else None
         
         if f.filename != '':
             nombre_original = secure_filename(f.filename)
             
-            # 1. Generar un nombre físico único en el disco para evitar sobrescribir
+            # Generar un nombre único para el almacenamiento físico y evitar sobrescrituras
             ext = os.path.splitext(nombre_original)[1]
-            nombre_fisico = f"{uuid.uuid4().hex}_{nombre_original}"
+            nombre_fisico = f"{uuid.uuid4().hex}{ext}"
             
-            # Guardar en disco con el nombre único
-            f.save(os.path.join(app.config['UPLOAD_FOLDER'], nombre_fisico))
+            # Guardar archivo físico en la carpeta configurada
+            ruta_guardado = os.path.join(app.config['UPLOAD_FOLDER'], nombre_fisico)
+            f.save(ruta_guardado)
             
             fecha_actual = datetime.now().strftime('%d/%m/%Y %H:%M')
             
             conn = get_db_connection()
             cursor = conn.cursor()
             
-            # 2. Obtener el nombre de la carpeta actual
+            # Obtener el nombre real de la carpeta asociada
             nombre_carpeta = 'General'
             if carpeta_id:
                 cursor.execute("SELECT nombre FROM carpetas WHERE id = %s", (carpeta_id,))
@@ -329,8 +333,7 @@ def subir_archivo():
                 if res:
                     nombre_carpeta = res['nombre'] if isinstance(res, dict) else res[0]
 
-            # 3. Guardar en BD: guardas el nombre original para mostrarlo, 
-            # pero puedes guardar el nombre físico si requieres descargarlo/eliminarlo.
+            # Inserción limpia asegurando correspondencia exacta de 5 columnas y 5 valores
             cursor.execute("""
                 INSERT INTO archivos (nombre_archivo, subido_por, fecha, carpeta, carpeta_id) 
                 VALUES (%s, %s, %s, %s, %s)
