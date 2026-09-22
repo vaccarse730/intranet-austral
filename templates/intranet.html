@@ -1118,18 +1118,27 @@ function enviarDriveForm(event, form, urlAccion) {
 
     fetch(urlAccion, {
         method: 'POST',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        },
         body: formData
     })
-    .then(response => {
-        if (response.ok) {
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Si la subida fue exitosa, actualiza la vista y limpia el formulario
             cargarCarpeta(window.location.href);
             form.reset();
             ocultarForms();
         } else {
-            alert("Error al procesar la solicitud en Drive.");
+            // Despliega el mensaje de orden y limpieza devuelto por Flask
+            alert(data.message || "No se pudo procesar el archivo.");
         }
     })
-    .catch(err => console.error("Error en Drive:", err))
+    .catch(err => {
+        console.error("Error en subida:", err);
+        alert("Ocurrió un error de conexión al procesar la solicitud.");
+    })
     .finally(() => {
         if (btnSubmit) {
             btnSubmit.disabled = false;
@@ -1150,7 +1159,8 @@ function eliminarRegistroDrive(url, elementoHtml) {
             }
         })
         .catch(err => console.error("Error al borrar:", err));
-}    
+}
+    
 </script>
 </body>
 </html>
