@@ -1017,6 +1017,7 @@ function enviarFormularioAjax(event, form, urlAccion) {
             cargarCarpeta(window.location.href);
             form.reset();
             ocultarForms();
+            location.reload();
         } else {
             alert("Ocurrió un error al procesar la solicitud.");
         }
