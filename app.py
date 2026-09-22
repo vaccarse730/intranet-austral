@@ -629,6 +629,42 @@ def borrar_link(id):
         conn.close()
     return redirect(url_for('inicio'))
 
+@app.route('/obtener_historial_tc', methods=['GET'])
+def obtener_historial_tc():
+    if 'usuario' not in session:
+        return jsonify({'success': False, 'message': 'Sesión no activa'}), 401
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    try:
+        cursor.execute("""
+            SELECT valor, modificado_por, TO_CHAR(fecha, 'DD/MM/YYYY HH24:MI') as fecha_formateada
+            FROM historial_tc 
+            ORDER BY id DESC 
+            LIMIT 20
+        """)
+        logs = cursor.fetchall()
+        
+        resultado = []
+        for log in logs:
+            if isinstance(log, dict):
+                resultado.append(log)
+            else:
+                resultado.append({
+                    'valor': str(log[0]),
+                    'modificado_por': log[1],
+                    'fecha_formateada': log[2]
+                })
+                
+        return jsonify({'success': True, 'historial': resultado})
+    except Exception as e:
+        print(f"Error al consultar historial_tc: {e}")
+        return jsonify({'success': False, 'historial': []})
+    finally:
+        cursor.close()
+        conn.close()
+
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)
