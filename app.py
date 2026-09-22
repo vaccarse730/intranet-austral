@@ -480,18 +480,18 @@ def logout():
     session.pop('puesto', None)
     return redirect(url_for('login'))
 
-@app.route('/descargar/<filename>')
+@app.route('/descargar/<path:filename>')
 def descargar_archivo(filename):
     if 'usuario' not in session:
         return redirect(url_for('login'))
+    # as_attachment=True fuerza a descargar el archivo directamente
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename, as_attachment=True)
 
-@app.route('/abrir_archivo/<filename>')
+@app.route('/abrir_archivo/<path:filename>')
 def abrir_archivo(filename):
     if 'usuario' not in session:
         return jsonify({'success': False, 'message': 'Sesión no activa'}), 401
-    
-    # Sirve el archivo desde la carpeta uploads de forma segura
+    # Sin as_attachment permite previsualizar en el navegador (PDF, imágenes, etc.)
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 @app.route('/publicar', methods=['POST'])
