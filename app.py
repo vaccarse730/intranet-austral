@@ -1,19 +1,37 @@
 import urllib.request
 import json
 import os
-from flask import Flask, render_template, request, redirect, url_for, session, send_from_directory, jsonify
+import time
+from flask import Flask, render_template, request, redirect, url_for, session, jsonify
 from werkzeug.utils import secure_filename
 import psycopg2
 from datetime import datetime
-import uuid
+from supabase import create_client  # <--- NUEVO
 
 app = Flask(__name__)
 app.secret_key = 'clave_secreta_para_sesiones'
-app.config['UPLOAD_FOLDER'] = os.path.join('static', 'uploads')
 
-os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+# --- CONFIGURACIÓN DE SUPABASE STORAGE ---
+SUPABASE_URL = os.environ.get('SUPABASE_URL', 'TU_SUPABASE_URL')
+SUPABASE_KEY = os.environ.get('SUPABASE_KEY', 'TU_SUPABASE_SERVICE_ROLE_O_ANON_KEY')
+supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
+BUCKET_NAME = 'intranet'
 
 EXTENSIONES_IMAGEN = {'png', 'jpg', 'jpeg', 'gif'}
+
+def get_db_connection():
+    database_url = os.environ.get('DATABASE_URL')
+    if not database_url:
+        raise ValueError("La variable DATABASE_URL no está configurada.")
+    conn = psycopg2.connect(database_url)
+    return conn
+
+def es_imagen(filename):
+    if '.' in filename:
+        ext = filename.rsplit('.', 1)[1].lower()
+        return ext in EXTENSIONES_IMAGEN
+    return False
+
 
 def get_db_connection():
     database_url = os.environ.get('DATABASE_URL')
@@ -335,6 +353,7 @@ def borrar_carpeta(id):
             return redirect(url_for('inicio', folder_id=padre_id))
     return redirect(url_for('inicio'))
 
+# --- MODIFICACIÓN EN SUBIR ARCHIVO (DRIVE) ---
 @app.route('/subir', methods=['POST'])
 def subir_archivo():
     if 'usuario' not in session:
@@ -351,7 +370,7 @@ def subir_archivo():
             conn = get_db_connection()
             cursor = conn.cursor()
             
-            # --- POLITICA DE ORDEN Y LIMPIEZA: Validar duplicados globales ---
+            # Validar duplicados globales en la BD
             cursor.execute("SELECT carpeta FROM archivos WHERE LOWER(nombre_archivo) = LOWER(%s)", (nombre_original,))
             archivo_existente = cursor.fetchone()
             
@@ -360,20 +379,22 @@ def subir_archivo():
                 cursor.close()
                 conn.close()
                 
-                # Despliega la advertencia exacta solicitada
                 mensaje_duplicado = (
                     f"El archivo '{nombre_original}' ya existe en la base de datos (ubicado en la carpeta '{carpeta_donde_esta}'). "
                     "Verifique en las carpetas que no sea el mismo, cámbiele el nombre y vuelva a subirlo."
                 )
-                
-                return jsonify({
-                    'success': False, 
-                    'message': mensaje_duplicado
-                }), 200
+                return jsonify({'success': False, 'message': mensaje_duplicado}), 200
 
-            # --- Guardado directo en la carpeta uploads ---
-            ruta_guardado = os.path.join(app.config['UPLOAD_FOLDER'], nombre_original)
-            f.save(ruta_guardado)
+            # --- SUBIR A SUPABASE STORAGE ---
+            bytes_archivo = f.read()
+            path_supabase = f"archivos/{nombre_original}"
+            
+            # Subir archivo al bucket
+            supabase.storage.from_(BUCKET_NAME).upload(
+                path=path_supabase,
+                file=bytes_archivo,
+                file_options={"content-type": f.content_type or "application/octet-stream"}
+            )
             
             fecha_actual = datetime.now().strftime('%d/%m/%Y %H:%M')
             
@@ -399,6 +420,7 @@ def subir_archivo():
         return redirect(url_for('inicio', folder_id=carpeta_id))
     return redirect(url_for('inicio'))
     
+# --- MODIFICACIÓN EN BORRAR ARCHIVO (DRIVE) ---
 @app.route('/borrar_archivo/<int:id>')
 def borrar_archivo(id):
     if 'usuario' in session:
@@ -416,15 +438,15 @@ def borrar_archivo(id):
             usuario_actual = (session.get('usuario') or '').lower().strip()
             puesto_actual = (session.get('puesto') or '').lower().strip()
             
-            # Permite eliminar si es el creador o si su puesto contiene 'admin'
             if subido_por == usuario_actual or 'admin' in puesto_actual:
                 cursor.execute("DELETE FROM archivos WHERE id=%s", (id,))
                 conn.commit()
                 
-                # Borrar archivo físico si existe en static/uploads
-                ruta_archivo = os.path.join(app.config['UPLOAD_FOLDER'], nombre_archivo)
-                if os.path.exists(ruta_archivo):
-                    os.remove(ruta_archivo)
+                # Eliminar de Supabase Storage
+                try:
+                    supabase.storage.from_(BUCKET_NAME).remove([f"archivos/{nombre_archivo}"])
+                except Exception as e:
+                    print("Error al borrar en Supabase:", e)
                     
         cursor.close()
         conn.close()
@@ -432,6 +454,7 @@ def borrar_archivo(id):
         if carpeta_id:
             return redirect(url_for('inicio', folder_id=carpeta_id))
     return redirect(url_for('inicio'))
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -480,42 +503,59 @@ def logout():
     session.pop('puesto', None)
     return redirect(url_for('login'))
 
+# --- MODIFICACIÓN EN DESCARGAR Y ABRIR ARCHIVO ---
 @app.route('/descargar/<path:filename>')
 def descargar_archivo(filename):
     if 'usuario' not in session:
         return redirect(url_for('login'))
-    # as_attachment=True fuerza a descargar el archivo directamente
-    return send_from_directory(app.config['UPLOAD_FOLDER'], filename, as_attachment=True)
-
+    
+    # Redirigir a la URL pública de Supabase con forzado de descarga
+    url_publica = supabase.storage.from_(BUCKET_NAME).get_public_url(f"archivos/{filename}")
+    return redirect(url_publica)
+    
 @app.route('/abrir_archivo/<path:filename>')
 def abrir_archivo(filename):
     if 'usuario' not in session:
         return jsonify({'success': False, 'message': 'Sesión no activa'}), 401
-    # Sin as_attachment permite previsualizar en el navegador (PDF, imágenes, etc.)
-    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+        
+    url_publica = supabase.storage.from_(BUCKET_NAME).get_public_url(f"archivos/{filename}")
+    return redirect(url_publica)
 
+# --- MODIFICACIÓN EN PUBLICAR (MURO DE ANUNCIOS) ---
 @app.route('/publicar', methods=['POST'])
 def publicar():
     if 'usuario' in session:
         contenido = request.form.get('contenido', '').strip()
         foto = request.files.get('foto')
-        nombre_imagen_bd = None
+        url_imagen_publica = None
         es_foto = 0
         
         if foto and foto.filename != '' and es_imagen(foto.filename):
-            filename = secure_filename(foto.filename)
-            os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-            foto.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            nombre_imagen_bd = filename
+            nombre_limpio = secure_filename(foto.filename)
+            filename = f"muro_{int(time.time())}_{nombre_limpio}"
+            bytes_foto = foto.read()
+
+            # Subir foto a la carpeta publicaciones dentro del bucket
+            supabase.storage.from_(BUCKET_NAME).upload(
+                path=f"publicaciones/{filename}",
+                file=bytes_foto,
+                file_options={"content-type": foto.content_type}
+            )
+
+            # Obtener URL pública completa de Supabase
+            url_imagen_publica = supabase.storage.from_(BUCKET_NAME).get_public_url(f"publicaciones/{filename}")
             es_foto = 1
 
         if contenido or es_foto:
             fecha_actual = datetime.now().strftime('%d/%m/%Y %H:%M')
             conn = get_db_connection()
             cursor = conn.cursor()
-            texto_guardar = nombre_imagen_bd if es_foto else contenido
+            
+            # Guardamos la URL pública en lugar de solo el nombre
+            texto_guardar = url_imagen_publica if es_foto else contenido
             if es_foto and contenido:
-                texto_guardar = f"{contenido}|{nombre_imagen_bd}"
+                texto_guardar = f"{contenido}|{url_imagen_publica}"
+
             cursor.execute("INSERT INTO mensajes (autor, contenido, es_foto, puesto_autor, fecha) VALUES (%s, %s, %s, %s, %s)",
                            (session['usuario'], texto_guardar, es_foto, session['puesto'], fecha_actual))
             conn.commit()
