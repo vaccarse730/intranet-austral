@@ -12,8 +12,8 @@ app = Flask(__name__)
 app.secret_key = 'clave_secreta_para_sesiones'
 
 # --- CONFIGURACIÓN DE SUPABASE STORAGE ---
-SUPABASE_URL = os.environ.get('SUPABASE_URL', 'TU_SUPABASE_URL')
-SUPABASE_KEY = os.environ.get('SUPABASE_KEY', 'TU_SUPABASE_SERVICE_ROLE_O_ANON_KEY')
+SUPABASE_URL = os.environ.get('SUPABASE_URL', 'https://hyswibgorwuzwvipjlth.supabase.co')
+SUPABASE_KEY = os.environ.get('SUPABASE_KEY', 'sb_secret_bzS5XdLi9G9Dd4MV-aqodg_tJBs9Sv_')
 supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 BUCKET_NAME = 'intranet'
 
