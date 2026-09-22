@@ -1217,8 +1217,40 @@ function eliminarRegistroDrive(url, elementoHtml) {
 }
 function abrirModalLogTC() {
     let modal = document.getElementById('modalLogTC');
+    let contenedor = document.getElementById('contenidoHistorialTC'); // ID del div dentro del modal
+    
     if (modal) {
         modal.style.display = 'flex';
+        
+        // Consultar el historial al abrir
+        fetch('/obtener_historial_tc')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && contenedor) {
+                    if (data.historial.length === 0) {
+                        contenedor.innerHTML = '<p style="padding: 10px; color: #666;">No hay registros en el historial.</p>';
+                        return;
+                    }
+                    
+                    let html = '<table class="tabla-log" style="width:100%; border-collapse:collapse; margin-top:10px;">';
+                    html += '<thead><tr style="border-bottom:1px solid #ddd; text-align:left;"><th>Valor</th><th>Modificado por</th><th>Fecha</th></tr></thead><tbody>';
+                    
+                    data.historial.forEach(row => {
+                        html += `<tr style="border-bottom:1px solid #eee;">
+                            <td style="padding:8px;">$${row.valor}</td>
+                            <td style="padding:8px;">${row.modificado_por}</td>
+                            <td style="padding:8px;">${row.fecha_formateada}</td>
+                        </tr>`;
+                    });
+                    
+                    html += '</tbody></table>';
+                    contenedor.innerHTML = html;
+                }
+            })
+            .catch(err => {
+                console.error("Error al cargar historial:", err);
+                if (contenedor) contenedor.innerHTML = '<p style="color:red;">Error al cargar el historial.</p>';
+            });
     }
 }
 </script>
