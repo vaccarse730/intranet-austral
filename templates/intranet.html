@@ -613,18 +613,19 @@ body.sidebar-open .main-content {
                     {% endif %}
                 </div>
                
-                {% if '|' in contenido %}
-                    <p style="font-size: 14px; line-height: 1.5; margin: 8px 0; white-space: pre-wrap;">{{ contenido.split('|')[0] }}</p>
-                    {% if es_foto == 1 %}
-                    <img src="/static/uploads/{{ contenido.split('|')[1] }}" style="max-width: 100%; max-height: 350px; border-radius: 6px; margin-top: 5px; display: block; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                    {% endif %}
-                {% else %}
-                    {% if es_foto == 1 %}
-                    <img src="/static/uploads/{{ contenido }}" style="max-width: 100%; max-height: 350px; border-radius: 6px; margin-top: 5px; display: block; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                    {% else %}
-                    <p style="font-size: 14px; line-height: 1.5; margin: 8px 0; white-space: pre-wrap;">{{ contenido }}</p>
-                    {% endif %}
-                {% endif %}                    
+<!-- CÓDIGO NUEVO ADAPTADO PARA SUPABASE -->
+{% if '|' in contenido %}
+    <p style="font-size: 14px; line-height: 1.5; margin: 8px 0; white-space: pre-wrap;">{{ contenido.split('|')[0] }}</p>
+    {% if es_foto == 1 %}
+    <img src="{{ contenido.split('|')[1] }}" style="max-width: 100%; max-height: 350px; border-radius: 6px; margin-top: 5px; display: block; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+    {% endif %}
+{% else %}
+    {% if es_foto == 1 %}
+    <img src="{{ contenido }}" style="max-width: 100%; max-height: 350px; border-radius: 6px; margin-top: 5px; display: block; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+    {% else %}
+    <p style="font-size: 14px; line-height: 1.5; margin: 8px 0; white-space: pre-wrap;">{{ contenido }}</p>
+    {% endif %}
+{% endif %}                 
                
                 <div style="margin-top: 10px;">
                     <button onclick="darLike('{{ id_m }}', this)" style="background: #ffc107; color: black; border: none; padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: bold; cursor: pointer;">
