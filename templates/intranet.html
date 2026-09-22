@@ -413,6 +413,47 @@ body.sidebar-open .main-content {
     transition: opacity 0.2s ease;
     pointer-events: none;
 }
+
+/* Contenedor oscuro que cubre toda la pantalla */
+.modal {
+    display: none; /* Se cambia a 'flex' vía JS cuando se abre */
+    position: fixed;
+    z-index: 9999;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Fondo semitransparente */
+    justify-content: center;
+    align-items: center;
+}
+
+/* Caja blanca con el contenido del modal */
+.modal-content {
+    background-color: #ffffff;
+    padding: 24px;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 600px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    position: relative;
+}
+
+/* Botón de cerrar (X) */
+.close-btn {
+    position: absolute;
+    top: 12px;
+    right: 16px;
+    font-size: 24px;
+    font-weight: bold;
+    color: #666;
+    cursor: pointer;
+}
+
+.close-btn:hover {
+    color: #000;
+}
+        
     </style>
 </head>
 <body>
@@ -500,11 +541,15 @@ body.sidebar-open .main-content {
 </div>
 
 <!-- Ejemplo del modal esperado -->
-<div id="modalLogTC" class="modal" style="display: none;">
+<div id="modalLogTC" class="modal">
     <div class="modal-content">
         <span class="close-btn" onclick="document.getElementById('modalLogTC').style.display='none'">&times;</span>
-        <h3>Historial de Tipo de Cambio</h3>
-        <!-- Contenido o tabla con el log del TC -->
+        <h2>Historial de Tipo de Cambio</h2>
+        
+        <!-- Aquí va la tabla o lista de registros históricos de TC -->
+        <div id="contenidoHistorialTC">
+            <!-- Ejemplo de tabla o datos cargados -->
+        </div>
     </div>
 </div>    
 
@@ -1173,9 +1218,7 @@ function eliminarRegistroDrive(url, elementoHtml) {
 function abrirModalLogTC() {
     let modal = document.getElementById('modalLogTC');
     if (modal) {
-        modal.style.display = 'flex'; // o 'block' según el diseño de tu modal
-    } else {
-        console.warn("El modal 'modalLogTC' no se encuentra en el DOM.");
+        modal.style.display = 'flex';
     }
 }
 </script>
