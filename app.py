@@ -314,7 +314,7 @@ def subir_archivo():
             conn = get_db_connection()
             cursor = conn.cursor()
             cursor.execute("INSERT INTO archivos (nombre_archivo, subido_por, fecha, carpeta, carpeta_id) VALUES (%s, %s, %s, %s, %s)", 
-                           (filename, session['usuario'], fecha_actual, nombre_carpeta, carpeta_id))
+                           (filename, session['usuario'], fecha_actual, carpeta, carpeta_id))
             conn.commit()
             cursor.close()
             conn.close()
