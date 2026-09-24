@@ -160,11 +160,13 @@ def obtener_ruta_carpetas(carpeta_actual_id):
 
 @app.route('/')
 def index():
-    # 1. Limpia cualquier sesión que haya quedado guardada en el navegador
-    session.clear()
-    # 2. Redirige obligatoriamente al formulario de Login
+    # Si el usuario ya está autenticado, va directo al inicio
+    if 'usuario' in session and 'puesto' in session:
+        return redirect(url_for('inicio'))
+    
+    # Si no hay sesión activa, va al formulario de login
     return redirect(url_for('login'))
-
+    
 @app.route('/inicio')
 def inicio():
     if 'usuario' not in session or 'puesto' not in session:
@@ -519,8 +521,7 @@ def registro():
     
 @app.route('/logout')
 def logout():
-    session.pop('usuario', None)
-    session.pop('puesto', None)
+    session.clear()
     return redirect(url_for('login'))
 
 # --- MODIFICACIÓN EN DESCARGAR Y ABRIR ARCHIVO ---
