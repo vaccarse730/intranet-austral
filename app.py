@@ -515,7 +515,7 @@ def registro():
             return redirect(url_for('registro'))
 
     return render_template('registro.html')
-
+    
 @app.route('/logout')
 def logout():
     session.pop('usuario', None)
