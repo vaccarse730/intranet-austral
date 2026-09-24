@@ -484,26 +484,33 @@ def login():
 @app.route('/registro', methods=['GET', 'POST'])
 def registro():
     if request.method == 'POST':
-        # 1. Recuperamos todos los datos enviados desde el formulario (registro.html)
         usuario = request.form.get('usuario')
-        email = request.form.get('email', '').strip().lower()  # Recibe el correo
+        email = request.form.get('email', '').strip().lower()
         clave = request.form.get('clave')
         puesto = request.form.get('puesto')
         cumpleanos = request.form.get('cumpleanos')
 
-        # 2. VALIDACIÓN DE SEGURIDAD EN EL SERVIDOR
+        # 1. Validación de dominio corporativo
         if not email.endswith('@austral.mx'):
             flash('Acceso restringido: Solo se permiten correos con el dominio @austral.mx')
             return redirect(url_for('registro'))
 
-        # 3. Guardar el nuevo usuario en tu Base de Datos
-        # (Aquí va tu lógica actual para guardar 'usuario', 'email', 'clave', 'puesto', etc.)
-        # ...
+        # 2. Inserción directa en la base de datos
+        try:
+            cursor.execute("""
+                INSERT INTO usuarios (usuario, email, clave, puesto, cumpleanos)
+                VALUES (%s, %s, %s, %s, %s)
+            """, (usuario, email, clave, puesto, cumpleanos))
+            conexion.commit()
 
-        flash('Cuenta creada exitosamente.')
-        return redirect(url_for('login'))
+            flash('Cuenta creada exitosamente. Ya puedes iniciar sesión.')
+            return redirect(url_for('login'))
 
-    # Si la petición es GET, simplemente muestra la vista del formulario
+        except Exception as e:
+            conexion.rollback()
+            flash('Error al registrar: El usuario o el correo ya se encuentran registrados.')
+            return redirect(url_for('registro'))
+
     return render_template('registro.html')
 
 @app.route('/logout')
