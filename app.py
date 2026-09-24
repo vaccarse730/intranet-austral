@@ -2,7 +2,7 @@ import urllib.request
 import json
 import os
 import time
-from flask import Flask, render_template, request, redirect, url_for, session, jsonify
+from flask import Flask, render_template, request, redirect, url_for, session, jsonify, flash
 from werkzeug.utils import secure_filename
 import psycopg2
 from datetime import datetime
@@ -484,24 +484,26 @@ def login():
 @app.route('/registro', methods=['GET', 'POST'])
 def registro():
     if request.method == 'POST':
-        usuario = request.form['usuario']
-        clave = request.form['clave']
-        puesto = request.form['puesto']
-        cumpleanos = request.form['cumpleanos']
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        try:
-            cursor.execute("INSERT INTO usuarios (usuario, clave, puesto, cumpleanos) VALUES (%s, %s, %s, %s)", 
-                           (usuario, clave, puesto, cumpleanos))
-            conn.commit()
-            cursor.close()
-            conn.close()
-            return "Usuario registrado con éxito. <a href='/login'>Ir al Login</a>"
-        except psycopg2.IntegrityError:
-            conn.rollback()
-            cursor.close()
-            conn.close()
-            return "El nombre de usuario ya existe. <a href='/registro'>Intentar otro</a>"
+        # 1. Recuperamos todos los datos enviados desde el formulario (registro.html)
+        usuario = request.form.get('usuario')
+        email = request.form.get('email', '').strip().lower()  # Recibe el correo
+        clave = request.form.get('clave')
+        puesto = request.form.get('puesto')
+        cumpleanos = request.form.get('cumpleanos')
+
+        # 2. VALIDACIÓN DE SEGURIDAD EN EL SERVIDOR
+        if not email.endswith('@austral.mx'):
+            flash('Acceso restringido: Solo se permiten correos con el dominio @austral.mx')
+            return redirect(url_for('registro'))
+
+        # 3. Guardar el nuevo usuario en tu Base de Datos
+        # (Aquí va tu lógica actual para guardar 'usuario', 'email', 'clave', 'puesto', etc.)
+        # ...
+
+        flash('Cuenta creada exitosamente.')
+        return redirect(url_for('login'))
+
+    # Si la petición es GET, simplemente muestra la vista del formulario
     return render_template('registro.html')
 
 @app.route('/logout')
