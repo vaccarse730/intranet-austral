@@ -1,33 +1,285 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Registro - Intranet</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrar Nuevo Empleado - Intranet</title>
+    <!-- FontAwesome para los iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Fuente Google Fonts (Inter) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
     <style>
-        body { font-family: Arial, sans-serif; background: #f4f6f9; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .box { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); width: 300px; text-align: center; }
-        input { width: 90%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; }
-        label { display: block; text-align: left; font-size: 13px; color: #555; margin-left: 15px; margin-top: 5px; }
-        button { width: 96%; padding: 10px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; margin-top: 10px; }
-        a { display: block; margin-top: 15px; color: #0056b3; text-decoration: none; font-size: 14px; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            /* Imagen de fondo compartida con la vista de login */
+            background: linear-gradient(rgba(15, 23, 42, 0.55), rgba(15, 23, 42, 0.55)), 
+                        url("{{ url_for('static', filename='fondo.jpg') }}") no-repeat center center fixed;
+            background-size: cover;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .login-card {
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            padding: 35px;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 420px;
+            text-align: center;
+        }
+
+        .brand-header {
+            margin-bottom: 22px;
+        }
+
+        .brand-logo-container {
+            margin-bottom: 12px;
+        }
+
+        .brand-logo {
+            max-width: 150px;
+            height: auto;
+            display: inline-block;
+        }
+
+        .brand-header h2 {
+            color: #0f172a;
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .brand-header p {
+            color: #475569;
+            font-size: 13px;
+            margin-top: 4px;
+        }
+
+        /* Mensajes de alerta de Flask */
+        .flash-messages {
+            margin-bottom: 16px;
+        }
+
+        .alert {
+            background-color: #fef2f2;
+            color: #dc2626;
+            border: 1px solid #fecaca;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 13px;
+            text-align: left;
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 14px;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: #334155;
+            margin-bottom: 4px;
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-wrapper i.field-icon {
+            position: absolute;
+            left: 14px;
+            color: #64748b;
+            font-size: 15px;
+        }
+
+        .input-wrapper input {
+            width: 100%;
+            padding: 10px 40px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 13.5px;
+            color: #1e293b;
+            background-color: rgba(255, 255, 255, 0.9);
+            transition: all 0.2s ease;
+            outline: none;
+        }
+
+        .input-wrapper input:focus {
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+            background-color: #ffffff;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 14px;
+            color: #64748b;
+            cursor: pointer;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+
+        .toggle-password:hover {
+            color: #334155;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 11px;
+            background: #4f46e5;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14.5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s ease, transform 0.1s ease;
+            margin-top: 10px;
+        }
+
+        .btn-submit:hover {
+            background: #4338ca;
+        }
+
+        .btn-submit:active {
+            transform: scale(0.99);
+        }
+
+        .login-link {
+            display: block;
+            margin-top: 18px;
+            color: #475569;
+            text-decoration: none;
+            font-size: 13px;
+            transition: color 0.2s;
+        }
+
+        .login-link span {
+            color: #4f46e5;
+            font-weight: 600;
+        }
+
+        .login-link:hover span {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
-    <div class="box">
-        <h2>📝 Registrar Nuevo Empleado</h2>
+
+    <div class="login-card">
+        <div class="brand-header">
+            <div class="brand-logo-container">
+                <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo Austral" class="brand-logo">
+            </div>
+            <h2>Registrar Nuevo Empleado</h2>
+            <p>Ingresa los datos del nuevo usuario</p>
+        </div>
+
+        <!-- Alertas Flash de Flask -->
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            <div class="flash-messages">
+              {% for message in messages %}
+                <div class="alert"><i class="fa-solid fa-circle-exclamation"></i> {{ message }}</div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        {% endwith %}
+
         <form method="POST">
-            <input type="text" name="usuario" placeholder="Nombre de Usuario" required><br>
-            <input type="password" name="clave" placeholder="Contraseña" required><br>
-            <input type="text" name="puesto" placeholder="Puesto (ej. Ventas, Logística)" required><br>
-            
-            <!-- NUEVO: Selector de fecha de cumpleaños -->
-            <label>Fecha de Nacimiento:</label>
-            <input type="date" name="cumpleanos" required><br>
-            
-            <button type="submit">Crear Cuenta</button>
+            <div class="input-group">
+                <label for="usuario">Usuario (empleado)</label>
+                <div class="input-wrapper">
+                    <i class="fa-solid fa-user field-icon"></i>
+                    <input type="text" id="usuario" name="usuario" placeholder="Ej. juan.perez" required autocomplete="username">
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label for="email">Correo Institucional</label>
+                <div class="input-wrapper">
+                    <i class="fa-solid fa-envelope field-icon"></i>
+                    <input 
+                        type="email" 
+                        id="email" 
+                        name="email" 
+                        placeholder="usuario@austral.mx" 
+                        pattern="^[a-zA-Z0-9._%+-]+@austral\.mx$" 
+                        title="Solo se permiten correos finalizados en @austral.mx" 
+                        required>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label for="clave">Contraseña</label>
+                <div class="input-wrapper">
+                    <i class="fa-solid fa-lock field-icon"></i>
+                    <input type="password" id="clave" name="clave" placeholder="••••••••" required autocomplete="new-password">
+                    <i class="fa-solid fa-eye toggle-password" id="toggleIcon" onclick="togglePasswordVisibility()"></i>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label for="puesto">Puesto</label>
+                <div class="input-wrapper">
+                    <i class="fa-solid fa-briefcase field-icon"></i>
+                    <input type="text" id="puesto" name="puesto" placeholder="Ej. Ventas, Logística" required>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label for="cumpleanos">Fecha de Nacimiento</label>
+                <div class="input-wrapper">
+                    <i class="fa-solid fa-cake-candles field-icon"></i>
+                    <input type="date" id="cumpleanos" name="cumpleanos" required>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-submit">
+                Crear Cuenta <i class="fa-solid fa-user-plus" style="margin-left: 6px;"></i>
+            </button>
         </form>
-        <a href="/login">Volver al Inicio de Sesión</a>
+
+        <a href="/login" class="login-link">
+            ¿Ya tienes cuenta? <span>Volver al Inicio de Sesión</span>
+        </a>
     </div>
+
+    <script>
+        function togglePasswordVisibility() {
+            const passwordInput = document.getElementById('clave');
+            const toggleIcon = document.getElementById('toggleIcon');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.classList.remove('fa-eye');
+                toggleIcon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                toggleIcon.classList.remove('fa-eye-slash');
+                toggleIcon.classList.add('fa-eye');
+            }
+        }
+    </script>
 </body>
 </html>
 
