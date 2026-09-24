@@ -172,6 +172,13 @@ def obtener_ruta_carpetas(carpeta_actual_id):
     return ruta
 
 @app.route('/')
+def index():
+    # 1. Limpia cualquier sesión que haya quedado guardada en el navegador
+    session.clear()
+    # 2. Redirige obligatoriamente al formulario de Login
+    return redirect(url_for('login'))
+
+@app.route('/inicio')
 def inicio():
     if 'usuario' not in session or 'puesto' not in session:
         return redirect(url_for('login'))
