@@ -32,20 +32,6 @@ def es_imagen(filename):
         return ext in EXTENSIONES_IMAGEN
     return False
 
-
-def get_db_connection():
-    database_url = os.environ.get('DATABASE_URL')
-    if not database_url:
-        raise ValueError("La variable DATABASE_URL no está configurada.")
-    conn = psycopg2.connect(database_url)
-    return conn
-
-def es_imagen(filename):
-    if '.' in filename:
-        ext = filename.rsplit('.', 1)[1].lower()
-        return ext in EXTENSIONES_IMAGEN
-    return False
-
 def init_db():
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -289,22 +275,20 @@ def inicio():
 @app.route('/crear_carpeta', methods=['POST'])
 def crear_carpeta():
     if 'usuario' not in session:
-        return jsonify({'success': False, 'message': 'Sesión no activa'}), 200
+        return jsonify({'success': False, 'message': 'Sesión no activa'}), 401
 
     nombre_carpeta = request.form.get('nombre_carpeta', '').strip()
-    
-    # Manejar padre_id tanto si viene como entero o string vacío
     raw_padre_id = request.form.get('padre_id')
     padre_id = int(raw_padre_id) if raw_padre_id and raw_padre_id.isdigit() else None
 
     if not nombre_carpeta:
-        return jsonify({'success': False, 'message': 'El nombre de la carpeta no puede estar vacío.'}), 200
+        return jsonify({'success': False, 'message': 'El nombre de la carpeta no puede estar vacío.'}), 400
 
-    conn = get_db_connection()
-    cursor = conn.cursor()
-
+    conn = None
     try:
-        # 1. Validar si ya existe una carpeta con ese mismo nombre dentro del mismo nivel (padre_id)
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
         cursor.execute("""
             SELECT id FROM carpetas 
             WHERE LOWER(nombre) = LOWER(%s) AND padre_id IS NOT DISTINCT FROM %s
@@ -316,9 +300,8 @@ def crear_carpeta():
             return jsonify({
                 'success': False, 
                 'message': f"La carpeta '{nombre_carpeta}' ya existe en esta ubicación."
-            }), 200
+            }), 400
 
-        # 2. Insertar la carpeta respetando la estructura de tu tabla (creador / padre_id)
         cursor.execute("""
             INSERT INTO carpetas (nombre, creador, padre_id) 
             VALUES (%s, %s, %s)
@@ -331,14 +314,11 @@ def crear_carpeta():
         return jsonify({'success': True, 'message': 'Carpeta creada correctamente.'})
 
     except Exception as e:
-        print("Error al crear carpeta:", e)
         if conn:
+            conn.rollback()
             conn.close()
-        return jsonify({'success': False, 'message': f'Error en el servidor: {str(e)}'}), 200
-            
-    if padre_id:
-        return redirect(url_for('inicio', folder_id=padre_id))
-    return redirect(url_for('inicio'))
+        print("Error al crear carpeta:", e)
+        return jsonify({'success': False, 'message': f'Error en el servidor: {str(e)}'}), 500
 
 @app.route('/borrar_carpeta/<int:id>')
 def borrar_carpeta(id):
@@ -361,68 +341,77 @@ def borrar_carpeta(id):
             return redirect(url_for('inicio', folder_id=padre_id))
     return redirect(url_for('inicio'))
 
-# --- MODIFICACIÓN EN SUBIR ARCHIVO (DRIVE) ---
 @app.route('/subir', methods=['POST'])
 def subir_archivo():
     if 'usuario' not in session:
-        return jsonify({'success': False, 'message': 'Sesión no activa'}), 200
+        return jsonify({'success': False, 'message': 'Sesión no activa'}), 401
 
-    if 'archivo' in request.files:
-        f = request.files['archivo']
-        raw_carpeta_id = request.form.get('carpeta_id')
-        carpeta_id = int(raw_carpeta_id) if raw_carpeta_id and raw_carpeta_id.isdigit() else None
-        
-        if f.filename != '':
-            nombre_original = secure_filename(f.filename)
-            
-            conn = get_db_connection()
-            cursor = conn.cursor()
-            
-            # Validar duplicados globales en la BD
-            cursor.execute("SELECT carpeta FROM archivos WHERE LOWER(nombre_archivo) = LOWER(%s)", (nombre_original,))
-            archivo_existente = cursor.fetchone()
-            
-            if archivo_existente:
-                carpeta_donde_esta = archivo_existente['carpeta'] if isinstance(archivo_existente, dict) else archivo_existente[0]
-                cursor.close()
-                conn.close()
-                
-                mensaje_duplicado = (
-                    f"El archivo '{nombre_original}' ya existe en la base de datos (ubicado en la carpeta '{carpeta_donde_esta}'). "
-                    "Verifique en las carpetas que no sea el mismo, cámbiele el nombre y vuelva a subirlo."
-                )
-                return jsonify({'success': False, 'message': mensaje_duplicado}), 200
+    if 'archivo' not in request.files:
+        return jsonify({'success': False, 'message': 'No se envió ningún archivo.'}), 400
 
-            # --- SUBIR A SUPABASE STORAGE ---
-            bytes_archivo = f.read()
-            path_supabase = f"archivos/{nombre_original}"
-            
-            # Subir archivo al bucket
-            supabase.storage.from_(BUCKET_NAME).upload(
-                path=path_supabase,
-                file=bytes_archivo,
-                file_options={"content-type": f.content_type or "application/octet-stream"}
-            )
-            
-            fecha_actual = datetime.now().strftime('%d/%m/%Y %H:%M')
-            
-            nombre_carpeta = 'General'
-            if carpeta_id:
-                cursor.execute("SELECT nombre FROM carpetas WHERE id = %s", (carpeta_id,))
-                res = cursor.fetchone()
-                if res:
-                    nombre_carpeta = res['nombre'] if isinstance(res, dict) else res[0]
+    f = request.files['archivo']
+    raw_carpeta_id = request.form.get('carpeta_id')
+    carpeta_id = int(raw_carpeta_id) if raw_carpeta_id and raw_carpeta_id.isdigit() else None
 
-            cursor.execute("""
-                INSERT INTO archivos (nombre_archivo, subido_por, fecha, carpeta, carpeta_id) 
-                VALUES (%s, %s, %s, %s, %s)
-            """, (nombre_original, session['usuario'], fecha_actual, nombre_carpeta, carpeta_id))
-            
-            conn.commit()
+    if f.filename == '':
+        return jsonify({'success': False, 'message': 'Nombre de archivo vacío.'}), 400
+
+    nombre_original = secure_filename(f.filename)
+    conn = None
+
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        # Validar duplicados
+        cursor.execute("SELECT carpeta FROM archivos WHERE LOWER(nombre_archivo) = LOWER(%s)", (nombre_original,))
+        archivo_existente = cursor.fetchone()
+
+        if archivo_existente:
+            carpeta_donde_esta = archivo_existente['carpeta'] if isinstance(archivo_existente, dict) else archivo_existente[0]
             cursor.close()
             conn.close()
+            return jsonify({
+                'success': False, 
+                'message': f"El archivo '{nombre_original}' ya existe en la carpeta '{carpeta_donde_esta}'."
+            }), 400
 
-            return jsonify({'success': True, 'message': 'Archivo subido correctamente.'})
+        # Subir a Supabase Storage
+        bytes_archivo = f.read()
+        path_supabase = f"archivos/{nombre_original}"
+
+        supabase.storage.from_(BUCKET_NAME).upload(
+            path=path_supabase,
+            file=bytes_archivo,
+            file_options={"content-type": f.content_type or "application/octet-stream"}
+        )
+
+        fecha_actual = datetime.now().strftime('%d/%m/%Y %H:%M')
+        nombre_carpeta = 'General'
+
+        if carpeta_id:
+            cursor.execute("SELECT nombre FROM carpetas WHERE id = %s", (carpeta_id,))
+            res = cursor.fetchone()
+            if res:
+                nombre_carpeta = res['nombre'] if isinstance(res, dict) else res[0]
+
+        cursor.execute("""
+            INSERT INTO archivos (nombre_archivo, subido_por, fecha, carpeta, carpeta_id) 
+            VALUES (%s, %s, %s, %s, %s)
+        """, (nombre_original, session['usuario'], fecha_actual, nombre_carpeta, carpeta_id))
+
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+        return jsonify({'success': True, 'message': 'Archivo subido correctamente.'})
+
+    except Exception as e:
+        if conn:
+            conn.rollback()
+            conn.close()
+        print(f"Error en /subir: {e}")
+        return jsonify({'success': False, 'message': f"Error al subir archivo: {str(e)}"}), 500
 
     if carpeta_id:
         return redirect(url_for('inicio', folder_id=carpeta_id))
@@ -466,21 +455,24 @@ def borrar_archivo(id):
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        usuario = request.form['usuario']
-        clave = request.form['clave']
+        usuario = request.form.get('usuario')
+        clave = request.form.get('clave')
+
         conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute("SELECT puesto FROM usuarios WHERE usuario=%s AND clave=%s", (usuario, clave))
         user = cursor.fetchone()
         cursor.close()
         conn.close()
+
         if user:
             session['usuario'] = usuario
             session['puesto'] = user[0]
             return redirect(url_for('inicio'))
         else:
-            return "Usuario o contraseña incorrectos. <a href='/login'>Volver</a>"
             flash('Usuario o contraseña incorrectos.', 'danger')
+            return redirect(url_for('login'))
+
     return render_template('login.html')
 
 @app.route('/registro', methods=['GET', 'POST'])
