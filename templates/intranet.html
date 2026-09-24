@@ -960,38 +960,31 @@ function actualizarTipoCambio(event, form) {
         });
     }
 
-function cargarCarpeta(url, e) {
-    if (e) e.preventDefault();
-    
-    let driveActual = document.querySelector('.drive-container');
-    if (driveActual) {
-        // Aplica efecto de carga y muestra indicador
-        driveActual.classList.add('container-loading');
-    }
-
-    fetch(url)
-        .then(response => response.text())
-        .then(html => {
-            let parser = new DOMParser();
-            let doc = parser.parseFromString(html, 'text/html');
-            let nuevoDrive = doc.querySelector('.drive-container');
-
-            if (nuevoDrive && driveActual) {
-                driveActual.innerHTML = nuevoDrive.innerHTML;
-                window.history.pushState({}, '', url);
-            }
-        })
-        .catch(err => console.error("Error al cargar carpeta:", err))
-        .finally(() => {
-            if (driveActual) {
-                driveActual.classList.remove('container-loading');
-            }
-        });
+function abrirCarpeta(folderId) {
+    // Es importante enviar 'credentials: same-origin' para incluir la cookie de sesión de Flask
+    fetch(`/inicio?folder_id=${folderId}`, {
+        method: 'GET',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        credentials: 'same-origin' // <--- ESTO EVITA QUE LA SESIÓN SE PIERDA
+    })
+    .then(response => {
+        // Si el servidor responde con una redirección (ej. cuando expira la sesión)
+        if (response.redirected) {
+            window.location.href = response.url; // Redirige de forma completa a /login
+            return;
+        }
+        return response.text();
+    })
+    .then(html => {
+        if (html) {
+            // Reemplaza el contenido de tu gestor/contenedor de archivos en la interfaz
+            document.getElementById('contenedor-archivos').innerHTML = html;
+        }
+    })
+    .catch(error => console.error('Error al navegar por la carpeta:', error));
 }
-
-    window.onpopstate = function() {
-        cargarCarpeta(window.location.href);
-    };
 
 function enviarFormularioAjax(event, form, urlAccion) {
     event.preventDefault();
