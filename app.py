@@ -495,19 +495,22 @@ def registro():
             flash('Acceso restringido: Solo se permiten correos con el dominio @austral.mx')
             return redirect(url_for('registro'))
 
-        # 2. Inserción directa en la base de datos
+        # 2. Inserción creando cursor dentro del ciclo de la petición
         try:
-            cursor.execute("""
+            cur = conexion.cursor()
+            cur.execute("""
                 INSERT INTO usuarios (usuario, email, clave, puesto, cumpleanos)
                 VALUES (%s, %s, %s, %s, %s)
             """, (usuario, email, clave, puesto, cumpleanos))
             conexion.commit()
+            cur.close()
 
             flash('Cuenta creada exitosamente. Ya puedes iniciar sesión.')
             return redirect(url_for('login'))
 
         except Exception as e:
             conexion.rollback()
+            print(f"Error en la base de datos: {e}")  # Muestra el error exacto en consola
             flash('Error al registrar: El usuario o el correo ya se encuentran registrados.')
             return redirect(url_for('registro'))
 
