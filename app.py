@@ -480,6 +480,7 @@ def login():
             return redirect(url_for('inicio'))
         else:
             return "Usuario o contraseña incorrectos. <a href='/login'>Volver</a>"
+            flash('Usuario o contraseña incorrectos.', 'danger')
     return render_template('login.html')
 
 @app.route('/registro', methods=['GET', 'POST'])
@@ -511,7 +512,7 @@ def registro():
             cursor.close()
             conn.close()
 
-            flash('Cuenta creada exitosamente. Ya puedes iniciar sesión.')
+            flash('Cuenta creada exitosamente. Ya puedes iniciar sesión.', 'success')
             return redirect(url_for('login'))
 
         except Exception as e:
