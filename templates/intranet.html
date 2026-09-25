@@ -715,22 +715,33 @@ body.sidebar-open .main-content {
             {% endif %}
 
             <!-- Lista Carpetas -->
-            {% if carpetas %}
-            <div style="font-size: 11px; font-weight: bold; color: #64748b; margin: 8px 0 4px 0;">CARPETAS</div>
-            <div style="display: flex; flex-direction: column; gap: 4px; margin-bottom: 10px;">
-                {% for id_c, nom_carp, creador_carp in carpetas %}
-                <div id="carpeta-{{ id_c }}" style="display: flex; align-items: center; justify-content: space-between; background: white; border: 1px solid #e2e8f0; border-radius: 4px; padding: 6px 8px;">
-                    <!-- Pasamos directamente el ID numérico '{{ id_c }}' en lugar de 'this.href' -->
-                    <a href="javascript:void(0)" onclick="abrirCarpeta('{{ id_c }}', event)" style="text-decoration: none; color: #334155; font-size: 12px; display: flex; align-items: center; gap: 6px;">
-                        📁 <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 250px;">{{ nom_carp }}</span>
-                    </a>
-                    {% if creador_carp|lower == usuario|lower or puesto|lower == 'administrador' %}
-                    <a href="javascript:void(0)" onclick="eliminarRegistroDrive('/borrar_carpeta/{{ id_c }}', this)" style="color: #ef4444; font-size: 11px; text-decoration: none;" title="Eliminar Carpeta">❌</a>
-                    {% endif %}
-                </div>
-                {% endfor %}
-            </div>
-            {% endif %}
+{% for carpeta in carpetas %}
+  <div class="folder-item" 
+       onclick="abrirCarpeta('{{ carpeta[0] }}', event)" 
+       style="display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; cursor: pointer; border-bottom: 1px solid #f1f5f9;"
+       title="{{ carpeta[3] }} elemento(s) dentro de esta carpeta">
+    
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <span style="font-size: 16px;">📁</span>
+      <span style="font-weight: 500; font-size: 13px; color: #334155;">{{ carpeta[1] }}</span>
+    </div>
+
+    <div style="display: flex; align-items: center; gap: 6px;">
+      <!-- Badge con el conteo de elementos -->
+      <span style="background-color: #f1f5f9; color: #64748b; font-size: 11px; font-weight: 600; padding: 2px 7px; border-radius: 10px; border: 1px solid #e2e8f0;">
+        {{ carpeta[3] }}
+      </span>
+
+      <!-- Botón para eliminar carpeta (si aplica a tu sistema) -->
+      {% if session.get('usuario') == carpeta[2] or session.get('puesto') == 'Administrador' %}
+        <button onclick="eliminarCarpeta('{{ carpeta[0] }}', event)" 
+                style="background: none; border: none; color: #ef4444; cursor: pointer; font-size: 13px; padding: 2px 4px;" 
+                title="Eliminar carpeta">❌</button>
+      {% endif %}
+    </div>
+
+  </div>
+{% endfor %}
 
             <!-- Lista Archivos -->
             <div style="font-size: 11px; font-weight: bold; color: #64748b; margin: 8px 0 4px 0;">ARCHIVOS</div>
