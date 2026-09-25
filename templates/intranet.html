@@ -961,35 +961,88 @@ function actualizarTipoCambio(event, form) {
         });
     }
 
+// Variable global para mantener el ID de la carpeta actual activa
+let carpetaActualId = null;
+
 function abrirCarpeta(folderId, event) {
     if (event) {
-        event.preventDefault(); // Evita que el navegador recargue la página por el enlace <a href="...">
+        event.preventDefault();
+        event.stopPropagation();
     }
 
-    fetch(`/inicio?folder_id=${folderId}`, {
+    // Normalizar ID
+    if (folderId === undefined || folderId === null || folderId === 'None' || folderId === '') {
+        folderId = '';
+    }
+    carpetaActualId = folderId;
+
+    const contenedor = document.getElementById('contenedor-archivos');
+    if (contenedor) {
+        // Indicador de carga visual mientras responde el servidor
+        contenedor.innerHTML = '<div style="text-align:center; padding:10px; font-size:12px; color:#64748b;">⏳ Cargando archivos...</div>';
+    }
+
+    const url = folderId ? `/inicio?folder_id=${encodeURIComponent(folderId)}` : '/inicio';
+
+    fetch(url, {
         method: 'GET',
         headers: {
             'X-Requested-With': 'XMLHttpRequest'
         },
-        credentials: 'same-origin' // Mantiene la cookie de sesión[cite: 5]
+        credentials: 'same-origin'
+    })
+    .then(response => response.text())
+    .then(html => {
+        if (contenedor) {
+            // Reemplaza el bloque de archivos/carpetas con la respuesta del servidor
+            contenedor.innerHTML = html;
+        }
+    })
+    .catch(err => {
+        console.error('Error al abrir la carpeta:', err);
+        if (contenedor) {
+            contenedor.innerHTML = '<div style="color:red; font-size:12px;">Error al cargar contenido.</div>';
+        }
+    });
+}
+
+function eliminarRegistroDrive(urlBorrar, elementoBoton) {
+    if (!confirm('¿Estás seguro de que deseas eliminar este registro?')) return;
+
+    // Deshabilitar el botón temporalmente para dar efecto de procesamiento
+    if (elementoBoton) elementoBoton.style.pointerEvents = 'none';
+
+    fetch(urlBorrar, {
+        method: 'POST',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        credentials: 'same-origin'
     })
     .then(response => {
-        if (response.redirected) {
-            window.location.href = response.url;
-            return;
-        }
-        return response.text();
-    })
-    .then(html => {
-        if (html) {
-            // Reemplaza únicamente el contenido del contenedor de archivos sin refrescar la ventana
-            const contenedor = document.getElementById('contenedor-archivos');
-            if (contenedor) {
-                contenedor.innerHTML = html;
+        if (response.ok) {
+            // Animación visual de borrado rápido: elimina la fila contenedora
+            const contenedorFila = elementoBoton ? elementoBoton.closest('div') : null;
+            if (contenedorFila) {
+                contenedorFila.style.transition = 'all 0.3s ease';
+                contenedorFila.style.opacity = '0';
+                setTimeout(() => {
+                    contenedorFila.remove();
+                    // Refresca la vista de la carpeta actual por si la lista quedó vacía
+                    abrirCarpeta(carpetaActualId, null);
+                }, 300);
+            } else {
+                abrirCarpeta(carpetaActualId, null);
             }
+        } else {
+            alert('No se pudo eliminar el registro.');
+            if (elementoBoton) elementoBoton.style.pointerEvents = 'auto';
         }
     })
-    .catch(error => console.error('Error al navegar por la carpeta:', error));
+    .catch(err => {
+        console.error('Error al eliminar:', err);
+        if (elementoBoton) elementoBoton.style.pointerEvents = 'auto';
+    });
 }
 function enviarFormularioAjax(event, form, urlAccion) {
     event.preventDefault();
@@ -1255,7 +1308,7 @@ function abrirModalLogTC() {
 }
 
 function renderizarArchivos(listaArchivos) {
-    let contenedor = document.getElementById('contenedor-archivos');
+    let contenedor = document.getElementById('drive-container');
     contenedor.innerHTML = '';
 
     listaArchivos.forEach(archivo => {
