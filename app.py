@@ -150,6 +150,7 @@ def index():
     # Si no hay sesión activa, va al formulario de login
     return redirect(url_for('login'))
     
+
 def obtener_ruta_carpetas(carpeta_actual_id):
     ruta = []
     curr_id = carpeta_actual_id
@@ -167,6 +168,7 @@ def obtener_ruta_carpetas(carpeta_actual_id):
     conn.close()
     return ruta
     
+
 @app.route('/inicio')
 def inicio():
     if 'usuario' not in session or 'puesto' not in session:
@@ -202,15 +204,15 @@ def inicio():
     breadcrumbs = obtener_ruta_carpetas(carpeta_actual_id)
 
     # ------------------------------------------------------------------
-    # DETECCIÓN DE PETICIÓN AJAX (Si solo se quiere actualizar las carpetas)
+    # PASO 2: DETECCIÓN DE PETICIÓN AJAX (Navegación de carpetas)
+    # Devolvemos directamente 'intranet.html' para evitar errores de plantillas faltantes.
     # ------------------------------------------------------------------
     if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
         cursor.close()
         conn.close()
         
-        # Renderiza solo la sección/partial del gestor de archivos
         return render_template(
-            'partials/gestor_archivos.html',  # o el nombre de tu partial/fragmento HTML
+            'intranet.html',
             archivos=archivos,
             carpetas=carpetas,
             carpeta_actual_id=carpeta_actual_id,
