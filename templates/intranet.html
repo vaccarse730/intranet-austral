@@ -654,12 +654,12 @@ body.sidebar-open .main-content {
             <div class="drive-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px;">
                 
                 <nav class="drive-breadcrumbs" style="font-size: 12px; font-weight: 500; display: flex; align-items: center; gap: 4px; flex-wrap: wrap;">
-                    <a href="/?folder_id=" onclick="cargarCarpeta(this.href, event)" class="crumb-item {% if not carpeta_actual_id %}active{% endif %}" title="Mi Unidad" style="color: #475569; text-decoration: none; padding: 2px 4px;">
+                    <a href="/?folder_id=" onclick="abrirCarpeta(this.href, event)" class="crumb-item {% if not carpeta_actual_id %}active{% endif %}" title="Mi Unidad" style="color: #475569; text-decoration: none; padding: 2px 4px;">
                         🏠 Inicio
                     </a>
                     {% for crumb in breadcrumbs %}
                         <span style="color: #cbd5e1; font-size: 9px;">></span>
-                        <a href="/?folder_id={{ crumb.id }}" onclick="cargarCarpeta(this.href, event)" style="color: #334155; text-decoration: none; font-size: 12px; font-weight: 600;">
+                        <a href="/?folder_id={{ crumb.id }}" onclick="abrirCarpeta(this.href, event)" style="color: #334155; text-decoration: none; font-size: 12px; font-weight: 600;">
                             {{ crumb.nombre }}
                         </a>
                     {% endfor %}
@@ -708,7 +708,7 @@ body.sidebar-open .main-content {
             {% if breadcrumbs|length > 0 %}
             {% set prev_folder = breadcrumbs[-2].id if breadcrumbs|length > 1 else '' %}
             <div style="margin-bottom: 8px;">
-                <a href="/?folder_id={{ prev_folder }}" onclick="cargarCarpeta(this.href, event)" style="font-size: 11px; color: #2563eb; text-decoration: none; font-weight: bold; display: flex; align-items: center; gap: 4px;">
+                <a href="/?folder_id={{ prev_folder }}" onclick="abrirCarpeta(this.href, event)" style="font-size: 11px; color: #2563eb; text-decoration: none; font-weight: bold; display: flex; align-items: center; gap: 4px;">
                     ⬆️ ... (Subir nivel)
                 </a>
             </div>
@@ -720,7 +720,7 @@ body.sidebar-open .main-content {
             <div style="display: flex; flex-direction: column; gap: 4px; margin-bottom: 10px;">
                 {% for id_c, nom_carp, creador_carp in carpetas %}
                 <div style="display: flex; align-items: center; justify-content: space-between; background: white; border: 1px solid #e2e8f0; border-radius: 4px; padding: 6px 8px;">
-                    <a href="/?folder_id={{ id_c }}" onclick="cargarCarpeta(this.href, event)" style="text-decoration: none; color: #334155; font-size: 12px; display: flex; align-items: center; gap: 6px; overflow: hidden;">
+                    <a href="/?folder_id={{ id_c }}" onclick="abrirCarpeta(this.href, event)" style="text-decoration: none; color: #334155; font-size: 12px; display: flex; align-items: center; gap: 6px; overflow: hidden;">
                         📂 <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 250px;">{{ nom_carp }}</span>
                     </a>
                     {% if creador_carp|lower == usuario|lower or puesto|lower == 'administrador' %}
@@ -960,32 +960,36 @@ function actualizarTipoCambio(event, form) {
         });
     }
 
-function cargarCarpeta(folderId) {
-    // Es importante enviar 'credentials: same-origin' para incluir la cookie de sesión de Flask
+function abrirCarpeta(folderId, event) {
+    if (event) {
+        event.preventDefault(); // Evita que el navegador recargue la página por el enlace <a href="...">
+    }
+
     fetch(`/inicio?folder_id=${folderId}`, {
         method: 'GET',
         headers: {
             'X-Requested-With': 'XMLHttpRequest'
         },
-        credentials: 'same-origin' // <--- ESTO EVITA QUE LA SESIÓN SE PIERDA
+        credentials: 'same-origin' // Mantiene la cookie de sesión[cite: 5]
     })
     .then(response => {
-        // Si el servidor responde con una redirección (ej. cuando expira la sesión)
         if (response.redirected) {
-            window.location.href = response.url; // Redirige de forma completa a /login
+            window.location.href = response.url;
             return;
         }
         return response.text();
     })
     .then(html => {
         if (html) {
-            // Reemplaza el contenido de tu gestor/contenedor de archivos en la interfaz
-            document.getElementById('contenedor-archivos').innerHTML = html;
+            // Reemplaza únicamente el contenido del contenedor de archivos sin refrescar la ventana
+            const contenedor = document.getElementById('contenedor-archivos');
+            if (contenedor) {
+                contenedor.innerHTML = html;
+            }
         }
     })
     .catch(error => console.error('Error al navegar por la carpeta:', error));
 }
-
 function enviarFormularioAjax(event, form, urlAccion) {
     event.preventDefault();
     let btnSubmit = form.querySelector('button[type="submit"]');
@@ -1007,7 +1011,7 @@ function enviarFormularioAjax(event, form, urlAccion) {
     })
     .then(response => {
         if (response.ok) {
-            cargarCarpeta(window.location.href);
+            abrirCarpeta(window.location.href);
             form.reset();
             ocultarForms();
             location.reload();
@@ -1177,7 +1181,7 @@ function enviarDriveForm(event, form, urlAccion) {
     .then(data => {
         if (data.success) {
             // Si la subida fue exitosa, actualiza la vista y limpia el formulario
-            cargarCarpeta(window.location.href);
+            abrirCarpeta(window.location.href);
             form.reset();
             ocultarForms();
         } else {
@@ -1203,7 +1207,7 @@ function eliminarRegistroDrive(url, elementoHtml) {
     fetch(url)
         .then(response => {
             if (response.ok) {
-                cargarCarpeta(window.location.href);
+                abrirCarpeta(window.location.href);
             } else {
                 alert("No se pudo eliminar el elemento.");
             }
