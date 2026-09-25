@@ -170,14 +170,59 @@ def index():
 @app.route('/inicio')
 def inicio():
     if 'usuario' not in session or 'puesto' not in session:
+        # Si expira la sesión durante una petición AJAX
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return jsonify({'redirect': url_for('login')}), 401
         return redirect(url_for('login'))
     
+    # Obtener el folder_id (maneja None si no se especifica)
     carpeta_actual_id = request.args.get('folder_id', type=int)
-    
+    if carpeta_actual_id == 0:
+        carpeta_actual_id = None
+
     conn = get_db_connection()
     cursor = conn.cursor()
+
+    # --- CONSULTAS ESPECÍFICAS PARA EL GESTOR DE DOCUMENTOS ---
+    # 1. Subcarpetas de la carpeta actual
+    if carpeta_actual_id is None:
+        cursor.execute("SELECT id, nombre, creador FROM carpetas WHERE padre_id IS NULL ORDER BY nombre ASC")
+    else:
+        cursor.execute("SELECT id, nombre, creador FROM carpetas WHERE padre_id = %s ORDER BY nombre ASC", (carpeta_actual_id,))
+    carpetas = cursor.fetchall()
     
-    # 1. Mensajes y Likes
+    # 2. Archivos de la carpeta actual
+    if carpeta_actual_id is None:
+        cursor.execute("SELECT id, nombre_archivo, subido_por, fecha, carpeta_id FROM archivos WHERE carpeta_id IS NULL ORDER BY id DESC")
+    else:
+        cursor.execute("SELECT id, nombre_archivo, subido_por, fecha, carpeta_id FROM archivos WHERE carpeta_id = %s ORDER BY id DESC", (carpeta_actual_id,))
+    archivos = cursor.fetchall()
+
+    # 3. Ruta de migas de pan (Breadcrumbs)
+    breadcrumbs = obtener_ruta_carpetas(carpeta_actual_id)
+
+    # ------------------------------------------------------------------
+    # DETECCIÓN DE PETICIÓN AJAX (Si solo se quiere actualizar las carpetas)
+    # ------------------------------------------------------------------
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        cursor.close()
+        conn.close()
+        
+        # Renderiza solo la sección/partial del gestor de archivos
+        return render_template(
+            'partials/gestor_archivos.html',  # o el nombre de tu partial/fragmento HTML
+            archivos=archivos,
+            carpetas=carpetas,
+            carpeta_actual_id=carpeta_actual_id,
+            breadcrumbs=breadcrumbs,
+            usuario=session.get('usuario'),
+            puesto=session.get('puesto')
+        )
+
+    # ------------------------------------------------------------------
+    # CARGA COMPLETA (Solo si el usuario recarga manualmente la página F5)
+    # ------------------------------------------------------------------
+    # Mensajes y Likes
     cursor.execute('''
         SELECT m.id, m.autor, m.contenido, m.es_foto, m.puesto_autor, m.fecha,
                (SELECT COUNT(*) FROM likes WHERE mensaje_id = m.id) as total_likes
@@ -187,22 +232,8 @@ def inicio():
     
     cursor.execute("SELECT mensaje_id FROM likes WHERE usuario = %s", (session['usuario'],))
     mis_likes = [fila[0] for fila in cursor.fetchall()]
-    
-    # 2. Subcarpetas de la carpeta actual
-    if carpeta_actual_id is None:
-        cursor.execute("SELECT id, nombre, creador FROM carpetas WHERE padre_id IS NULL ORDER BY nombre ASC")
-    else:
-        cursor.execute("SELECT id, nombre, creador FROM carpetas WHERE padre_id = %s ORDER BY nombre ASC", (carpeta_actual_id,))
-    carpetas = cursor.fetchall()
-    
-    # 3. Archivos de la carpeta actual
-    if carpeta_actual_id is None:
-        cursor.execute("SELECT id, nombre_archivo, subido_por, fecha, carpeta_id FROM archivos WHERE carpeta_id IS NULL ORDER BY id DESC")
-    else:
-        cursor.execute("SELECT id, nombre_archivo, subido_por, fecha, carpeta_id FROM archivos WHERE carpeta_id = %s ORDER BY id DESC", (carpeta_actual_id,))
-    archivos = cursor.fetchall()
 
-    # 4. Cumpleaños
+    # Cumpleaños
     cursor.execute("SELECT usuario, puesto, cumpleanos FROM usuarios ORDER BY cumpleanos ASC")
     todos_cumpleanos = cursor.fetchall()
     
@@ -222,7 +253,7 @@ def inicio():
             fecha_bonita = fecha_str
         cumpleanos_limpios.append((usuario_c, puesto_c, fecha_bonita, es_hoy))
 
-    # 5. Directorio y Configuración
+    # Directorio y Configuración
     cursor.execute("SELECT id, nombre, telefono, area, creador, correo FROM directorio ORDER BY nombre ASC")
     contactos = cursor.fetchall()
     
@@ -252,8 +283,6 @@ def inicio():
     cursor.close()
     conn.close()
 
-    breadcrumbs = obtener_ruta_carpetas(carpeta_actual_id)
-
     return render_template(
         'intranet.html',
         mensajes=mensajes,
@@ -265,9 +294,9 @@ def inicio():
         cumpleanos=cumpleanos_limpios,
         contactos=contactos,
         tipo_cambio=tipo_cambio,
-        d_fecha=d_fecha,        # <-- Fecha del último cambio
-        d_hora=d_hora,          # <-- Hora del último cambio
-        d_usuario=d_usuario,    # <-- Usuario que hizo el cambio
+        d_fecha=d_fecha,
+        d_hora=d_hora,
+        d_usuario=d_usuario,
         d_anterior=d_anterior,
         links=links,
         usuario=session.get('usuario'),
