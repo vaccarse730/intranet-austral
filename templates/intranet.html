@@ -35,28 +35,42 @@
             color: var(--text-main); 
         }
 
-                /* Contenedor o body con imagen en Blanco y Negro */
-            body {
-                background-image: url('/static/FondoColonia.jpg'); /* Cambia esto por la ruta de tu imagen */
-                background-size: cover;
-                background-position: center;
-                background-attachment: fixed;
-                background-repeat: no-repeat;
-                
-                /* Filtros para Blanco y Negro perfecto */
-                filter: grayscale(100%) contrast(105%); 
-            }
-            
-            /* Efecto transparente/cristal (Glassmorphism) para la columna central y tarjetas */
-            .columna-principal, 
-            .muro-container,
-            .card {
-                background: rgba(255, 255, 255, 0.85) !important; /* Blanco al 85% de opacidad */
-                backdrop-filter: blur(8px);                     /* Desenfoque de cristal suave */
-                -webkit-backdrop-filter: blur(8px);
-                border: 1px solid rgba(255, 255, 255, 0.4);
-                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-            }
+/* 1. Asegurar que el body tenga posición relativa */
+body {
+    position: relative;
+    background: #0f172a; /* Fondo base oscuro por si la imagen tarda en cargar */
+}
+
+/* 2. Pseudo-elemento para la imagen de fondo en Blanco y Negro */
+body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1; /* Se coloca detrás de todo el contenido */
+    background-image: url('/static/img/tu_foto.jpg'); /* Pon aquí la ruta exacta de tu foto */
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+    
+    /* Aplica el Blanco y Negro SOLO a la imagen de fondo */
+    filter: grayscale(100%) contrast(110%) brightness(0.85);
+}
+
+/* 3. Módulos y Tarjetas transparentes (Efecto Glassmorphism) */
+.columna-principal, 
+.muro-container,
+.card {
+    background: rgba(255, 255, 255, 0.82) !important; /* Blanco al 82% de opacidad */
+    backdrop-filter: blur(10px);                     /* Desenfoque de cristal */
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: 12px;                             /* Bordes redondeados elegantes */
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+}
         
         h1, h2, h3, h4, .tc-label, button {
             font-family: var(--font-heading);
