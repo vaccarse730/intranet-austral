@@ -970,16 +970,14 @@ function abrirCarpeta(folderId, event) {
         event.stopPropagation();
     }
 
-    // Normalizar ID
     if (folderId === undefined || folderId === null || folderId === 'None' || folderId === '') {
         folderId = '';
     }
-    carpetaActualId = folderId;
 
-    const contenedor = document.getElementById('contenedor-archivos');
+    // Ubica el contenedor en el HTML
+    const contenedor = document.querySelector('.drive-container');
     if (contenedor) {
-        // Indicador de carga visual mientras responde el servidor
-        contenedor.innerHTML = '<div style="text-align:center; padding:10px; font-size:12px; color:#64748b;">⏳ Cargando archivos...</div>';
+        contenedor.innerHTML = '<div style="text-align:center; padding:15px; font-size:12px; color:#64748b;">⏳ Cargando...</div>';
     }
 
     const url = folderId ? `/inicio?folder_id=${encodeURIComponent(folderId)}` : '/inicio';
@@ -991,21 +989,29 @@ function abrirCarpeta(folderId, event) {
         },
         credentials: 'same-origin'
     })
-    .then(response => response.text())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Error en el servidor: ' + response.status);
+        }
+        return response.text();
+    })
     .then(html => {
-        if (contenedor) {
-            // Reemplaza el bloque de archivos/carpetas con la respuesta del servidor
-            contenedor.innerHTML = html;
+        // Lee el HTML devuelto y extrae únicamente la caja del gestor (.drive-container)
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        const nuevoContenido = doc.querySelector('.drive-container');
+
+        if (contenedor && nuevoContenido) {
+            contenedor.innerHTML = nuevoContenido.innerHTML;
         }
     })
     .catch(err => {
         console.error('Error al abrir la carpeta:', err);
         if (contenedor) {
-            contenedor.innerHTML = '<div style="color:red; font-size:12px;">Error al cargar contenido.</div>';
+            contenedor.innerHTML = '<div style="color:#ef4444; font-size:12px; text-align:center; padding:10px;">Ocurrió un error al cargar el contenido.</div>';
         }
     });
 }
-
 function eliminarRegistroDrive(urlBorrar, elementoBoton) {
     if (!confirm('¿Estás seguro de que deseas eliminar este registro?')) return;
 
