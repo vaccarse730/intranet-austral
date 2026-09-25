@@ -141,6 +141,15 @@ def init_db():
 
 init_db()
 
+@app.route('/')
+def index():
+    # Si el usuario ya está autenticado, va directo al inicio
+    if 'usuario' in session and 'puesto' in session:
+        return redirect(url_for('inicio'))
+    
+    # Si no hay sesión activa, va al formulario de login
+    return redirect(url_for('login'))
+    
 def obtener_ruta_carpetas(carpeta_actual_id):
     ruta = []
     curr_id = carpeta_actual_id
@@ -157,15 +166,6 @@ def obtener_ruta_carpetas(carpeta_actual_id):
     cursor.close()
     conn.close()
     return ruta
-
-@app.route('/')
-def index():
-    # Si el usuario ya está autenticado, va directo al inicio
-    if 'usuario' in session and 'puesto' in session:
-        return redirect(url_for('inicio'))
-    
-    # Si no hay sesión activa, va al formulario de login
-    return redirect(url_for('login'))
     
 @app.route('/inicio')
 def inicio():
