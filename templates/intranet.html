@@ -719,12 +719,13 @@ body.sidebar-open .main-content {
             <div style="font-size: 11px; font-weight: bold; color: #64748b; margin: 8px 0 4px 0;">CARPETAS</div>
             <div style="display: flex; flex-direction: column; gap: 4px; margin-bottom: 10px;">
                 {% for id_c, nom_carp, creador_carp in carpetas %}
-                <div style="display: flex; align-items: center; justify-content: space-between; background: white; border: 1px solid #e2e8f0; border-radius: 4px; padding: 6px 8px;">
-                    <a href="/?folder_id={{ id_c }}" onclick="abrirCarpeta(this.href, event)" style="text-decoration: none; color: #334155; font-size: 12px; display: flex; align-items: center; gap: 6px; overflow: hidden;">
-                        📂 <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 250px;">{{ nom_carp }}</span>
+                <div id="carpeta-{{ id_c }}" style="display: flex; align-items: center; justify-content: space-between; background: white; border: 1px solid #e2e8f0; border-radius: 4px; padding: 6px 8px;">
+                    <!-- Pasamos directamente el ID numérico '{{ id_c }}' en lugar de 'this.href' -->
+                    <a href="javascript:void(0)" onclick="abrirCarpeta('{{ id_c }}', event)" style="text-decoration: none; color: #334155; font-size: 12px; display: flex; align-items: center; gap: 6px;">
+                        📁 <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 250px;">{{ nom_carp }}</span>
                     </a>
                     {% if creador_carp|lower == usuario|lower or puesto|lower == 'administrador' %}
-                    <a href="javascript:void(0)" onclick="eliminarRegistroDrive('/borrar_carpeta/{{ id_c }}', this)" style="color: #ef4444; font-size: 11px; text-decoration: none;" title="Eliminar">❌</a>
+                    <a href="javascript:void(0)" onclick="eliminarRegistroDrive('/borrar_carpeta/{{ id_c }}', this)" style="color: #ef4444; font-size: 11px; text-decoration: none;" title="Eliminar Carpeta">❌</a>
                     {% endif %}
                 </div>
                 {% endfor %}
