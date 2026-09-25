@@ -10,7 +10,10 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Montserrat:wght@600;700;800&display=swap" rel="stylesheet">
     <style>
-    
+
+
+
+        
         :root {
         --font-heading: 'Montserrat', sans-serif;
         --font-body: 'Inter', sans-serif;
@@ -31,6 +34,29 @@
             background: var(--bg-body); 
             color: var(--text-main); 
         }
+
+                /* Contenedor o body con imagen en Blanco y Negro */
+            body {
+                background-image: url('/static/img/tu_fondo.jpg'); /* Cambia esto por la ruta de tu imagen */
+                background-size: cover;
+                background-position: center;
+                background-attachment: fixed;
+                background-repeat: no-repeat;
+                
+                /* Filtros para Blanco y Negro perfecto */
+                filter: grayscale(100%) contrast(105%); 
+            }
+            
+            /* Efecto transparente/cristal (Glassmorphism) para la columna central y tarjetas */
+            .columna-principal, 
+            .muro-container,
+            .card {
+                background: rgba(255, 255, 255, 0.85) !important; /* Blanco al 85% de opacidad */
+                backdrop-filter: blur(8px);                     /* Desenfoque de cristal suave */
+                -webkit-backdrop-filter: blur(8px);
+                border: 1px solid rgba(255, 255, 255, 0.4);
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            }
         
         h1, h2, h3, h4, .tc-label, button {
             font-family: var(--font-heading);
