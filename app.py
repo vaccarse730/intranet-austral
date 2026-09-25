@@ -186,11 +186,26 @@ def inicio():
     cursor = conn.cursor()
 
     # --- CONSULTAS ESPECÍFICAS PARA EL GESTOR DE DOCUMENTOS ---
-    # 1. Subcarpetas de la carpeta actual
+    
+    # 1. Subcarpetas de la carpeta actual con conteo de elementos (carpetas + archivos)
     if carpeta_actual_id is None:
-        cursor.execute("SELECT id, nombre, creador FROM carpetas WHERE padre_id IS NULL ORDER BY nombre ASC")
+        cursor.execute("""
+            SELECT c.id, c.nombre, c.creador,
+                   ((SELECT COUNT(*) FROM carpetas sub WHERE sub.padre_id = c.id) +
+                    (SELECT COUNT(*) FROM archivos a WHERE a.carpeta_id = c.id)) AS total_elementos
+            FROM carpetas c
+            WHERE c.padre_id IS NULL
+            ORDER BY c.nombre ASC
+        """)
     else:
-        cursor.execute("SELECT id, nombre, creador FROM carpetas WHERE padre_id = %s ORDER BY nombre ASC", (carpeta_actual_id,))
+        cursor.execute("""
+            SELECT c.id, c.nombre, c.creador,
+                   ((SELECT COUNT(*) FROM carpetas sub WHERE sub.padre_id = c.id) +
+                    (SELECT COUNT(*) FROM archivos a WHERE a.carpeta_id = c.id)) AS total_elementos
+            FROM carpetas c
+            WHERE c.padre_id = %s
+            ORDER BY c.nombre ASC
+        """, (carpeta_actual_id,))
     carpetas = cursor.fetchall()
     
     # 2. Archivos de la carpeta actual
