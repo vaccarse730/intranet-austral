@@ -960,7 +960,7 @@ function actualizarTipoCambio(event, form) {
         });
     }
 
-function abrirCarpeta(folderId) {
+function cargarCarpeta(folderId) {
     // Es importante enviar 'credentials: same-origin' para incluir la cookie de sesión de Flask
     fetch(`/inicio?folder_id=${folderId}`, {
         method: 'GET',
