@@ -990,23 +990,27 @@ function actualizarTipoCambio(event, form) {
 // Variable global para mantener el ID de la carpeta actual activa
 let carpetaActualId = null;
 
-function abrirCarpeta(folderId, event) {
+function abrirCarpeta(param, event) {
     if (event) {
         event.preventDefault();
         event.stopPropagation();
     }
 
-    if (folderId === undefined || folderId === null || folderId === 'None' || folderId === '') {
-        folderId = '';
+    let url = '/inicio';
+    
+    if (param !== undefined && param !== null && param !== '' && param !== 'None') {
+        // Si el parámetro ya viene formateado como URL (breadcrumbs)
+        if (typeof param === 'string' && (param.includes('folder_id=') || param.startsWith('/'))) {
+            url = param;
+        } else {
+            url = `/inicio?folder_id=${encodeURIComponent(param)}`;
+        }
     }
 
-    // Ubica el contenedor en el HTML
     const contenedor = document.querySelector('.drive-container');
     if (contenedor) {
         contenedor.innerHTML = '<div style="text-align:center; padding:15px; font-size:12px; color:#64748b;">⏳ Cargando...</div>';
     }
-
-    const url = folderId ? `/inicio?folder_id=${encodeURIComponent(folderId)}` : '/inicio';
 
     fetch(url, {
         method: 'GET',
@@ -1016,13 +1020,10 @@ function abrirCarpeta(folderId, event) {
         credentials: 'same-origin'
     })
     .then(response => {
-        if (!response.ok) {
-            throw new Error('Error en el servidor: ' + response.status);
-        }
+        if (!response.ok) throw new Error('Error en el servidor: ' + response.status);
         return response.text();
     })
     .then(html => {
-        // Lee el HTML devuelto y extrae únicamente la caja del gestor (.drive-container)
         const parser = new DOMParser();
         const doc = parser.parseFromString(html, 'text/html');
         const nuevoContenido = doc.querySelector('.drive-container');
@@ -1038,6 +1039,7 @@ function abrirCarpeta(folderId, event) {
         }
     });
 }
+    
 function eliminarRegistroDrive(urlBorrar, elementoBoton) {
     if (!confirm('¿Estás seguro de que deseas eliminar este registro?')) return;
 
