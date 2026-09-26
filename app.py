@@ -819,6 +819,146 @@ def obtener_historial_tc():
         cursor.close()
         conn.close()
 
+# --- RUTA FALTANTE: CAMBIAR CONTRASEÑA ---
+@app.route('/cambiar_password', methods=['POST'])
+def cambiar_password():
+    if 'usuario' not in session:
+        return jsonify({'success': False, 'error': 'Sesión no activa'}), 401
+
+    pass_actual = request.form.get('pass_actual')
+    pass_nueva = request.form.get('pass_nueva')
+
+    if not pass_actual or not pass_nueva:
+        return jsonify({'success': False, 'error': 'Todos los campos son obligatorios.'}), 400
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT clave FROM usuarios WHERE usuario = %s", (session['usuario'],))
+    res = cursor.fetchone()
+
+    if not res or res[0] != pass_actual:
+        cursor.close()
+        conn.close()
+        return jsonify({'success': False, 'error': 'La contraseña actual es incorrecta.'}), 400
+
+    cursor.execute("UPDATE usuarios SET clave = %s WHERE usuario = %s", (pass_nueva, session['usuario']))
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+    return jsonify({'success': True, 'message': 'Contraseña actualizada correctamente.'})
+
+
+# --- CORRECCIÓN EN SUBIR ARCHIVO ---
+@app.route('/subir', methods=['POST'])
+def subir_archivo():
+    if 'usuario' not in session:
+        return jsonify({'success': False, 'message': 'Sesión no activa'}), 401
+
+    if 'archivo' not in request.files:
+        return jsonify({'success': False, 'message': 'No se envió ningún archivo.'}), 400
+
+    f = request.files['archivo']
+    raw_carpeta_id = request.form.get('carpeta_id')
+    carpeta_id = int(raw_carpeta_id) if raw_carpeta_id and raw_carpeta_id.isdigit() else None
+
+    if f.filename == '':
+        return jsonify({'success': False, 'message': 'Nombre de archivo vacío.'}), 400
+
+    nombre_original = secure_filename(f.filename)
+    conn = None
+
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        # Validación de duplicados (Corregido acceso a tupla res[0])
+        cursor.execute("SELECT carpeta FROM archivos WHERE LOWER(nombre_archivo) = LOWER(%s)", (nombre_original,))
+        archivo_existente = cursor.fetchone()
+
+        if archivo_existente:
+            carpeta_donde_esta = archivo_existente[0]
+            cursor.close()
+            conn.close()
+            return jsonify({
+                'success': False, 
+                'message': f"El archivo '{nombre_original}' ya existe en la carpeta '{carpeta_donde_esta}'."
+            }), 400
+
+        # Subir a Supabase Storage
+        bytes_archivo = f.read()
+        path_supabase = f"archivos/{nombre_original}"
+
+        supabase.storage.from_(BUCKET_NAME).upload(
+            path=path_supabase,
+            file=bytes_archivo,
+            file_options={"content-type": f.content_type or "application/octet-stream"}
+        )
+
+        fecha_actual = datetime.now().strftime('%d/%m/%Y %H:%M')
+        nombre_carpeta = 'General'
+
+        if carpeta_id:
+            cursor.execute("SELECT nombre FROM carpetas WHERE id = %s", (carpeta_id,))
+            res = cursor.fetchone()
+            if res:
+                nombre_carpeta = res[0]
+
+        cursor.execute("""
+            INSERT INTO archivos (nombre_archivo, subido_por, fecha, carpeta, carpeta_id) 
+            VALUES (%s, %s, %s, %s, %s)
+        """, (nombre_original, session['usuario'], fecha_actual, nombre_carpeta, carpeta_id))
+
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+        return jsonify({'success': True, 'message': 'Archivo subido correctamente.'})
+
+    except Exception as e:
+        if conn:
+            conn.rollback()
+            conn.close()
+        return jsonify({'success': False, 'message': f"Error al subir archivo: {str(e)}"}), 500
+
+
+# --- CORRECCIÓN EN BORRAR ARCHIVO ---
+@app.route('/borrar_archivo/<int:id>', methods=['GET', 'POST'])
+def borrar_archivo(id):
+    if 'usuario' in session:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT subido_por, nombre_archivo, carpeta_id FROM archivos WHERE id=%s", (id,))
+        archivo_info = cursor.fetchone()
+        
+        carpeta_id = None
+        if archivo_info:
+            subido_por = (archivo_info[0] or '').lower().strip()
+            nombre_archivo = archivo_info[1]
+            carpeta_id = archivo_info[2]
+            
+            usuario_actual = (session.get('usuario') or '').lower().strip()
+            puesto_actual = (session.get('puesto') or '').lower().strip()
+            
+            if subido_por == usuario_actual or 'admin' in puesto_actual:
+                cursor.execute("DELETE FROM archivos WHERE id=%s", (id,))
+                conn.commit()
+                
+                try:
+                    supabase.storage.from_(BUCKET_NAME).remove([f"archivos/{nombre_archivo}"])
+                except Exception as e:
+                    print("Error al borrar en Supabase:", e)
+                    
+        cursor.close()
+        conn.close()
+        
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return jsonify({'success': True})
+            
+        if carpeta_id:
+            return redirect(url_for('inicio', folder_id=carpeta_id))
+    return redirect(url_for('inicio'))
+
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)
