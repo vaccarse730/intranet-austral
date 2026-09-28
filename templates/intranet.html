@@ -13,10 +13,10 @@
     :root {
         --font-heading: 'Montserrat', sans-serif;
         --font-body: 'Inter', sans-serif;
-        --primary: #0b1f3a;          /* Azul Marino Profundo Austral */
+        --primary: #0b1f3a;           /* Azul Marino Profundo Austral */
         --primary-hover: #15345d;
-        --accent: #c5a059;           /* Dorado Corporativo */
-        --bg-body: #0f172a;          /* Fondo base */
+        --accent: #c5a059;            /* Dorado Corporativo */
+        --bg-body: #0f172a;           /* Fondo base */
         --text-main: #2b2b2b;
         --text-muted: #64748b;
         --border-color: #e2e8f0;
@@ -61,7 +61,7 @@
         font-family: var(--font-heading);
     }
 
-    /* 3. HEADER PRINCIPAL (Escritorio) */
+    /* 3. HEADER PRINCIPAL */
     .main-header {
         background-color: var(--primary);
         border-bottom: 3px solid var(--accent);
@@ -94,7 +94,7 @@
         object-fit: contain;
     }
 
-    /* WIDGET TIPO DE CAMBIO EN HEADER */
+    /* WIDGET TIPO DE CAMBIO */
     .tc-widget {
         display: flex;
         align-items: center;
@@ -147,22 +147,20 @@
         margin-left: 2px;
     }
 
-    .tc-btn-edit {
+    .tc-btn-edit, .tc-btn-log {
         background: none;
         border: none;
-        color: var(--accent);
         cursor: pointer;
         padding: 2px;
         font-size: 13px;
+        transition: transform 0.15s ease;
     }
 
-    .tc-btn-log {
-        background: none;
-        border: none;
-        color: #cbd5e1;
-        cursor: pointer;
-        padding: 2px;
-        font-size: 13px;
+    .tc-btn-edit { color: var(--accent); }
+    .tc-btn-log { color: #cbd5e1; }
+    
+    .tc-btn-edit:hover, .tc-btn-log:hover {
+        transform: scale(1.15);
     }
 
     /* INFO USUARIO Y ACCIONES */
@@ -180,9 +178,7 @@
         gap: 6px;
     }
 
-    .user-greeting b {
-        color: #ffffff;
-    }
+    .user-greeting b { color: #ffffff; }
 
     .user-greeting .puesto {
         color: rgba(255, 255, 255, 0.7);
@@ -311,80 +307,130 @@
         font-weight: 700;
     }
 
-    /* 6. MODALES */
-    .modal-overlay {
-        display: none;                /* Cambiar a flex con JS al abrir */
+    /* 6. MODALES Y TABLA DE HISTORIAL (ESTILOS OSCUROS OPTIMIZADOS) */
+    .modal-overlay, #modalLogTC, #modalTC {
+        display: none;
         position: fixed;
         top: 0;
         left: 0;
         width: 100vw;
         height: 100vh;
-        background: rgba(15, 23, 42, 0.75); /* Oscurece el fondo */
-        backdrop-filter: blur(4px);          /* Desenfoque elegante */
-        z-index: 3000;                       /* Por encima de todo */
+        background: rgba(15, 23, 42, 0.75);
+        backdrop-filter: blur(4px);
+        z-index: 3000;
         justify-content: center;
         align-items: center;
         padding: 15px;
-        box-sizing: border-box;
     }
 
-    .modal-box {
-        background: white;
-        padding: 25px;
-        border-radius: 8px;
+    .modal-box, .modal-contenido {
+        background: #0b192c !important; /* Azul Oscuro de Austral */
+        color: #ffffff !important;
         width: 100%;
-        max-width: 380px;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-    }
-
-    .modal-box {
-        background: #ffffff !important;      /* Fondo blanco sólido obligatorio */
-        color: #1e293b !important;
-        width: 100%;
-        max-width: 480px;
+        max-width: 500px;
         border-radius: 12px;
-        padding: 20px;
-        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
-        border: 1px solid var(--border-color);
+        padding: 24px;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+        border: 1px solid rgba(255, 255, 255, 0.1);
         max-height: 85vh;
         display: flex;
         flex-direction: column;
+        position: relative;
     }
     
-    .modal-header {
-        font-size: 16px;
+    .modal-header, .modal-box h3, .modal-contenido h3 {
+        font-size: 1.15rem;
         font-weight: 700;
-        color: var(--primary);
+        color: #ffffff;
         display: flex;
         justify-content: space-between;
         align-items: center;
-        border-bottom: 1px solid var(--border-color);
-        padding-bottom: 10px;
-        margin-bottom: 12px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        padding-bottom: 12px;
+        margin-bottom: 16px;
     }
     
     .modal-close {
         font-size: 22px;
-        color: var(--text-muted);
+        color: #94a3b8;
         cursor: pointer;
         line-height: 1;
+        transition: color 0.2s;
+    }
+
+    .modal-close:hover {
+        color: #ffffff;
     }
 
     .modal-form input {
         width: 100%;
-        padding: 8px;
+        padding: 10px;
         margin-bottom: 12px;
-        border: 1px solid #cbd5e1;
-        border-radius: 4px;
-        box-sizing: border-box;
-        font-size: 13px;
+        background: #1e293b;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 6px;
+        color: #ffffff;
+        font-size: 14px;
     }
 
     .modal-actions {
         display: flex;
         justify-content: flex-end;
         gap: 8px;
-        margin-top: 10px;
+        margin-top: 15px;
+    }
+
+    /* Tabla dentro del Modal de Historial TC */
+    .table-log-tc {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 5px;
+        font-size: 0.875rem;
+    }
+
+    .table-log-tc th {
+        background-color: #1e293b;
+        color: #94a3b8;
+        text-align: left;
+        padding: 10px 12px;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        position: sticky;
+        top: 0;
+    }
+
+    .table-log-tc td {
+        padding: 10px 12px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        color: #e2e8f0;
+    }
+
+    .table-log-tc tr:hover td {
+        background-color: rgba(255, 255, 255, 0.03);
+    }
+
+    .table-log-tc .tc-price {
+        color: #4ade80;
+        font-weight: 700;
+    }
+
+    .btn-cerrar-modal {
+        background-color: #1e293b;
+        color: #e2e8f0;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 8px 20px;
+        border-radius: 6px;
+        cursor: pointer;
+        margin-top: 15px;
+        align-self: flex-end;
+        font-size: 0.875rem;
+        transition: all 0.2s ease;
+    }
+
+    .btn-cerrar-modal:hover {
+        background-color: #334155;
+        color: #ffffff;
     }
 
     /* 7. ESTILOS MURO DE ANUNCIOS */
@@ -423,6 +469,11 @@
         padding: 8px 16px;
         border-radius: 4px;
         cursor: pointer;
+        transition: background 0.2s;
+    }
+
+    button[type="submit"]:hover {
+        background-color: var(--primary-hover);
     }
 
     /* 8. FOOTER Y DIRECTORIO CORPORATIVO */
@@ -487,7 +538,7 @@
         text-decoration: none;
     }
 
-    /* 9. ESTADOS DE CARGA Y ANIMACIONES */
+    /* 9. ANIMACIONES */
     @keyframes spin {
         0% { transform: rotate(0deg); }
         100% { transform: rotate(360deg); }
@@ -506,15 +557,13 @@
     }
 
     /* ==========================================
-       ESTILOS RESPONSIVOS UNIFICADOS PARA MÓVIL (<= 768px)
+       10. ESTILOS RESPONSIVOS MÓVIL (<= 768px)
        ========================================== */
     @media (max-width: 768px) {
-        
         body::before {
-            background-attachment: scroll; /* Previene parpadeos de fondo en iOS */
+            background-attachment: scroll;
         }
 
-        /* 1. Header adaptativo */
         .main-header {
             flex-direction: column;
             padding: 12px 15px;
@@ -530,7 +579,7 @@
         }
 
         .header-logo img {
-            height: 60px; /* Tamaño del logo optimizado para móvil */
+            height: 60px;
         }
 
         .tc-widget {
@@ -538,7 +587,6 @@
             justify-content: space-between;
         }
 
-    /* HEADER Y BOTONERA EN MÓVIL */
         .header-user-info {
             width: 100%;
             display: flex;
@@ -563,7 +611,7 @@
             padding: 8px 10px;
             font-size: 12px;
         }
-        /* 2. Contenido Principal */
+
         .main-content {
             padding: 15px 10px 140px 10px !important;
             max-width: 100% !important;
@@ -577,7 +625,6 @@
             margin-bottom: 15px !important;
         }
 
-        /* 3. Panel Lateral a Pantalla Completa */
         .sidebar-panel {
             width: 100vw !important;
             right: -100vw !important;
@@ -588,11 +635,10 @@
             right: 0 !important;
         }
 
-        /* 4. Previene auto-zoom molesto de inputs en iPhone/iOS */
         textarea, 
         input, 
         select {
-            font-size: 16px !important; 
+            font-size: 16px !important; /* Evita auto-zoom en iOS */
         }
 
         button[type="submit"] {
@@ -602,10 +648,8 @@
             margin-top: 8px;
         }
 
-        /* 5. Footer y Directorio */
-
         .fixed-footer {
-        padding: 0;
+            padding: 0;
         }
       
         .footer-bottom-bar {
@@ -616,17 +660,16 @@
         }
 
         .footer-top-layout {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 10px;
-        padding: 12px 15px;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 10px;
+            padding: 12px 15px;
         }
 
         .footer-redes a {
             margin: 0 6px;
         }
 
-    /* Permite desplazamiento horizontal en la tabla de directorio para que no se corte */
         .footer-dir-content {
             width: 100%;
             overflow-x: auto;
@@ -635,47 +678,27 @@
         }
 
         .footer-dir-search-container {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-        width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            width: 100%;
         }
 
         .footer-dir-search-container input {
-        width: 100% !important;
-        font-size: 14px !important;
-        padding: 8px 12px;
-        box-sizing: border-box;
+            width: 100% !important;
+            font-size: 14px !important;
+            padding: 8px 12px;
+            box-sizing: border-box;
         }
 
         .table-dir {
-            min-width: 500px; /* Ancho mínimo para que quepan las 4 columnas sin apretarse */
+            min-width: 500px;
         }
     
         .table-dir th, .table-dir td {
             padding: 8px;
-            white-space: nowrap; /* Evita saltos de línea extraños */
+            white-space: nowrap;
         }
-    }
-    .table-log-tc {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 13px;
-    text-align: left;
-    }
-    
-    .table-log-tc th {
-        background: var(--primary);
-        color: #ffffff;
-        padding: 8px 10px;
-        position: sticky;
-        top: 0;
-    }
-    
-    .table-log-tc td {
-        padding: 8px 10px;
-        border-bottom: 1px solid var(--border-color);
-        color: #334155;
     }
 </style>
 </head>
