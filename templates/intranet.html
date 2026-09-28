@@ -16,7 +16,7 @@
         --primary: #0b1f3a;          /* Azul Marino Profundo Austral */
         --primary-hover: #15345d;
         --accent: #c5a059;           /* Dorado Corporativo */
-        --bg-body: #0f172a;          /* Fondo base por si la imagen carga lento */
+        --bg-body: #0f172a;          /* Fondo base */
         --text-main: #2b2b2b;
         --text-muted: #64748b;
         --border-color: #e2e8f0;
@@ -61,18 +61,18 @@
         font-family: var(--font-heading);
     }
 
-    /* 3. HEADER PRINCIPAL */
+    /* 3. HEADER PRINCIPAL (Escritorio) */
     .main-header {
-        background-color: #ffffff;
-        border-bottom: 1px solid var(--border-color);
-        padding: 10px 25px;
+        background-color: var(--primary);
+        border-bottom: 3px solid var(--accent);
+        padding: 12px 30px;
         display: flex;
         justify-content: space-between;
         align-items: center;
         position: sticky;
         top: 0;
         z-index: 900;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
     }
 
     .header-left {
@@ -82,99 +82,167 @@
     }
 
     .header-logo {
-        font-size: 20px;
-        font-weight: 700;
-        color: var(--primary);
         display: flex;
         align-items: center;
-        gap: 8px;
+        text-decoration: none;
+    }
+
+    .header-logo img {
+        height: 80px;
+        width: auto;
+        display: block;
+        object-fit: contain;
     }
 
     /* WIDGET TIPO DE CAMBIO EN HEADER */
     .tc-widget {
         display: flex;
         align-items: center;
-        gap: 8px;
-        background: #f8fafc;
-        border: 1px solid #cbd5e1;
-        padding: 4px 10px;
+        gap: 10px;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        padding: 5px 14px;
         border-radius: 20px;
+        color: #ffffff;
         font-size: 13px;
+    }
+
+    .tc-widget-content {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        line-height: 1.1;
+    }
+
+    .tc-widget-row {
+        display: flex;
+        align-items: center;
+        gap: 6px;
     }
 
     .tc-label {
         font-weight: 700;
-        color: #1e293b;
-        display: flex;
-        align-items: center;
-        gap: 5px;
+        color: #e2e8f0;
     }
 
-    .tc-value {
-        color: #0f766e;
+    .tc-label i {
+        color: var(--accent);
+    }
+
+    .tc-value-prefix, .tc-value {
         font-weight: 800;
+        color: #4ade80;
+    }
+
+    .tc-last-update {
+        font-size: 9px;
+        color: rgba(255, 255, 255, 0.75);
+        margin-top: 2px;
+    }
+
+    .tc-actions {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        margin-left: 2px;
     }
 
     .tc-btn-edit {
         background: none;
         border: none;
-        color: #64748b;
+        color: var(--accent);
         cursor: pointer;
-        font-size: 11px;
-        padding: 2px 4px;
-        border-radius: 4px;
-        transition: color 0.2s;
+        padding: 2px;
+        font-size: 13px;
     }
 
-    .tc-btn-edit:hover {
-        color: var(--primary);
+    .tc-btn-log {
+        background: none;
+        border: none;
+        color: #cbd5e1;
+        cursor: pointer;
+        padding: 2px;
+        font-size: 13px;
     }
 
+    /* INFO USUARIO Y ACCIONES */
     .header-user-info {
+        color: #ffffff;
+        font-size: 13px;
         display: flex;
         align-items: center;
-        gap: 12px;
+        gap: 16px;
     }
 
-    .btn-open-sidebar {
-        background: var(--primary);
-        color: white;
-        border: none;
-        padding: 7px 14px;
-        border-radius: 20px;
-        font-size: 12px;
-        font-weight: 600;
-        cursor: pointer;
+    .user-greeting {
         display: flex;
         align-items: center;
         gap: 6px;
-        transition: background 0.2s;
     }
 
-    .btn-open-sidebar:hover {
-        background: var(--primary-hover);
+    .user-greeting b {
+        color: #ffffff;
     }
 
-    .btn-change-pass {
-        background: #f1f5f9;
-        color: #334155;
-        border: 1px solid #cbd5e1;
-        padding: 6px 10px;
+    .user-greeting .puesto {
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 13px;
+    }
+
+    .btn-open-sidebar {
+        background: rgba(255, 255, 255, 0.15);
+        color: #ffffff;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        padding: 8px 32px;
         border-radius: 6px;
-        font-size: 12px;
+        font-size: 13px;
         font-weight: 600;
         cursor: pointer;
         display: flex;
         align-items: center;
-        gap: 5px;
+        gap: 8px;
+        transition: background 0.2s ease;
+    }
+
+    .btn-open-sidebar:hover {
+        background: rgba(255, 255, 255, 0.25);
+    }
+
+    .btn-change-pass {
+        background: rgba(255, 255, 255, 0.1);
+        color: #ffffff;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        padding: 8px 12px;
+        border-radius: 6px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s ease;
     }
 
     .btn-change-pass:hover {
-        background: #e2e8f0;
-        color: var(--primary);
+        background: rgba(255, 255, 255, 0.2);
     }
 
-    /* 4. COLUMNA CENTRAL (CENTRADOS Y TARJETAS LIMPIAS) */
+    .btn-logout {
+        background: #ef4444;
+        color: #ffffff;
+        padding: 8px 16px;
+        border-radius: 6px;
+        font-size: 13px;
+        font-weight: 600;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        transition: background 0.2s ease;
+    }
+
+    .btn-logout:hover {
+        background: #dc2626;
+    }
+
+    /* 4. COLUMNA CENTRAL */
     .main-content {
         max-width: 1000px;
         margin: 0 auto;
@@ -301,43 +369,6 @@
         margin-top: 10px;
     }
 
-    .modal {
-        display: none;
-        position: fixed;
-        z-index: 9999;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
-        justify-content: center;
-        align-items: center;
-    }
-
-    .modal-content {
-        background-color: #ffffff;
-        padding: 24px;
-        border-radius: 8px;
-        width: 90%;
-        max-width: 600px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-        position: relative;
-    }
-
-    .close-btn {
-        position: absolute;
-        top: 12px;
-        right: 16px;
-        font-size: 24px;
-        font-weight: bold;
-        color: #666;
-        cursor: pointer;
-    }
-
-    .close-btn:hover {
-        color: #000;
-    }
-
     /* 7. ESTILOS MURO DE ANUNCIOS */
     .msg-item {
         border-bottom: 1px solid var(--border-color);
@@ -371,7 +402,7 @@
         background-color: var(--primary);
         color: white;
         border: none;
-        padding: 6px 12px;
+        padding: 8px 16px;
         border-radius: 4px;
         cursor: pointer;
     }
@@ -419,7 +450,7 @@
         background: rgba(255,255,255,0.1);
         border: none;
         color: white;
-        padding: 2px 5px;
+        padding: 4px 8px;
         border-radius: 3px;
         width: 90%;
     }
@@ -456,60 +487,67 @@
         vertical-align: middle;
     }
 
-    .loading-state {
-        opacity: 0.7;
-        pointer-events: none;
-        cursor: wait !important;
-    }
-
-    .container-loading {
-        opacity: 0.5;
-        transition: opacity 0.2s ease;
-        pointer-events: none;
-    }
-
     /* ==========================================
        ESTILOS RESPONSIVOS UNIFICADOS PARA MÓVIL (<= 768px)
        ========================================== */
     @media (max-width: 768px) {
         
-        /* Evita el bug de renderizado de imagen fija en móviles */
         body::before {
-            background-attachment: scroll;
+            background-attachment: scroll; /* Previene parpadeos de fondo en iOS */
         }
 
-        /* 1. Header / Navbar responsivo */
+        /* 1. Header adaptativo */
         .main-header {
             flex-direction: column;
-            padding: 10px 15px;
-            gap: 10px;
-            position: relative; /* O sticky si prefieres fijarlo */
+            padding: 12px 15px;
+            gap: 12px;
+            position: relative;
         }
 
         .header-left {
             width: 100%;
-            justify-content: space-between;
+            flex-direction: column;
+            align-items: center;
             gap: 10px;
+        }
+
+        .header-logo img {
+            height: 60px; /* Tamaño del logo optimizado para móvil */
+        }
+
+        .tc-widget {
+            width: 100%;
+            justify-content: space-between;
         }
 
         .header-user-info {
             width: 100%;
+            flex-wrap: wrap;
             justify-content: space-between;
             gap: 8px;
-            border-top: 1px solid #f1f5f9;
-            padding-top: 8px;
+            border-top: 1px solid rgba(255, 255, 255, 0.15);
+            padding-top: 10px;
         }
 
-        .btn-open-sidebar, .btn-change-pass {
-            padding: 6px 10px;
-            font-size: 11px;
+        .user-greeting {
+            width: 100%;
+            justify-content: center;
+            margin-bottom: 4px;
+        }
+
+        .btn-open-sidebar, 
+        .btn-change-pass, 
+        .btn-logout {
             flex: 1;
             justify-content: center;
+            padding: 8px 10px;
+            font-size: 12px;
+            text-align: center;
         }
 
-        /* 2. Contenido Principal y Tarjetas */
+        /* 2. Contenido Principal */
         .main-content {
-            padding: 15px 12px 140px 12px !important;
+            padding: 15px 10px 140px 10px !important;
             max-width: 100% !important;
             margin: 0 !important;
         }
@@ -519,10 +557,9 @@
             width: 100% !important;
             padding: 15px !important;
             margin-bottom: 15px !important;
-            box-sizing: border-box;
         }
 
-        /* 3. Panel Lateral a Ancho Completo */
+        /* 3. Panel Lateral a Pantalla Completa */
         .sidebar-panel {
             width: 100vw !important;
             right: -100vw !important;
@@ -533,20 +570,23 @@
             right: 0 !important;
         }
 
-        /* 4. Formularios e Inputs */
-        textarea, input {
-            font-size: 14px !important; /* Previene auto-zoom en iOS */
+        /* 4. Previene auto-zoom molesto de inputs en iPhone/iOS */
+        textarea, 
+        input, 
+        select {
+            font-size: 16px !important; 
         }
 
         button[type="submit"] {
             width: 100%;
-            padding: 10px;
+            padding: 12px;
             font-size: 14px;
             margin-top: 8px;
         }
 
-        /* 5. Directorio y Footer */
-        .footer-top-layout, .footer-bottom-bar {
+        /* 5. Footer y Directorio */
+        .footer-top-layout, 
+        .footer-bottom-bar {
             flex-direction: column;
             gap: 8px;
             text-align: center;
@@ -554,7 +594,7 @@
         }
 
         .footer-redes a {
-            margin: 0 5px;
+            margin: 0 6px;
         }
 
         .footer-dir-content {
@@ -563,71 +603,69 @@
         }
 
         .table-dir {
-            min-width: 480px;
+            min-width: 480px; /* Habilita desplazamiento limpio si sobrepasa la pantalla */
         }
     }
 </style>
 </head>
 <body>
 
-<header class="main-header" style="background: var(--primary); padding: 12px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid var(--accent);">
-    <div class="header-left" style="display: flex; align-items: center; gap: 20px;">
-
-        <!-- Logo Oficial Austral en PNG transparente -->
-        <a href="/" style="display: flex; align-items: center; text-decoration: none;">
-            <img src="/static/LogoAustralBlanco.png" alt="Austral Logo" style="height: 80px; width: auto; display: block; object-fit: contain;">
+<!-- HEADER PRINCIPAL -->
+<header class="main-header">
+    <div class="header-left">
+        <!-- Logo Oficial Austral -->
+        <a href="/" class="header-logo">
+            <img src="/static/LogoAustralBlanco.png" alt="Austral Logo">
         </a>
 
         <!-- Widget Tipo de Cambio -->
-        <div class="tc-widget" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); padding: 5px 14px; border-radius: 20px; color: white; font-size: 13px; display: flex; align-items: center; gap: 10px;">
-            <div style="display: flex; flex-direction: column; justify-content: center; line-height: 1.1;">
-                <div style="display: flex; align-items: center; gap: 6px;">
-                    <span class="tc-label" style="font-weight: 700; color: #e2e8f0;">
-                        <i class="fa-solid fa-dollar-sign" style="color: var(--accent);"></i> TC USD:
+        <div class="tc-widget">
+            <div class="tc-widget-content">
+                <div class="tc-widget-row">
+                    <span class="tc-label">
+                        <i class="fa-solid fa-dollar-sign"></i> TC USD:
                     </span>
-                    <span style="font-weight: 800; color: #4ade80;">$</span><span class="tc-value" id="val-tipo-cambio" style="font-weight: 800; color: #4ade80;">{{ tipo_cambio or '0.00' }}</span>
+                    <span class="tc-value-prefix">$</span>
+                    <span class="tc-value" id="val-tipo-cambio">{{ tipo_cambio or '0.00' }}</span>
                 </div>
                 
                 {% if d_usuario and d_fecha %}
-                <span class="tc-last-update" style="font-size: 9px; color: rgba(255, 255, 255, 0.75); margin-top: 2px;">
+                <span class="tc-last-update">
                     Modificado por <b>{{ d_usuario }}</b> ({{ d_fecha }} {{ d_hora }})
                 </span>
                 {% endif %}
             </div>
 
-            <div style="display: flex; align-items: center; gap: 4px; margin-left: 2px;">
+            <div class="tc-actions">
                 {% if 'administra' in (puesto or '')|lower or 'admin' in (puesto or '')|lower %}
-                <button class="tc-btn-edit" onclick="abrirModalTC()" style="background: none; border: none; color: var(--accent); cursor: pointer; padding: 2px; font-size: 13px;" title="Actualizar Tipo de Cambio">
+                <button class="tc-btn-edit" onclick="abrirModalTC()" title="Actualizar Tipo de Cambio">
                     ✏️
                 </button>
                 {% endif %}
 
-                <button class="tc-btn-log" onclick="abrirModalLogTC()" style="background: none; border: none; color: #cbd5e1; cursor: pointer; padding: 2px; font-size: 13px;" title="Ver Log de Cambios">
+                <button class="tc-btn-log" onclick="abrirModalLogTC()" title="Ver Log de Cambios">
                     📜
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- Info Usuario y Acciones -->
-    <div class="header-user-info" style="color: white; font-size: 13px; display: flex; align-items: center; gap: 16px;">
-        <div style="display: flex; align-items: center; gap: 6px;">
-            <span>Hola, <b style="color: white;">{{ usuario }}</b></span>
-            <span style="color: rgba(255,255,255,0.7); font-size: 13px;">| {{ puesto }}</span>
+    <!-- Info Usuario y Botones de Acción -->
+    <div class="header-user-info">
+        <div class="user-greeting">
+            <span>Hola, <b>{{ usuario }}</b></span>
+            <span class="puesto">| {{ puesto }}</span>
         </div>
 
-        <!-- Botón Menú -->
-        <button class="btn-open-sidebar" onclick="toggleSidebar()" style="background: rgba(255,255,255,0.15); color: white; border: 1px solid rgba(255,255,255,0.3); padding: 8px 32px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px;">
+        <button class="btn-open-sidebar" onclick="toggleSidebar()">
             🛠️ Menú
         </button>
 
-        <!-- Botón Cambio de Contraseña -->
-        <button class="btn-change-pass" onclick="abrirModalPassword()" title="Cambiar Contraseña" style="background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 8px 12px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer;">
+        <button class="btn-change-pass" onclick="abrirModalPassword()" title="Cambiar Contraseña">
             🔑
         </button>
 
-        <!-- Botón Cerrar Sesión -->
-        <a href="/logout" style="background: #ef4444; color: white; padding: 8px 16px; border-radius: 6px; font-size: 13px; font-weight: 600; text-decoration: none; display: flex; align-items: center; gap: 6px;">
+        <a href="/logout" class="btn-logout">
             🚪 Salir
         </a>
     </div>
