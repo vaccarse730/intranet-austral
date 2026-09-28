@@ -313,16 +313,19 @@
 
     /* 6. MODALES */
     .modal-overlay {
-        display: none;
+        display: none;                /* Cambiar a flex con JS al abrir */
         position: fixed;
         top: 0;
         left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.5);
-        z-index: 2000;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(15, 23, 42, 0.75); /* Oscurece el fondo */
+        backdrop-filter: blur(4px);          /* Desenfoque elegante */
+        z-index: 3000;                       /* Por encima de todo */
         justify-content: center;
         align-items: center;
+        padding: 15px;
+        box-sizing: border-box;
     }
 
     .modal-box {
@@ -334,22 +337,37 @@
         box-shadow: 0 10px 25px rgba(0,0,0,0.2);
     }
 
+    .modal-box {
+        background: #ffffff !important;      /* Fondo blanco sólido obligatorio */
+        color: #1e293b !important;
+        width: 100%;
+        max-width: 480px;
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+        border: 1px solid var(--border-color);
+        max-height: 85vh;
+        display: flex;
+        flex-direction: column;
+    }
+    
     .modal-header {
         font-size: 16px;
         font-weight: 700;
         color: var(--primary);
-        margin-bottom: 15px;
         display: flex;
+        justify-content: space-between;
         align-items: center;
-        gap: 8px;
+        border-bottom: 1px solid var(--border-color);
+        padding-bottom: 10px;
+        margin-bottom: 12px;
     }
-
-    .modal-form label {
-        font-size: 12px;
-        font-weight: 600;
-        color: #475569;
-        display: block;
-        margin-bottom: 4px;
+    
+    .modal-close {
+        font-size: 22px;
+        color: var(--text-muted);
+        cursor: pointer;
+        line-height: 1;
     }
 
     .modal-form input {
@@ -520,14 +538,14 @@
             justify-content: space-between;
         }
 
+    /* HEADER Y BOTONERA EN MÓVIL */
         .header-user-info {
             width: 100%;
+            display: flex;
             flex-wrap: wrap;
-            justify-content: space-between;
             gap: 8px;
-            border-top: 1px solid rgba(255, 255, 255, 0.15);
-            padding-top: 10px;
-        }
+            justify-content: space-between;
+        }    
 
         .user-greeting {
             width: 100%;
@@ -538,13 +556,13 @@
         .btn-open-sidebar, 
         .btn-change-pass, 
         .btn-logout {
-            flex: 1;
+            flex: 1 1 auto;
+            min-width: 80px;
+            text-align: center;
             justify-content: center;
             padding: 8px 10px;
             font-size: 12px;
-            text-align: center;
         }
-
         /* 2. Contenido Principal */
         .main-content {
             padding: 15px 10px 140px 10px !important;
@@ -585,7 +603,11 @@
         }
 
         /* 5. Footer y Directorio */
-        .footer-top-layout, 
+
+        .fixed-footer {
+        padding: 0;
+        }
+      
         .footer-bottom-bar {
             flex-direction: column;
             gap: 8px;
@@ -593,18 +615,67 @@
             padding: 10px 15px;
         }
 
+        .footer-top-layout {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+        padding: 12px 15px;
+        }
+
         .footer-redes a {
             margin: 0 6px;
         }
 
+    /* Permite desplazamiento horizontal en la tabla de directorio para que no se corte */
         .footer-dir-content {
-            padding: 10px 8px;
+            width: 100%;
             overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            padding: 10px 15px;
+        }
+
+        .footer-dir-search-container {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        width: 100%;
+        }
+
+        .footer-dir-search-container input {
+        width: 100% !important;
+        font-size: 14px !important;
+        padding: 8px 12px;
+        box-sizing: border-box;
         }
 
         .table-dir {
-            min-width: 480px; /* Habilita desplazamiento limpio si sobrepasa la pantalla */
+            min-width: 500px; /* Ancho mínimo para que quepan las 4 columnas sin apretarse */
         }
+    
+        .table-dir th, .table-dir td {
+            padding: 8px;
+            white-space: nowrap; /* Evita saltos de línea extraños */
+        }
+    }
+    .table-log-tc {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    text-align: left;
+    }
+    
+    .table-log-tc th {
+        background: var(--primary);
+        color: #ffffff;
+        padding: 8px 10px;
+        position: sticky;
+        top: 0;
+    }
+    
+    .table-log-tc td {
+        padding: 8px 10px;
+        border-bottom: 1px solid var(--border-color);
+        color: #334155;
     }
 </style>
 </head>
@@ -675,29 +746,37 @@
 <div id="modalTC" class="modal-overlay">
     <div class="modal-box">
         <div class="modal-header">
-            <i class="fa-solid fa-coins"></i> Actualizar Tipo de Cambio
+            <span><i class="fa-solid fa-coins"></i> Actualizar Tipo de Cambio</span>
+            <span class="modal-close" onclick="cerrarModalTC()">&times;</span>
         </div>
         <form class="modal-form" onsubmit="actualizarTipoCambio(event, this)">
             <label for="nuevo_tc">Nuevo Valor (USD):</label>
             <input type="number" step="0.01" id="nuevo_tc" name="nuevo_tc" value="{{ tipo_cambio or '' }}" required placeholder="Ej: 20.50">
 
             <div class="modal-actions">
-                <button type="button" onclick="cerrarModalTC()" style="background: #94a3b8; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer;">Cancelar</button>
+                <button type="button" class="btn-secondary" onclick="cerrarModalTC()">Cancelar</button>
                 <button type="submit">Guardar</button>
             </div>
         </form>
     </div>
 </div>
 
-<!-- Ejemplo del modal esperado -->
-<div id="modalLogTC" class="modal">
-    <div class="modal-content">
-        <span class="close-btn" onclick="document.getElementById('modalLogTC').style.display='none'">&times;</span>
-        <h2>Historial de Tipo de Cambio</h2>
+<!-- MODAL HISTORIAL DE TIPO DE CAMBIO -->
+<div id="modalLogTC" class="modal-overlay">
+    <div class="modal-box modal-log-box">
+        <div class="modal-header">
+            <span><i class="fa-solid fa-clock-rotate-left"></i> Historial de Tipo de Cambio</span>
+            <span class="modal-close" onclick="cerrarModalLogTC()">&times;</span>
+        </div>
         
-        <!-- Aquí va la tabla o lista de registros históricos de TC -->
-        <div id="contenidoHistorialTC">
-            <!-- Ejemplo de tabla o datos cargados -->
+        <div class="modal-body-scroll">
+            <div id="contenidoHistorialTC">
+                <!-- La tabla de registros históricos cargada dinámicamente -->
+            </div>
+        </div>
+
+        <div class="modal-actions">
+            <button type="button" class="btn-secondary" onclick="cerrarModalLogTC()">Cerrar</button>
         </div>
     </div>
 </div>    
@@ -1025,14 +1104,14 @@
 
 <script>
     /* MODAL TIPO DE CAMBIO */
-    function abrirModalTC() {
-        document.getElementById('modalTC').style.display = 'flex';
-    }
-
-    function cerrarModalTC() {
-        document.getElementById('modalTC').style.display = 'none';
-    }
-
+function abrirModalTC() {
+    const modal = document.getElementById('modalTC');
+    if (modal) modal.style.display = 'flex';
+}
+function cerrarModalTC() {
+    const modal = document.getElementById('modalTC');
+    if (modal) modal.style.display = 'none';
+}
 function actualizarTipoCambio(event, form) {
     event.preventDefault();
     let btnSubmit = form.querySelector('button[type="submit"]');
@@ -1438,30 +1517,47 @@ function eliminarRegistroDrive(url, elementoHtml) {
 }
 function abrirModalLogTC() {
     let modal = document.getElementById('modalLogTC');
-    let contenedor = document.getElementById('contenidoHistorialTC'); // ID del div dentro del modal
+    let contenedor = document.getElementById('contenidoHistorialTC');
     
     if (modal) {
         modal.style.display = 'flex';
         
+        // Mensaje de carga mientras obtiene los datos
+        if (contenedor) {
+            contenedor.innerHTML = '<p style="padding: 15px; text-align: center; color: var(--text-muted);">Cargando historial...</p>';
+        }
+
         // Consultar el historial al abrir
         fetch('/obtener_historial_tc')
             .then(response => response.json())
             .then(data => {
                 if (data.success && contenedor) {
-                    if (data.historial.length === 0) {
-                        contenedor.innerHTML = '<p style="padding: 10px; color: #666;">No hay registros en el historial.</p>';
+                    if (!data.historial || data.historial.length === 0) {
+                        contenedor.innerHTML = '<p style="padding: 15px; text-align: center; color: var(--text-muted);">No hay registros en el historial.</p>';
                         return;
                     }
                     
-                    let html = '<table class="tabla-log" style="width:100%; border-collapse:collapse; margin-top:10px;">';
-                    html += '<thead><tr style="border-bottom:1px solid #ddd; text-align:left;"><th>Valor</th><th>Modificado por</th><th>Fecha</th></tr></thead><tbody>';
+                    // Tabla con clases CSS puras (sin estilos inline redundantes)
+                    let html = `
+                        <table class="table-log-tc">
+                            <thead>
+                                <tr>
+                                    <th>Valor</th>
+                                    <th>Modificado por</th>
+                                    <th>Fecha</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                    `;
                     
                     data.historial.forEach(row => {
-                        html += `<tr style="border-bottom:1px solid #eee;">
-                            <td style="padding:8px;">$${row.valor}</td>
-                            <td style="padding:8px;">${row.modificado_por}</td>
-                            <td style="padding:8px;">${row.fecha_formateada}</td>
-                        </tr>`;
+                        html += `
+                            <tr>
+                                <td class="tc-price">$${row.valor}</td>
+                                <td>${row.modificado_por}</td>
+                                <td>${row.fecha_formateada}</td>
+                            </tr>
+                        `;
                     });
                     
                     html += '</tbody></table>';
@@ -1470,11 +1566,27 @@ function abrirModalLogTC() {
             })
             .catch(err => {
                 console.error("Error al cargar historial:", err);
-                if (contenedor) contenedor.innerHTML = '<p style="color:red;">Error al cargar el historial.</p>';
+                if (contenedor) {
+                    contenedor.innerHTML = '<p style="padding: 15px; color: #ef4444; text-align: center;">Error al cargar el historial.</p>';
+                }
             });
     }
 }
 
+function cerrarModalLogTC() {
+    const modal = document.getElementById('modalLogTC');
+    if (modal) modal.style.display = 'none';
+}
+
+    // Cierre automático al hacer clic en el fondo oscuro
+window.addEventListener('click', function(event) {
+    const modalTC = document.getElementById('modalTC');
+    const modalLogTC = document.getElementById('modalLogTC');
+    
+    if (event.target === modalTC) cerrarModalTC();
+    if (event.target === modalLogTC) cerrarModalLogTC();
+});    
+    
 function renderizarArchivos(listaArchivos) {
     let contenedor = document.getElementById('drive-container');
     contenedor.innerHTML = '';
@@ -1499,7 +1611,8 @@ function descargarArchivo(nombreArchivo) {
     // Llama a la ruta /descargar
     window.location.href = `/descargar/${encodeURIComponent(nombreArchivo)}`;
 }    
-    
+
+
 </script>
 </body>
 </html>
