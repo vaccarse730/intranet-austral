@@ -239,6 +239,7 @@
     }
 
     /* 4. COLUMNA CENTRAL */
+    
     .main-content {
         max-width: 1000px;
         margin: 0 auto;
@@ -251,14 +252,23 @@
         margin-right: var(--sidebar-width);
     }
 
+    /* Contenedor del Muro y Tarjetas Principales */
     .card, 
     .muro-container {
-        background: var(--card-bg) !important;
-        border-radius: 8px;
+        /* Fondo semitransparente (Blanco con 15% de opacidad para resaltar sobre el fondo oscuro/B&N) */
+        background: rgba(255, 255, 255, 0.12) !important;
+        
+        /* Desenfoque de fondo esmerilado intenso */
+        backdrop-filter: blur(12px) saturate(160%);
+        -webkit-backdrop-filter: blur(12px) saturate(160%);
+        
+        /* Borde sutil brillante para simular cristal */
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        border-radius: 12px;
         padding: 20px;
         margin-bottom: 20px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-        border: 1px solid var(--border-color);
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.25);
+        color: #ffffff; /* Texto claro para mejor contraste sobre cristal */
     }
 
     /* 5. PANEL LATERAL DESPLEGABLE */
@@ -434,23 +444,43 @@
     }
 
     /* 7. ESTILOS MURO DE ANUNCIOS */
-    .msg-item {
-        border-bottom: 1px solid var(--border-color);
-        padding: 12px 0;
-    }
+    /* Tarjetas individuales de mensajes/publicaciones dentro del muro */
+        .msg-item {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 8px;
+            padding: 14px;
+            margin-bottom: 12px;
+        }
 
     .msg-meta {
         font-size: 12px;
-        color: var(--text-muted);
-        margin-bottom: 5px;
+        color: #cbd5e1; /* Texto secundario legible */
+        margin-bottom: 6px;
+    }
+    
+    .role-tag {
+            background: rgba(197, 160, 89, 0.25); /* Dorado corporativo semitransparente */
+            color: #f1f5f9;
+            border: 1px solid rgba(197, 160, 89, 0.5);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+    /* Área de texto para publicar en el muro */
+    .muro-container textarea {
+        background: rgba(15, 23, 42, 0.6);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: #ffffff;
+        border-radius: 6px;
     }
 
-    .role-tag {
-        background: #e2e8f0;
-        color: #334155;
-        padding: 2px 6px;
-        border-radius: 4px;
-        font-size: 11px;
+    .muro-container textarea::placeholder {
+        color: #94a3b8;
     }
 
     textarea {
