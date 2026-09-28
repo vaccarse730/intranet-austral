@@ -9,14 +9,14 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Montserrat:wght@600;700;800&display=swap" rel="stylesheet">
-<style>        
+<style>       
     :root {
         --font-heading: 'Montserrat', sans-serif;
         --font-body: 'Inter', sans-serif;
-        --primary: #0b1f3a;         /* Azul Marino Profundo Austral */
+        --primary: #0b1f3a;          /* Azul Marino Profundo Austral */
         --primary-hover: #15345d;
-        --accent: #c5a059;          /* Dorado Corporativo */
-        --bg-body: #0f172a;         /* Fondo base por si la imagen carga lento */
+        --accent: #c5a059;           /* Dorado Corporativo */
+        --bg-body: #0f172a;          /* Fondo base por si la imagen carga lento */
         --text-main: #2b2b2b;
         --text-muted: #64748b;
         --border-color: #e2e8f0;
@@ -40,7 +40,7 @@
         overflow-x: hidden;
     }
 
-    /* 2. FONDO EN BLANCO Y NEGRO (NO AFECTA AL TEXTO NI ÍCONOS) */
+    /* 2. FONDO EN BLANCO Y NEGRO */
     body::before {
         content: "";
         position: fixed;
@@ -49,7 +49,7 @@
         width: 100%;
         height: 100%;
         z-index: -1;
-        background-image: url('/static/FondoColonia.jpg'); /* Tu imagen de fondo */
+        background-image: url('/static/FondoColonia.jpg');
         background-size: cover;
         background-position: center;
         background-attachment: fixed;
@@ -182,7 +182,6 @@
         transition: all 0.3s ease-in-out;
     }
 
-    /* Cuando el menú lateral se abre, la columna central se reajusta suavemente */
     body.sidebar-open .main-content {
         max-width: calc(100% - var(--sidebar-width) - 40px);
         margin-right: var(--sidebar-width);
@@ -302,7 +301,6 @@
         margin-top: 10px;
     }
 
-    /* Contenedor oscuro para modales generales */
     .modal {
         display: none;
         position: fixed;
@@ -469,98 +467,105 @@
         transition: opacity 0.2s ease;
         pointer-events: none;
     }
+
     /* ==========================================
-   ESTILOS RESPONSIVOS PARA MÓVIL (<= 768px)
-   ========================================== */
-@media (max-width: 768px) {
-    
-    /* 1. Header / Navbar */
-    .header-user-info {
-        flex-wrap: wrap;
-        gap: 6px;
-        justify-content: flex-end;
-    }
-    
-    .btn-open-sidebar, .btn-change-pass {
-        padding: 6px 10px;
-        font-size: 11px;
-    }
+       ESTILOS RESPONSIVOS UNIFICADOS PARA MÓVIL (<= 768px)
+       ========================================== */
+    @media (max-width: 768px) {
+        
+        /* Evita el bug de renderizado de imagen fija en móviles */
+        body::before {
+            background-attachment: scroll;
+        }
 
-    /* 2. Contenido Principal */
-    .main-content {
-        padding: 15px 10px 140px 10px !important;
-        max-width: 100% !important;
-    }
+        /* 1. Header / Navbar responsivo */
+        .main-header {
+            flex-direction: column;
+            padding: 10px 15px;
+            gap: 10px;
+            position: relative; /* O sticky si prefieres fijarlo */
+        }
 
-    .card {
-        padding: 15px;
-        margin-bottom: 15px;
-    }
+        .header-left {
+            width: 100%;
+            justify-content: space-between;
+            gap: 10px;
+        }
 
-    /* 3. Panel Lateral ("Utilidades & Archivos") a Ancho Completo */
-    .sidebar-panel {
-        width: 100vw !important;
-        right: -100vw !important;
-        padding: 15px;
-    }
+        .header-user-info {
+            width: 100%;
+            justify-content: space-between;
+            gap: 8px;
+            border-top: 1px solid #f1f5f9;
+            padding-top: 8px;
+        }
 
-    .sidebar-panel.active {
-        right: 0 !important;
-    }
+        .btn-open-sidebar, .btn-change-pass {
+            padding: 6px 10px;
+            font-size: 11px;
+            flex: 1;
+            justify-content: center;
+        }
 
-    /* 4. Muro y Formularios */
-    textarea {
-        font-size: 14px; /* Evita zoom automático en iPhones */
-    }
+        /* 2. Contenido Principal y Tarjetas */
+        .main-content {
+            padding: 15px 12px 140px 12px !important;
+            max-width: 100% !important;
+            margin: 0 !important;
+        }
 
-    button[type="submit"] {
-        width: 100%;
-        padding: 10px;
-        font-size: 14px;
-        margin-top: 8px;
-    }
+        .card, 
+        .muro-container {
+            width: 100% !important;
+            padding: 15px !important;
+            margin-bottom: 15px !important;
+            box-sizing: border-box;
+        }
 
-    /* 5. Directorio y Footer */
-    .footer-top-layout, .footer-bottom-bar {
-        flex-direction: column;
-        gap: 8px;
-        text-align: center;
-    }
+        /* 3. Panel Lateral a Ancho Completo */
+        .sidebar-panel {
+            width: 100vw !important;
+            right: -100vw !important;
+            padding: 20px 15px;
+        }
 
-    .footer-redes a {
-        margin: 0 5px;
-    }
+        .sidebar-panel.active {
+            right: 0 !important;
+        }
 
-    .footer-dir-content {
-        padding: 10px 5px;
-        overflow-x: auto; /* Permite scroll horizontal en la tabla del directorio */
-    }
+        /* 4. Formularios e Inputs */
+        textarea, input {
+            font-size: 14px !important; /* Previene auto-zoom en iOS */
+        }
 
-    .table-dir {
-        min-width: 500px; /* Asegura que la tabla no se aplaste demasiado */
-    }
-}
-@media (max-width: 768px) {
-  /* Contenedor o layout principal de las tarjetas/muro */
-  .muro-container, 
-  .main-content {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;            /* Espacio uniforme entre tarjetas */
-    padding: 16px 12px;   /* Padding interno para despegar de las orillas */
-    margin-top: 60px;     /* Margen para no tapar la barra/header superior */
-  }
+        button[type="submit"] {
+            width: 100%;
+            padding: 10px;
+            font-size: 14px;
+            margin-top: 8px;
+        }
 
-  /* Ajuste para las tarjetas blancas (Publicar y Muro) */
-  .card, 
-  .muro-card, 
-  .announcement-box {
-    width: 100% !important;
-    max-width: 100% !important;
-    box-sizing: border-box;
-    margin-bottom: 0;     /* El espacio lo controla el 'gap' del padre */
-  }
-}
+        /* 5. Directorio y Footer */
+        .footer-top-layout, .footer-bottom-bar {
+            flex-direction: column;
+            gap: 8px;
+            text-align: center;
+            padding: 10px 15px;
+        }
+
+        .footer-redes a {
+            margin: 0 5px;
+        }
+
+        .footer-dir-content {
+            padding: 10px 8px;
+            overflow-x: auto;
+        }
+
+        .table-dir {
+            min-width: 480px;
+        }
+    }
 </style>
 </head>
 <body>
