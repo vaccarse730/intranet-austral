@@ -540,6 +540,27 @@
         min-width: 500px; /* Asegura que la tabla no se aplaste demasiado */
     }
 }
+@media (max-width: 768px) {
+  /* Contenedor o layout principal de las tarjetas/muro */
+  .muro-container, 
+  .main-content {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;            /* Espacio uniforme entre tarjetas */
+    padding: 16px 12px;   /* Padding interno para despegar de las orillas */
+    margin-top: 60px;     /* Margen para no tapar la barra/header superior */
+  }
+
+  /* Ajuste para las tarjetas blancas (Publicar y Muro) */
+  .card, 
+  .muro-card, 
+  .announcement-box {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box;
+    margin-bottom: 0;     /* El espacio lo controla el 'gap' del padre */
+  }
+}
 </style>
 </head>
 <body>
