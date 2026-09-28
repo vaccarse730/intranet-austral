@@ -469,6 +469,77 @@
         transition: opacity 0.2s ease;
         pointer-events: none;
     }
+    /* ==========================================
+   ESTILOS RESPONSIVOS PARA MÓVIL (<= 768px)
+   ========================================== */
+@media (max-width: 768px) {
+    
+    /* 1. Header / Navbar */
+    .header-user-info {
+        flex-wrap: wrap;
+        gap: 6px;
+        justify-content: flex-end;
+    }
+    
+    .btn-open-sidebar, .btn-change-pass {
+        padding: 6px 10px;
+        font-size: 11px;
+    }
+
+    /* 2. Contenido Principal */
+    .main-content {
+        padding: 15px 10px 140px 10px !important;
+        max-width: 100% !important;
+    }
+
+    .card {
+        padding: 15px;
+        margin-bottom: 15px;
+    }
+
+    /* 3. Panel Lateral ("Utilidades & Archivos") a Ancho Completo */
+    .sidebar-panel {
+        width: 100vw !important;
+        right: -100vw !important;
+        padding: 15px;
+    }
+
+    .sidebar-panel.active {
+        right: 0 !important;
+    }
+
+    /* 4. Muro y Formularios */
+    textarea {
+        font-size: 14px; /* Evita zoom automático en iPhones */
+    }
+
+    button[type="submit"] {
+        width: 100%;
+        padding: 10px;
+        font-size: 14px;
+        margin-top: 8px;
+    }
+
+    /* 5. Directorio y Footer */
+    .footer-top-layout, .footer-bottom-bar {
+        flex-direction: column;
+        gap: 8px;
+        text-align: center;
+    }
+
+    .footer-redes a {
+        margin: 0 5px;
+    }
+
+    .footer-dir-content {
+        padding: 10px 5px;
+        overflow-x: auto; /* Permite scroll horizontal en la tabla del directorio */
+    }
+
+    .table-dir {
+        min-width: 500px; /* Asegura que la tabla no se aplaste demasiado */
+    }
+}
 </style>
 </head>
 <body>
